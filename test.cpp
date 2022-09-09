@@ -19978,6 +19978,118 @@ T m_lcm(T a, T b)
 //    }
 //}
 
+/////////////////////////////////////////2389. 和有限的最长子序列///////////////////////////
+
+//https://leetcode.cn/problems/longest-subsequence-with-limited-sum/solution/fei-bao-li-zuo-fa-qian-zhui-he-er-fen-by-ny4m/
+//给你一个长度为 n 的整数数组 nums ，和一个长度为 m 的整数数组 queries 。
+//返回一个长度为 m 的数组 answer ，其中 answer[i] 是 nums 中 元素之和小于等于 queries[i] 的 子序列 的 最大 长度  。
+//queries 对应的 answer 如下：
+//- 子序列[2, 1] 的和小于或等于 3 。可以证明满足题目要求的子序列的最大长度是 2 ，所以 answer[0] = 2 。
+//- 子序列[4, 5, 1] 的和小于或等于 10 。可以证明满足题目要求的子序列的最大长度是 3 ，所以 answer[1] = 3 。
+//- 子序列[4, 5, 2, 1] 的和小于或等于 21 。可以证明满足题目要求的子序列的最大长度是 4 ，所以 answer[2] = 4 。
+//int main()
+//{
+//    vector<int> nums = { 4, 5, 2, 1 }, queries = { 3, 10, 21 };
+//    sort(nums.begin(), nums.end());//由于想找的是子序列之和，所以需要保证顺序
+//    int n = nums.size();
+//    for (int i = 1;i < n;++i)
+//        nums[i] += nums[i - 1];//原地计算前缀和
+//    vector<int> res;
+//    for (int x : queries) 
+//    {//找到第一个大于 queries[i] 的前缀和，它的前面的前缀和一定小于等于 queries[i]
+//        res.push_back(upper_bound(nums.begin(), nums.end(), x) - nums.begin());
+//    }
+//    for (auto i : res)
+//    {
+//        cout << i << ' ';
+//    }
+//}
+
+/////////////////////////////////////////2397. 被列覆盖的最多行数///////////////////////////
+
+//https://leetcode.cn/problems/maximum-rows-covered-by-columns/solution/c-by-liu-xiang-3-htvj/
+//给你一个下标从 0 开始的 m x n 二进制矩阵 mat 和一个整数 cols ，表示你需要选出的列数。
+//如果一行中，所有的 1 都被你选中的列所覆盖，那么我们称这一行 被覆盖 了。
+//请你返回在选择 cols 列的情况下，被覆盖 的行数 最大 为多少。
+//int main()
+//{
+//    vector<vector<int>> mat = { {0, 0, 0},{1, 0, 1},{0, 1, 1},{0, 0, 1} };
+//    int cols = 2;
+//    int n = mat.size(), m = mat[0].size();//总共n行m列
+//    int ans = 0;
+//    for (int i = 0; i < (1 << m); i++) 
+//    {//从m列中随便选择，总共有 2^m 种选择方案，分别枚举
+//        //因为m最大是12，所以不会超时
+//        int cnt = 0;// 统计是否恰好选择 cols 列
+//        for (int j = 0; j < m; j++)
+//            cnt += i & (1 << j);
+//        if (cnt != cols) 
+//            continue;//必须选中cols列才行
+//        // 统计被覆盖的行
+//        cnt = 0;
+//        for (int j = 0; j < n; j++) 
+//        {//统计每一行
+//            bool flag = true;
+//            for (int k = 0; k < m; k++)
+//                //对于这一行的所有列
+//                // 该列为 1 但没有被覆盖，因此该行没有被覆盖
+//                if (mat[j][k] == 1 && (i & (1<<k)) == 0)
+//                {
+//                    flag = false;
+//                    break;
+//                }
+//            if (flag)
+//                cnt++;
+//        }
+//        ans = max(ans, cnt);//最大行数
+//    }
+//    return ans;
+//}
+
+/////////////////////////////////////////2398. 预算内的最多机器人数目///////////////////////////
+
+//https://leetcode.cn/problems/maximum-number-of-robots-within-budget/solution/by-endlesscheng-7ukp/
+//运行 k 个机器人 总开销 是 max(chargeTimes) + k * sum(runningCosts) ，
+//其中 max(chargeTimes) 是这 k 个机器人中最大充电时间，sum(runningCosts) 是这 k 个机器人的运行时间之和。
+//请你返回在 不超过 budget 的前提下，最多可以有多少个机器人可以连续运行。
+//int main()
+//{
+//    vector<int> chargeTimes = { 8,17,5,2 }, runningCosts = { 1,14,4,1 };
+//    int budget = 17;
+//    int ans = 0;
+//    deque<int> q;//单调递减队列，不能用优先队列是因为pq无法去除前面不属于当前区间的最大值
+//                //也就是说，有可能出现以下情况：
+//                // 当前区间左端点是最大的，但是他不满足条件，因此我们要将其从优先队列中去除
+//                // 去除之后 由于我们不会将之前区间出现过的最大值清除出优先队列，就会造成
+//                // 最大值是前面区间的，而 和 是当前区间的情况
+//                // 单调队列不会出现这种情况，因为假如当前当前左端点是最大的，它在进入单调队列的时候会将
+//                // 所有之前区间的的最大值全都清除，因此如果他不满足条件，队列就成空了，不会出现上面的情况
+//    long sum = 0L;
+//    // 枚举区间右端点 right，挪动左端点 left ，计算该区间的花费
+//    for (int left = 0, right = 0; right < chargeTimes.size(); ++right) 
+//    {//每次都换一个右端点重新挪动左端点，找到满足条件的最大区间，相当于变长的滑动窗口
+//        // 及时清除队列中的无用数据，保证队列的单调性
+//        while (!q.empty() && chargeTimes[right] >= chargeTimes[q.back()])
+//            q.pop_back();
+//        q.push_back(right);
+//        sum += runningCosts[right];//记录区间的和
+//        // 如果左端点 left 不满足要求，就不断右移 left
+//        //chargeTimes[q.front()]就是max(chargeTimes)，(right - left + 1) * sum就是k * sum(runningCosts)
+//        while (!q.empty() && chargeTimes[q.front()] + (right - left + 1) * sum > budget) {
+//            // 及时清除队列中的无用数据，保证队列的单调性
+//            if (q.front() == left) 
+//                //为什么只要等于左端点而不是小于等于左端点？
+//                //假如有某个最大值不在当前区间，并且不满足条件，那么之前遍历的时候，他肯定有作为左端点的时候
+//                //以他为左端点的区间如果不满足条件的话，他就会被弹出，不会出现在后面的区间里，因此不需要考虑小于等于
+//                //当然写成小于等于也没关系
+//                q.pop_front();//我们要把左端点右移，如果左端点的值是此区间的最大值，并且区间不满足条件，就需要从单调队列中去除
+//            sum -= runningCosts[left++];
+//        }
+//        ans = max(ans, right - left + 1);
+//    }
+//    return ans;
+//}
+
 //int main()
 //{
 //    vector<int> arr = { 1,2,3,4 };
