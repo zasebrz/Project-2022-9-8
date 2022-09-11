@@ -20222,3 +20222,94 @@ T m_lcm(T a, T b)
 //    }
 //    return res;
 //}
+
+/////////////////////////////////////////2400. 恰好移动 k 步到达某一位置的方法数目///////////////////////////
+
+//https://leetcode.cn/problems/number-of-ways-to-reach-a-position-after-exactly-k-steps/solution/by-tsreaper-qzp3/
+//int dp[3000][1005] = {}, mod = 1e9 + 7;// dp[i][j]: 从i出发再走j步到达endpos的方法数
+//int dfs(int x, int step, int endPos) {
+//    if (step == 0) 
+//        return endPos == x;
+//    if (dp[x + 1000][step] != -1) 
+//        return dp[x + 1000][step];    // 已经计算过，不再重复计算
+//    dp[x + 1000][step] = 0;     // 未计算，初始化为0
+//    // 枚举下一步往左或者往右，累加即为答案
+//    // 因为负数的原因，将坐标整体向右移动1000
+//    dp[x + 1000][step] = (dfs(x + 1, step - 1, endPos) + dfs(x - 1, step - 1, endPos)) % mod;
+//    return dp[x + 1000][step];
+//}
+////存在 3 种从 1 到 2 且恰好移动 3 步的方法：
+//// 1 -> 2 -> 3 -> 2.
+//// 1 -> 2 -> 1 -> 2.
+//// 1 -> 0 -> 1 -> 2.
+//int main()
+//{
+//    int startPos = 1, endPos = 2, K = 3;
+//    memset(dp, -1, sizeof(dp));
+//    cout << dfs(startPos, K, endPos); 
+//    //***********************************组合数学****************************************
+//    //称 startPos 指向 endPos 的方向为正方向，startPos 远离 endPos 的方向为负方向。
+//    //设从 startPos 出发，往正方向走了 a 步，往负方向走了(k - a) 步后到达 endPos，根据组合数的定义可知答案为C(k,a) 
+//    //（k 步里选 aa 步走正方向）。
+//    //记 d = abs(endPos - startPos)，有方程 a - (k - a) = d，得 a = （d + k）/2。
+//    //因此首先判断是否(d + k)是偶数（这样才能求出整数的 a），以及 d<=k（否则走不到），然后求组合数即可。
+//    //可以用的递推式C(i,j)=C(i-1,j-1)+C(i-1,j)求组合数，复杂度O（k^2)。
+//    //int d = abs(startPos - endPos);//起点终点之间的距离
+//    //if ((d + K) % 2 == 1 || d > K) 
+//    //  return 0;
+//    //// 递推求组合数
+//    //vector<vector<long long>> f(K + 1, vector<long long>(K + 1));
+//    //for (int i = 0; i <= K; i++) {
+//    //    f[i][0] = 1;
+//    //    for (int j = 1; j <= i; j++) 
+//    //      f[i][j] = (f[i - 1][j] + f[i - 1][j - 1]) % MOD;
+//    //}
+//    //cout<< f[K][(d + K) / 2];
+//    //
+//    //也可以通过C(k,i)=((k-i+1)/i)*C(k,i-1) 的递推式 O(k) 求组合数，需要用到乘法逆元。
+//    //int d = abs(startPos - endPos);
+//    //if ((d + K) % 2 == 1 || d > K) return 0;
+//    //// 线性求逆元
+//    //vector<long long> inv(K + 1);
+//    //inv[1] = 1;
+//    //for (int i = 2; i <= K; i++) 
+//    //  inv[i] = (MOD - MOD / i) * inv[MOD % i] % MOD;
+//    //// 递推求组合数，初值 C(k, 0) = 1
+//    //long long ans = 1;
+//    //for (int i = 1; i <= (d + K) / 2; i++) 
+//    //  ans = ans * (K - i + 1) % MOD * inv[i] % MOD;
+//    //return ans;
+//}
+
+
+//int main()
+//{
+//    vector<int> nums = { 1, 3, 8, 48, 10 };
+//    int j = 0;//左端点
+//    int ans = 1;
+//    int mask = 0;//窗口内所有数的 二进制 记录
+//    for (int i = 0; i < nums.size(); i++) //右端点
+//    {
+//        while (mask & nums[i]) { /* 不满足条件, 窗口收缩, 更新状态 */
+//            mask ^= nums[j++];
+//        }
+//        ans = max(ans, i - j + 1);
+//        mask |= nums[i]; /* 窗口变大 */
+//    }
+//    cout<< ans;
+//}
+
+int main()
+{
+    vector<vector<int>> intervals = { {5, 10},{6, 8}, {1, 5},{2, 3},{1, 10} };
+    sort(intervals.begin(), intervals.end());
+    priority_queue<int, vector<int>, greater<int>> pq;
+    for (auto& vec : intervals) {
+        // 判断是否存在一组（结束时间最小的组）使得它的结束时间小于当前区间的开始时间
+        if (!pq.empty() && pq.top() < vec[0]) //这里是if，也就是最多只需要找到一组就可以了，不是while
+            pq.pop();
+        pq.push(vec[1]);
+    }
+    return pq.size();
+}
+
