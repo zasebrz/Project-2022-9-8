@@ -17089,8 +17089,6 @@ T m_lcm(T a, T b)
 //    return 0;
 //}
 
-//2022年8月17日20:24:43
-
 ////////////////////////////////////////////外星字典序（拓扑排序）///////////////////////////////////////
 
 //https://leetcode.cn/problems/Jf1JuT/solution/by-ac_oier-4xmv/
@@ -17419,35 +17417,47 @@ T m_lcm(T a, T b)
 //    return 0;
 //}
 
+////////////////////////////////////////////730. 统计不同回文子序列///////////////////////////////////////
+
+//https://leetcode.cn/problems/count-different-palindromic-subsequences/solution/tong-ji-bu-tong-hui-wen-zi-xu-lie-by-lee-7slg/
+//给定一个字符串 s，返回 s 中不同的非空「回文子序列」个数 。
+//通过从 s 中删除 0 个或多个字符来获得子序列。
 //int main()
 //{
 //    string s = "bccb";
 //    int n = s.length();
+//    //状态 dp(x, i, j) 表示在字符串区间 s[i:j] 中以字符 x 为开头和结尾的不同「回文序列」总数
+//    //s[i] 仅包含 'a', 'b', 'c' 或 'd'，所以 x 只有4种可能
 //    vector<vector<vector<int>>> dp(4, vector(n, vector(n, 0)));
 //    for (int i = 0;i < n;i++)
 //    {
-//        dp[s[i] - 'a'][i][i] = 1;
+//        dp[s[i] - 'a'][i][i] = 1;//任何单个字符都是回文序列
 //    }
 //    for (int len = 2;len <= n;len++)
-//    {
+//    {//枚举长度
 //        for (int i = 0, j = len - 1;j < n;i++, j++)
 //        {
+//            //枚举子序列起点 i，终点 j
 //            for (char c = 'a', k = 0;k < 4;c++, k++)
-//            {
+//            {//枚举子序列开头和结尾的字符 x
 //                if (s[j] == c && s[i] == c)
-//                {
+//                {//当s[i] = x 且 s[j] = x 时，那么对于 s[i + 1:j - 1] 中的任意一个「回文序列」在头尾
+//                 //加上字符 x 都会生成一个新的以字符 x 为开头结尾的「回文序列」，并加上 xx（去掉中间所有的字符）
+//                 //和 x (只保留首部或尾部，注意这里i和j是不相等的，所以和前面单个字符是不一样的状态）
+//                 //两个单独的「回文序列」。下式中，由于首尾字符不同的「回文序列」一定互不相同，
+//                 //因此可以直接累加，无需考虑去重。
 //                    dp[k][i][j] = (2LL + dp[0][i + 1][j - 1] + dp[1][i + 1][j - 1] + dp[2][i + 1][j - 1] + dp[3][i + 1][j - 1]) % MOD;
 //                }
 //                else if (s[j] == c && s[i] != c)
-//                {
+//                {//当 s[j]=x 且 s[i]!= x 时，那么 dp(x, i, j) 等价于 dp(x,i+1,j)
 //                    dp[k][i][j] = dp[k][i + 1][j];
 //                }
 //                else if (s[j] != c && s[i] == c)
-//                {
+//                {//当 s[j]!=x 且 s[i]= x 时，那么 dp(x, i, j) 等价于 dp(x,i,j-1)
 //                    dp[k][i][j] = dp[k][i][j - 1];
 //                }
 //                else
-//                {
+//                {//当 s[j]!=x 且 s[i]!= x 时，那么 dp(x, i, j) 等价于 dp(x,i+1,j-1)
 //                    dp[k][i][j] = dp[k][i + 1][j - 1];
 //                }
 //            }
@@ -17455,7 +17465,7 @@ T m_lcm(T a, T b)
 //    }
 //    int res = 0;
 //    for (int i = 0;i < 4;i++)
-//    {
+//    {//统计最大区间的总方案数即可
 //        res = (res + dp[i][0][n - 1]) % MOD;
 //    }
 //    return res;
@@ -17599,6 +17609,8 @@ T m_lcm(T a, T b)
 //    return 0;
 //}
 
+////////////////////////////////////////////719. 找出第 K 小的数对距离///////////////////////////////////////
+
 //https://leetcode.cn/problems/find-k-th-smallest-pair-distance/solution/zhao-chu-di-k-xiao-de-shu-dui-ju-chi-by-xwfgf/
 //int main()
 //{
@@ -17645,6 +17657,9 @@ T m_lcm(T a, T b)
 //    return 0;
 //}
 
+////////////////////////////////////////////剑指 Offer II 029. 排序的循环链表///////////////////////////////////////
+
+//https://leetcode.cn/problems/4ueAj6/solution/by-ac_oier-kqv3/
 //class Node {
 //public:
 //    int val;
@@ -17665,14 +17680,14 @@ T m_lcm(T a, T b)
 //class Solution {
 //public:
 //    Node* insert(Node* head, int insertVal) {
-//        Node* res = head;
+//        Node* res = head;//记录原本的头结点
 //        if (head == NULL)
 //        {
 //            Node* node = new Node(insertVal);
-//            node->next = node;
+//            node->next = node;//循环链表，只有一个元素也要循环
 //            return node;
 //        }
-//        int axm = head->val, inm = head->val;
+//        int axm = head->val, inm = head->val;//记录循环链表中的最大值和最小值
 //        while (head->next != res)
 //        {
 //            head = head->next;
@@ -17680,20 +17695,21 @@ T m_lcm(T a, T b)
 //            inm = min(inm, head->val);
 //        }
 //        if (inm == axm)
-//        {
+//        {//最大值和最小值相等，说明只有一个元素（有很多节点，但这些节点值都相同，视为只有一个元素），那么随便在哪插入都可以
+//            //这里插入到头节点的下一个位置,这样方便返回
 //            Node* node = new Node(insertVal);
 //            node->next = res->next;
 //            res->next = node;
 //        }
 //        else
-//        {
+//        {//否则说明有多个元素
 //            while (head->val <= head->next->val)
-//            {
+//            {//找到有序列表的结束点（结束点的定义为：当前节点值为最大值，下一节点值为最小值。即为有序链表分割位置的左端点)
 //                head = head->next;
 //            }
-//            cout << head->val;
+//            cout << head->val;//此时的head是最大值节点
 //            if (insertVal >= axm || insertVal <= inm)
-//            {
+//            {//大于最大值或小于最小值，都应该插入到最大值节点的下一位置
 //                Node* node = new Node(insertVal);
 //                node->next = head->next;
 //                head->next = node;
@@ -17701,7 +17717,7 @@ T m_lcm(T a, T b)
 //            else
 //            {
 //                while (!(head->val <= insertVal && head->next->val > insertVal))
-//                {
+//                {//否则找到他应该插入的位置，该位置前一节点小于等于它，后一位置大于它
 //                    head = head->next;
 //                }
 //                Node* node = new Node(insertVal);
@@ -17709,7 +17725,7 @@ T m_lcm(T a, T b)
 //                head->next = node;
 //            }
 //        }
-//        return res;
+//        return res;//res是原本的头结点
 //    }
 //};
 //int main()
@@ -17965,6 +17981,65 @@ T m_lcm(T a, T b)
 //    return 0;
 //}
 
+//////////////////////////////////////////// 白名单里的随机数 ///////////////////////////////////////
+
+//https://leetcode.cn/problems/random-pick-with-blacklist/solution/hei-ming-dan-zhong-de-sui-ji-shu-by-leet-cyrx/1625225
+//给定一个整数 n 和一个 无重复 黑名单整数数组 blacklist 。设计一种算法，
+//从[0, n - 1] 范围内的任意整数中选取一个 未加入 黑名单 blacklist 的整数。
+//任何在上述范围内且不在黑名单 blacklist 中的整数都应该有 同等的可能性 被返回。
+ //按官方给的思路，逻辑上构思一个[0,n)的整型数组，而我们把随机边界 bound 就设为 n - m, m是黑名单的长度
+ //也就是我们逻辑上认为 [0,n) 的所有整数中，所有的黑名单数都在 [bound,n)这个区间里
+ //这样我们只需要在 [0,bound) 上随机一次，就能得到一个可取随机白名单数
+ //那实际上不可能刚好黑名单数就全出现在最后
+ //所以我们要是可以把在 bound 前边出现的黑名单数，都一一映射到后边的非黑名单数的话，那就相当于实现了这样的效果了
+//class Solution {
+//public:
+//    unordered_map<int, int> umap;//存放 bound 前面的黑名单数到 bound 后面的黑名单数的映射
+//    unordered_set<int> black;//存放所有的黑名单数
+//    int bound;//随机边界，即构思的 [0,n) 整型数组，前边全是白名单，后边全是黑名单数，它是分界线
+//    Solution(int n, vector<int>& blacklist) {
+//        int m = blacklist.size();
+//        bound = n - m;//设置边界为 n-m
+//        for (auto& i : blacklist)
+//        {
+//            black.insert(i);
+//        }
+//        int tmp = bound;//用来构造映射，tmp在 bound 后面寻找可用的白名单数,bound属于黑名单列表
+//        for (auto& i : blacklist)
+//        {
+//            if (i < bound)
+//            {//如果 bound 前面存在 黑名单数
+//                while (black.find(tmp) != black.end())
+//                {//找到 bound 后面（包括bound）的白名单数，如果 tmp 是一个黑名单数，说明它不可用，递增
+//                    ++tmp;
+//                }
+//                umap[i] = tmp++;//退出循环时 tmp是一个可用的白名单数，做一个映射，然后将tmp递增，表明它不可用了
+//            }
+//        }
+//    }
+//
+//    int pick() {
+//        int k = rand() % bound;//在 bound 里随机一个数
+//        if (black.find(k) != black.end())
+//        {//如果是 黑名单数，那么返回它在bound后面的白名单数映射
+//            return umap[k];
+//        }
+//        return k;//否则直接返回
+//    }
+//};
+//int main()
+//{
+//    vector<int> blacklist = { 2, 3, 5 };
+//    Solution solution(7, blacklist);
+//    solution.pick(); // 返回0，任何[0,1,4,6]的整数都可以。注意，对于每一个pick的调用，
+//                     // 0、1、4和6的返回概率必须相等(即概率为1/4)。
+//    solution.pick(); // 返回 4
+//    solution.pick(); // 返回 1
+//    solution.pick(); // 返回 6
+//    solution.pick(); // 返回 1
+//    solution.pick(); // 返回 0
+//    solution.pick(); // 返回 4
+//}
 
 //////////////////////////////////////////// 所有串联所有单词的子串起始位置 ///////////////////////////////////////
 
@@ -18017,63 +18092,6 @@ T m_lcm(T a, T b)
 //    {
 //        cout << i << endl;
 //    }
-//}
-
-//////////////////////////////////////////// 白名单里的随机数 ///////////////////////////////////////
-
-//https://leetcode.cn/problems/random-pick-with-blacklist/solution/hei-ming-dan-zhong-de-sui-ji-shu-by-leet-cyrx/1625225
- //按官方给的思路，逻辑上构思一个[0,n)的整型数组，而我们把随机边界 bound 就设为 n - m, m是黑名单的长度
- //也就是我们逻辑上认为 [0,n) 的所有整数中，所有的黑名单数都在 [n-m,n)这个区间里
- //这样我们只需要在 [0,bound) 上随机一次，就能得到一个可取随机白名单数
- //那实际上不可能刚好黑名单数就全出现在最后
- //所以我们要是可以把在 bound 前边出现的黑名单数，都一一映射到后边的非黑名单数的话，那就相当于实现了这样的效果了
-//class Solution {
-//public:
-//    unordered_map<int, int> umap;//存放 bound 前面的黑名单数到 bound 后面的黑名单数的映射
-//    unordered_set<int> black;//存放所有的黑名单数
-//    int bound;//随机边界，即构思的 [0,n) 整型数组，前边全是白名单，后边全是黑名单数，它是分界线
-//    Solution(int n, vector<int>& blacklist) {
-//        int m = blacklist.size();
-//        bound = n - m;//设置边界为 n-m
-//        for (auto& i : blacklist)
-//        {
-//            black.insert(i);
-//        }
-//        int tmp = bound;//用来构造映射，tmp在 bound 后面寻找可用的白名单数
-//        for (auto& i : blacklist)
-//        {
-//            if (i < bound)
-//            {//如果 bound 前面存在 黑名单数
-//                while (black.find(tmp) != black.end())
-//                {//找到 bound后面的白名单数，如果 tmp 是一个黑名单数，说明它不可用，递增
-//                    ++tmp;
-//                }
-//                umap[i] = tmp++;//退出循环时 tmp是一个可用的白名单数，做一个映射，然后将tmp递增，表明它不可用了
-//            }
-//        }
-//    }
-//
-//    int pick() {
-//        int k = rand() % bound;//在 bound 里随机一个数
-//        if (black.find(k) != black.end())
-//        {//如果是 黑名单数，那么返回它在bound后面的白名单数映射
-//            return umap[k];
-//        }
-//        return k;//否则直接返回
-//    }
-//};
-//int main()
-//{
-//    vector<int> blacklist = { 2, 3, 5 };
-//    Solution solution(7, blacklist);
-//    solution.pick(); // 返回0，任何[0,1,4,6]的整数都可以。注意，对于每一个pick的调用，
-//                     // 0、1、4和6的返回概率必须相等(即概率为1/4)。
-//    solution.pick(); // 返回 4
-//    solution.pick(); // 返回 1
-//    solution.pick(); // 返回 6
-//    solution.pick(); // 返回 1
-//    solution.pick(); // 返回 0
-//    solution.pick(); // 返回 4
 //}
 
 //////////////////////////////////////////// 6106. 统计无向图中无法互相到达点对数 ///////////////////////////////////////
@@ -18476,48 +18494,6 @@ T m_lcm(T a, T b)
 //    copy(res.begin(), res.end(), os);
 //}
 
-////////////////////////////////////////////871. 最低加油次数///////////////////////////////////////
-
-//https://leetcode.cn/problems/minimum-number-of-refueling-stops/solution/by-ac_oier-q2mk/
-//-将路上的一个个加油站 视为 一桶桶的油，每次经过的时候，就把油带上放后备箱；
-//- 当油不够的时候，取出后备箱所带的 最多的那桶油 加进油箱
-//- 这样以来，如若油箱和后备箱的油加起来都不够，那么就到不了了
-//int main()
-//{
-//    int target = 100, startFuel = 10;
-//    vector<vector<int>> stations = { {10, 60},{20, 30},{30, 30},{60, 40} };
-//    int n = stations.size();
-//    int pos = 0, idx = 0, curFuel = startFuel;//pos表示当前位置，idx表示当前哪些加油站的油已经带上了，curFuel表示当前的油量
-//    int res = 0;
-//    priority_queue<int> priq;// 使用优先队列，承装所经过加油站的油
-//    while (pos < target)
-//    {//只要还没到目的地就一直循环
-//        if (curFuel == 0)
-//        {//油用光了，从后备箱里加油，意味着我们需要在相应的加油站停留
-//            if (!priq.empty())
-//            {//后备箱非空，才能加油
-//                curFuel += priq.top();//先加一个最多的，不够的话再加后续的
-//                priq.pop();//加过的不能再加了
-//                res++;//加油意味着我们需要在相应的加油站停留，但不需要知道是哪个加油站
-//            }
-//            else
-//            {//后备箱是空的话那就无法到达终点了
-//                cout << -1 << endl;
-//                return 0;
-//            }
-//        }
-//        pos += curFuel;//用当前油量直接跑到最远的位置
-//        curFuel = 0;//油用光了
-//        while (idx < n && pos >= stations[idx][0])
-//        {//跑到最远位置的过程中遇到哪些加油站，都把他们装到后备箱里
-//            priq.push(stations[idx][1]);
-//            idx++;
-//        }
-//    }
-//    cout << res << endl;
-//    return 0;
-//}
-
 ////////////////////////////////////////////6110. 网格图中递增路径的数目///////////////////////////////////////
 
 //https://leetcode.cn/problems/number-of-increasing-paths-in-a-grid/solution/ji-yi-hua-sou-suo-pythonjavacgo-by-endle-xecc/
@@ -18558,6 +18534,49 @@ T m_lcm(T a, T b)
 //    Solution so;
 //    vector<vector<int>> g = { {1,1,1},{1,1,1},{1,1,1} };
 //    cout << so.countPaths(g) << endl;
+//}
+
+
+////////////////////////////////////////////871. 最低加油次数///////////////////////////////////////
+
+//https://leetcode.cn/problems/minimum-number-of-refueling-stops/solution/by-ac_oier-q2mk/
+//-将路上的一个个加油站 视为 一桶桶的油，每次经过的时候，就把油带上放后备箱；
+//- 当油不够的时候，取出后备箱所带的 最多的那桶油 加进油箱
+//- 这样以来，如若油箱和后备箱的油加起来都不够，那么就到不了了
+//int main()
+//{
+//    int target = 100, startFuel = 10;
+//    vector<vector<int>> stations = { {10, 60},{20, 30},{30, 30},{60, 40} };
+//    int n = stations.size();
+//    int pos = 0, idx = 0, curFuel = startFuel;//pos表示当前位置，idx表示当前哪些加油站的油已经带上了，curFuel表示当前的油量
+//    int res = 0;
+//    priority_queue<int> priq;// 使用优先队列，承装所经过加油站的油
+//    while (pos < target)
+//    {//只要还没到目的地就一直循环
+//        if (curFuel == 0)
+//        {//油用光了，从后备箱里加油，意味着我们需要在相应的加油站停留
+//            if (!priq.empty())
+//            {//后备箱非空，才能加油
+//                curFuel += priq.top();//先加一个最多的，不够的话再加后续的
+//                priq.pop();//加过的不能再加了
+//                res++;//加油意味着我们需要在相应的加油站停留，但不需要知道是哪个加油站
+//            }
+//            else
+//            {//后备箱是空的话那就无法到达终点了
+//                cout << -1 << endl;
+//                return 0;
+//            }
+//        }
+//        pos += curFuel;//用当前油量直接跑到最远的位置
+//        curFuel = 0;//油用光了
+//        while (idx < n && pos >= stations[idx][0])
+//        {//跑到最远位置的过程中遇到哪些加油站，都把他们装到后备箱里
+//            priq.push(stations[idx][1]);
+//            idx++;
+//        }
+//    }
+//    cout << res << endl;
+//    return 0;
 //}
 
 ////////////////////////////////////////////6109. 知道秘密的人数///////////////////////////////////////
@@ -19284,6 +19303,183 @@ T m_lcm(T a, T b)
 //    circularQueue.Rear(); // 返回 4
 //}
 
+/////////////////////////////////////////623. 在二叉树中增加一行//////////////////////////////////////////
+
+//https://leetcode.cn/problems/add-one-row-to-tree/solution/by-ac_oier-sc34/
+//给定一个二叉树的根 root 和两个整数 val 和 depth ，在给定的深度 depth 处添加一个值为 val 的节点行。
+//注意，根节点 root 位于深度 1 。
+//加法规则如下 :
+//给定整数 depth，对于深度为 depth - 1 的每个非空树节点 cur ，创建两个值为 val 的树节点作为 cur 的左子树根和右子树根。
+//cur 原来的左子树应该是新的左子树根的左子树。
+//cur 原来的右子树应该是新的右子树根的右子树。
+//如果 depth == 1 意味着 depth - 1 根本没有深度，那么创建一个树节点，值 val 作为整个原始树的新根，而原始树就是新根的左子树。
+//TreeNode* addOneRow(TreeNode* root, int val, int depth) {
+//    int layer = 1;
+//    if (depth == 1)
+//    {
+//        TreeNode* res = new TreeNode(val, root, nullptr);
+//        return res;
+//    }
+//    queue<TreeNode*> q;
+//    q.push(root);
+//    while (!q.empty())
+//    {
+//        if (layer == depth - 1)
+//        {//对于深度为 depth - 1 的每个非空树节点 cur
+//            int sz = q.size();
+//            while (sz--)
+//            {
+//                auto t = q.front();
+//                q.pop();
+//                TreeNode* oldleft = t->left;//原来的左右子树
+//                TreeNode* oldright = t->right;
+//                t->left = new TreeNode(val, oldleft, nullptr);//新建左右孩子
+//                t->right = new TreeNode(val, nullptr, oldright);
+//            }
+//            break;//新建完成，退出while循环
+//        }
+//        else
+//        {
+//            int sz = q.size();
+//            while (sz--)
+//            {
+//                auto t = q.front();
+//                q.pop();
+//                if (t->left)
+//                {
+//                    q.push(t->left);
+//                }
+//                if (t->right)
+//                {
+//                    q.push(t->right);
+//                }
+//            }
+//            layer++;
+//        }
+//    }
+//    return root;
+//}
+//int main()
+//{
+//    TreeNode* one = new TreeNode(1);
+//    TreeNode* two = new TreeNode(3);
+//    TreeNode* thr = new TreeNode(5);
+//    TreeNode* fou = new TreeNode(2,one,two);
+//    TreeNode* fiv = new TreeNode(6,thr,nullptr);
+//    TreeNode* six = new TreeNode(4,fou,fiv);
+//    addOneRow(six, 1, 2);
+//}
+
+/////////////////////////////////////////636. 函数的独占时间//////////////////////////////////////////
+
+//https://leetcode.cn/problems/exclusive-time-of-functions/solution/by-ac_oier-z3ed/
+//typedef pair<int, int> pii;
+//vector<string> split(string& s, char delimiter) {
+//    vector<string> ans;
+//    int left = 0, right = 0;
+//    while (right < s.size()) {
+//        if (s[right] == delimiter) {
+//            ans.push_back(s.substr(left, right - left));
+//            left = right + 1;
+//        }
+//        right++;
+//    }
+//    ans.push_back(s.substr(left, right - left));
+//    return ans;
+//}
+////输入：n = 2, logs = ["0:start:0", "1:start:2", "1:end:5", "0:end:6"]
+////输出：[3, 4]
+////解释：
+////函数 0 在时间戳 0 的起始开始执行，执行 2 个单位时间，于时间戳 1 的末尾结束执行。
+////函数 1 在时间戳 2 的起始开始执行，执行 4 个单位时间，于时间戳 5 的末尾结束执行。
+////函数 0 在时间戳 6 的开始恢复执行，执行 1 个单位时间。
+////所以函数 0 总共执行 2 + 1 = 3 个单位时间，函数 1 总共执行 4 个单位时间。
+//int main()
+//{
+//    int n = 2;
+//    vector<string> logs = { "0:start:0", "1:start:2", "1:end:5", "0:end:6" };
+//    vector<int> ans(n, 0);
+//    stack<pii> st;
+//    int gain = 0;
+//    for (int i = 0; i < logs.size(); i++) {
+//        vector<string> items = split(logs[i], ':');
+//        int id = stoi(items[0]), ct = stoi(items[2]);
+//        if (items[1] == "start") {//新函数的调用开始时间
+//            st.push({ id, ct });
+//        }
+//        else {
+//            //此时栈顶元素必然是该函数的调用记录，此时 log[i] 的结束时间 ct 与栈顶记录的函数开始时间之差 ct - pt + 1，
+//            //必然是该函数的执行时间，将其累加到当前函数中，并更新当前时间。
+//            auto top = st.top();
+//            st.pop();
+//            int pt = top.second;//该函数的调用开始时间
+//            ans[id] += ct - pt + 1;
+//            if (!st.empty())
+//                //对于下一个函数来说，因为我们只记录了此函数（记为a）开始时间和结束时间如果中间又调用了其他函数(记为b）
+//                //如果直接通过log记录的start和end计算 a 的运行时间，那么有可能会多计算一些时间，所以，我们计算完
+//                //栈顶函数（相当于b）的运行时间后，如果栈非空，说明此时还处在 a 的调用期间，所以 a 的运行时间应该减去
+//                //b 的运行时间
+//                ans[st.top().first] -= ct - pt + 1;
+//        }
+//    }
+//    for (auto i : ans)
+//    {
+//        cout << i << ' ';
+//    }
+//}
+
+/////////////////////////////////////////761. 特殊的二进制序列//////////////////////////////////////////
+
+//特殊的二进制序列是具有以下两个性质的二进制序列：
+//·0 的数量与 1 的数量相等。
+//·二进制序列的每一个前缀码中 1 的数量要大于等于 0 的数量。
+//给定一个特殊的二进制序列 S，以字符串形式表示。定义一个操作 为首先选择 S 的两个连续且非空的 特殊的子串，然后将它们交换。
+//（两个子串为连续的当且仅当第一个子串的最后一个字符恰好为第二个子串的第一个字符的前一个字符。)
+//在任意次数的操作之后，交换后的字符串按照字典序排列的最大的结果是什么？
+//输入: S = "11011000"
+//输出 : "11100100"
+//解释 :
+//    将子串 "10" （在S[1]出现） 和 "1100" （在S[3]出现）进行交换。
+//    这是在进行若干次操作后按字典序排列最大的结果。
+//把 1 看成左括号，0 看成右括号。第一个条件其实就是在说左括号数量等于右括号数量，第二个条件就是每个右括号有对应的左括号。
+//string makeLargestSpecial(string_view s) {
+//    const int n = s.size();
+//    if (n == 0) 
+//        return "";
+//    int stk = 0, pos = 0;
+//    vector<string> children;
+//    for (int i = 0;i < n;++i) {
+//        switch (s[i]) {
+//        case '1':
+//            // 栈中增加一个左括号
+//            // 增加前栈为空说明当前是一个新的极小括号序列的开头
+//            // 将新的极小括号序列的开始位置记录下来
+//            if (stk++ == 0)
+//                pos = i;
+//            break;
+//        case '0':
+//            // 栈中减少一个左括号
+//            // 减少后栈为空说明当前已经找到了一个完整的极小括号序列
+//            // 将极小括号序列去除最外围的括号后，递归计算最大值
+//            // 将递归得到的子括号序列加入列表
+//            if (--stk == 0)
+//                //[pos+1，i-1]是还未构造的括号序列，所以需要递归构造，字串开头的 pos+1，长度是 i-1-(pos+1)+1=i-pos-1
+//                //字串构造完成后，加上这一层最外面的左右括号，就是一个完整的满足条件的括号序列，
+//                //加入res数组，最后在排序还原成字符串
+//                children.push_back("1" + makeLargestSpecial(s.substr(pos + 1, i - pos - 1)) + "0");
+//            break;
+//        }
+//    }
+//    // 将子括号序列按从大到小排序
+//    sort(children.begin(), children.end(), greater<string>{});//字符串排序是按照字典序排列的
+//    return reduce(children.begin(), children.end(), ""s);//还原成字符串，注意必须是""s或者string("")，直接""是不行的
+//                                                         //因为""是字符指针const char*，没有重载+运算符，不能用reduce
+//}
+//int main()
+//{
+//    cout << makeLargestSpecial("11011000");
+//}
+
 /////////////////////////////////////////899. 转移字符能得到的字典序最小的字符串//////////////////////
 
 //https://leetcode.cn/problems/orderly-queue/solution/nao-jin-ji-zhuan-wan-by-heren1229-gg97/
@@ -19466,7 +19662,7 @@ T m_lcm(T a, T b)
 //    {
 //        //对于已经分好块的数组，若在其末尾添加一个数字，如何求得新数组的分块方式？
 //        //·新添加的数字可能会改变原数组的分块方式。如果新添加的数字大于或等于原数组最后一个块的最大值，
-//        //则这个新添加的数字可以自己形成一个块。
+//        //则这个新添加的数字可以自己形成一个块，因为我们要求最多分为多少块。
 //        //·如果新添加的数字小于原数组最后一个块的最大值，则它必须融入最后一个块。
 //        //如果它大于或等于原数组倒数第二个块（如果有）的最大值，那么这个过程可以停止，
 //        //新数组的分块方式已经求得。否则，它将继续融合原数组倒数第二个块，直到遇到一个块，
