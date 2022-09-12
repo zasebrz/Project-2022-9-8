@@ -18587,6 +18587,7 @@ T m_lcm(T a, T b)
 //    return (cnt_a + dp[n - 1]) % MOD;
 //}
 
+/////////////////////////////////////////// 乌鸦喝水 ///////////////////////////////////////
 
 //class Solution {
 //public:
@@ -19448,40 +19449,6 @@ T m_lcm(T a, T b)
 //    return 0;
 //}
 
-/////////////////////////////////////////跳跃游戏//////////////////////////////////////////
-
-//https://leetcode.cn/problems/jump-game-ii/
-//int main()
-//{
-//    vector<int> a = { 2,2,3,0,4 };
-//    int N = a.size();
-//    int curDistance = 0;    // 当前覆盖最远距离下标
-//    int ans = 0;            // 记录⾛的最⼤步数
-//    int nextDistance = 0;   // 下⼀步覆盖最远距离下标，下一步不一定要等到当前最远距离的时候才去跳
-//    for (int i = 0; i < N; i++) {
-//        nextDistance = max(a[i] + i, nextDistance);  // 更新下⼀步覆盖最远距离下标
-//        if (i > curDistance)
-//        {//到达了当前覆盖最远距离无法覆盖的地方，说明无论如何不能到达这里，
-//            //如果可以的话，nextDistance会覆盖这里，则返回-1，表示无法到达
-//            return -1;
-//        }
-//        if (i == curDistance)
-//        {// 遇到当前覆盖最远距离下标
-//            if (curDistance != N - 1)
-//            {// 如果当前覆盖最远距离下标不是终点
-//                ans++;// 需要⾛下⼀步
-//                if (nextDistance >= N - 1)
-//                    break; // 下⼀步的覆盖范围已经可以达到终点，结束循环，上面ans已经递增了
-//                curDistance = nextDistance;// 否则更新当前覆盖最远距离下标
-//
-//            }
-//            else
-//                break;// 当前覆盖最远距离下标是集合终点，不⽤做ans++操作了，直接结束
-//        }
-//    }
-//    return ans;
-//}
-
 /////////////////////////////////////////768. 最多能完成排序的块 II//////////////////////////////////////////
 
 //https://leetcode.cn/problems/max-chunks-to-make-sorted-ii/solution/zui-duo-neng-wan-cheng-pai-xu-de-kuai-ii-w5c6/
@@ -19685,6 +19652,40 @@ T m_lcm(T a, T b)
 //        return res;//返回，计算上一位的方案数。
 //    };
 //    return fun(0, 0, true, false);
+//}
+
+/////////////////////////////////////////跳跃游戏//////////////////////////////////////////
+
+//https://leetcode.cn/problems/jump-game-ii/
+//int main()
+//{
+//    vector<int> a = { 2,2,3,0,4 };
+//    int N = a.size();
+//    int curDistance = 0;    // 当前覆盖最远距离下标
+//    int ans = 0;            // 记录⾛的最⼤步数
+//    int nextDistance = 0;   // 下⼀步覆盖最远距离下标，下一步不一定要等到当前最远距离的时候才去跳
+//    for (int i = 0; i < N; i++) {
+//        nextDistance = max(a[i] + i, nextDistance);  // 更新下⼀步覆盖最远距离下标
+//        if (i > curDistance)
+//        {//到达了当前覆盖最远距离无法覆盖的地方，说明无论如何不能到达这里，
+//            //如果可以的话，nextDistance会覆盖这里，则返回-1，表示无法到达
+//            return -1;
+//        }
+//        if (i == curDistance)
+//        {// 遇到当前覆盖最远距离下标
+//            if (curDistance != N - 1)
+//            {// 如果当前覆盖最远距离下标不是终点
+//                ans++;// 需要⾛下⼀步
+//                if (nextDistance >= N - 1)
+//                    break; // 下⼀步的覆盖范围已经可以达到终点，结束循环，上面ans已经递增了
+//                curDistance = nextDistance;// 否则更新当前覆盖最远距离下标
+//
+//            }
+//            else
+//                break;// 当前覆盖最远距离下标是集合终点，不⽤做ans++操作了，直接结束
+//        }
+//    }
+//    return ans;
 //}
 
 /////////////////////////////////////////2380. 二进制字符串重新安排顺序需要的时间///////////////////////////
@@ -20090,34 +20091,48 @@ T m_lcm(T a, T b)
 //    return ans;
 //}
 
+/////////////////////////////////////////658. 最接近 x 的 k 个数///////////////////////////
+
+//https://leetcode.cn/problems/find-k-closest-elements/solution/zhao-dao-k-ge-zui-jie-jin-de-yuan-su-by-ekwtd/
+//给定一个 排序好 的数组 arr ，两个整数 k 和 x ，从数组中找到最靠近 x（两数之差最小）的 k 个数。返回的结果必须要是按升序排好的。
+//整数 a 比整数 b 更接近 x 需要满足：
+//| a - x | < | b - x | 或者
+//| a - x| == |b - x | 且 a < b
+//假设数组长度为 n，注意到数组 arr 已经按照升序排序，我们可以将数组 arr 分成两部分，
+//前一部分所有元素[0, left] 都小于 x，后一部分所有元素[right, n−1] 都大于等于 x，left 与 right 都可以通过二分查找获得。
+//left 和 right 指向的元素都是各自部分最接近 x 的元素，因此我们可以通过比较 left 和 right 指向的元素获取整体最接近 x 的元素。
+//如果 x-arr[left]<=arr[right]-x，那么将 left 减一，否则将 right 加一。相应地，如果 left 或 right 已经越界，那么不考虑对应部分的元素。
+//最后，区间[left + 1, right−1] 的元素就是我们所要获得的结果，返回答案既可。
 //int main()
 //{
 //    vector<int> arr = { 1,2,3,4 };
 //    int k = 4, x = -1;
 //    int right = lower_bound(arr.begin(), arr.end(), x) - arr.begin();
 //    int left = right - 1;
-//    while (k--) {
-//        if (left < 0) {
+//    while (k--) {//每次只加入一个值
+//        if (left < 0) {//左边已经越界
 //            right++;
 //        }
-//        else if (right >= arr.size()) {
+//        else if (right >= arr.size()) {//右边已经越界
 //            left--;
 //        }
-//        else if (x - arr[left] <= arr[right] - x) {
+//        else if (x - arr[left] <= arr[right] - x) {//左边的值更接近x
 //            left--;
 //        }
-//        else {
+//        else {//右边的值更接近x
 //            right++;
 //        }
 //    }
-//    for (auto i : vector<int>(arr.begin() + left + 1, arr.begin() + right))
+//    for (auto i : vector<int>(arr.begin() + left + 1, arr.begin() + right))//退出循环时left和right都是未经过检查的，因此不能取
 //    {
 //        cout << i << ' ';
 //    }
 //    return 0;
 //}
 
+/////////////////////////////////////////662. 二叉树最大宽度///////////////////////////
 
+//https://leetcode.cn/problems/maximum-width-of-binary-tree/solution/er-cha-shu-zui-da-kuan-du-by-leetcode-so-9zp3/1724500
 //求每一层的宽度时，因为两端点间的 null 节点也需要计入宽度，因此可以对节点进行编号。
 //一个编号为 index 的左子节点的编号记为 2×index，右子节点的编号记为 2×index + 1，
 //计算每层宽度时，用每层节点的最大编号减去最小编号再加 11 即为宽度。
@@ -20130,7 +20145,7 @@ T m_lcm(T a, T b)
 //    TreeNode* fiv = new TreeNode(2,nullptr,thr);
 //    TreeNode* root = new TreeNode(1,fou,fiv);
 //    unsigned long long res = 1;
-//    vector<pair<TreeNode*, unsigned long long>> arr;//节点与其对应的编号
+//    vector<pair<TreeNode*, unsigned long long>> arr;//节点与其对应的编号 ，如果树高度很高，就会造成某一层节点的编号非常大，所以要用unsigned long long
 //    arr.emplace_back(root, 1L);
 //    while (!arr.empty()) {
 //        vector<pair<TreeNode*, unsigned long long>> tmp;//用来记录下一层的所有节点编号
@@ -20149,7 +20164,38 @@ T m_lcm(T a, T b)
 //    }
 //    return res;
 //}
-//因题目保证了答案在int范围内，所以不会出现某一层超过int个节点的情况，如果我们能把每一层都从1开始标下标，就可以用int来ac
+//因题目保证了答案在int范围内，所以不会出现某一层超过int个节点的情况，如果我们能把每一层都从 0 开始标下标，就可以用int来ac
+//① 找到本层第一个有子节点的节点的index，记为first
+//② 向下一层传坐标index时，以first为起点，先减去first再执行 * 2 或 * 2 + 1 操作
+//  这样每一层的节点编号就代表它是 本层 的第几个节点，而不是整棵树的第几个节点，就不会出现非常大的编号了
+//int widthOfBinaryTree(TreeNode* root) {
+//    int ans = -1;
+//    queue<pair<TreeNode*, int>> Queue;
+//    Queue.emplace(root, 1);
+//    while (!Queue.empty()) {
+//        int size = Queue.size();
+//        int left = Queue.front().second;//本层的最左边节点编号
+//        int right;
+//        int first = -1; //找第一个有孩子节点的下标
+//        while (size--) {
+//            TreeNode* curr = Queue.front().first;
+//            right = Queue.front().second;//每次都刷新最右边节点编号，其实只需要记录本层最后一个节点编号就行了
+//            ans = max(ans, right - left + 1);
+//            Queue.pop();
+//            if (first == -1 && (curr->left || curr->right)) 
+//            {//记录本层第一个有子节点的结点编号
+//                first = right;
+//            }
+//            if (curr->left) {// 以first为起点，保证下一层第一个节点下标为0,最后节点下标也不会超int
+//                Queue.emplace(curr->left, (right - first) * 2); //right是当前节点编号
+//            }
+//            if (curr->right) {
+//                Queue.emplace(curr->right, (right - first) * 2 + 1);
+//            }
+//        }
+//    }
+//    return ans;
+//}
 
 /////////////////////////////////////////25. K 个一组翻转链表///////////////////////////
 
@@ -20299,17 +20345,114 @@ T m_lcm(T a, T b)
 //    cout<< ans;
 //}
 
-int main()
-{
-    vector<vector<int>> intervals = { {5, 10},{6, 8}, {1, 5},{2, 3},{1, 10} };
-    sort(intervals.begin(), intervals.end());
-    priority_queue<int, vector<int>, greater<int>> pq;
-    for (auto& vec : intervals) {
-        // 判断是否存在一组（结束时间最小的组）使得它的结束时间小于当前区间的开始时间
-        if (!pq.empty() && pq.top() < vec[0]) //这里是if，也就是最多只需要找到一组就可以了，不是while
-            pq.pop();
-        pq.push(vec[1]);
-    }
-    return pq.size();
-}
+//int main()
+//{
+//    vector<vector<int>> intervals = { {5, 10},{6, 8}, {1, 5},{2, 3},{1, 10} };
+//    sort(intervals.begin(), intervals.end());
+//    priority_queue<int, vector<int>, greater<int>> pq;
+//    for (auto& vec : intervals) {
+//        // 判断是否存在一组（结束时间最小的组）使得它的结束时间小于当前区间的开始时间
+//        if (!pq.empty() && pq.top() < vec[0]) //这里是if，也就是最多只需要找到一组就可以了，不是while
+//            pq.pop();
+//        pq.push(vec[1]);
+//    }
+//    return pq.size();
+//}
 
+/////////////////////////////////////////986. 两个区间列表的交集///////////////////////////
+
+//https://leetcode.cn/problems/interval-list-intersections/solution/qu-jian-lie-biao-de-jiao-ji-by-leetcode/1360013
+//int main()
+//{
+//    vector<vector<int>> firstList = { {0, 2},{5, 10},{13, 23},{24, 25} }, secondList = { {1, 5},{8, 12},{15, 24},{25, 26} };
+//    int i = 0, j = 0;
+//    int n = firstList.size(), m = secondList.size();
+//    vector<vector<int>> res;
+//    /*
+//       双指针:
+//       指针i表示A集合中区间的索引,那么A[i][0]和A[i][1]分别表示区间A[i]的左右边界
+//       指针j表示B集合中区间的索引,那么B[j][0]和B[j][1]分别表示区间B[j]的左右边界
+//       左边界start取两个区间左边界较大值,右边界end取两个区间右界较小值
+//       若start<=end则可以形成区间,将[start,end]加入结果
+//       指针移动:看谁的右边界较小,较小的右边界后面不可能有交集了,因此根据右边界大小移动i与j指针
+//       相同的话就同时移动
+//       具体地:A[i][1]>B[j][1],j++;A[i][1]<B[j][1],i++
+//       循环至两个区间组都到达末尾就结束
+//    */
+//    while (i < n && j < m)
+//    {
+//        int max_left = max(firstList[i][0], secondList[j][0]);
+//        int min_right = min(firstList[i][1], secondList[j][1]);
+//        if (max_left <= min_right)
+//        {
+//            res.push_back({ max_left,min_right });
+//        }
+//        if (firstList[i][1] >= secondList[j][1])
+//        {
+//            j++;
+//        }
+//        if (firstList[i][1] <= secondList[j][1])
+//        {
+//            i++;
+//        }
+//    }
+//}
+
+/////////////////////////////////////////857. 雇佣 K 名工人的最低成本///////////////////////////
+
+//https://leetcode.cn/problems/minimum-cost-to-hire-k-workers/solution/yi-bu-bu-ti-shi-ru-he-si-kao-ci-ti-by-en-1p00/
+//有 n 名工人。 给定两个数组 quality 和 wage ，其中，quality[i] 表示第 i 名工人的工作质量，其最低期望工资为 wage[i] 。
+//现在我们想雇佣 k 名工人组成一个工资组。在雇佣 一组 k 名工人时，我们必须按照下述规则向他们支付工资：
+//对工资组中的每名工人，应当按其工作质量与同组其他工人的工作质量的比例来支付工资。
+//工资组中的每名工人至少应当得到他们的最低期望工资。
+//给定整数 k ，返回 组成满足上述条件的付费群体所需的最小金额 
+//输入： quality = [3, 1, 10, 10, 1], wage = [4, 8, 2, 2, 7], k = 3
+//输出： 30.66667
+//解释： 我们向 0 号工人支付 4，向 2 号和 3 号分别支付 13.33333。
+//·在最优发工资方案下，至少有一名工人，发给他的工资恰好等于他的最低期望工资。
+//    反证：假设不存在这样的工人，那么发给每名工人的工资都高于其最低期望工资，
+//    我们可以把每人的工资都下调，从而得到更优的方案，矛盾。
+//·枚举发了最低期望工资的那名工人，在满足题干中规则 1 的前提下，哪些工人可以满足规则 2？
+//    如何快速地求出这些工人？
+//·定义 r[i]=wage[i]/quality[i]，表示「每单位工作质量的工资」。若以 k 名工人中最高的 r[i] 为基准（记为r_max)发工资，
+//    那么对于 r 值不超过 r_max的工人，发给他们的工资是不低于其最低期望工资的，
+//    w[i]（实际）= r_max * q[i] >= w[i]（最低）=r[i] * q[i]，那么按照 r[i] 从小到大排序，我们便可以快速地求出这些工人。
+//·设这 k 名工人的 quality 之和为 sumQ，若以 r_max ​为基准发工资，那么发的工资总额为 sumQ * r_max​
+//    因为 w[i]（实际）= r_max * q[i]，因此 sumQ 越小发的工资总额就越小，因此我们需要在从小到大枚举 r[i]
+//    维护当前最小的 k 个 quality 值。
+//·用一个最大堆来维护。按照 r[i] ​从小到大的顺序遍历，当堆中有 k 个元素时，如果 quality[i]​比堆顶小，
+//    则可以弹出堆顶，将 quality[i]​ 入堆，从而得到一个更小的 sumQ，此时有可能找到一个更优解 sumQ * r[i],更新答案。
+//typedef pair<double, int> pdi;//<r[i],q[i]>记录单位工资和对应的质量
+//int main()
+//{
+//    vector<int> quality = { 3,1,10,10,1 }, vector<int> wage = { 4,8,2,2,7 };
+//    int k = 3;
+//    int n = quality.size();
+//    vector<pdi> ri;
+//    for (int i = 0;i < n;i++)
+//    {
+//        ri.push_back(make_pair((double)wage[i] / quality[i], quality[i]));//计算单位质量的工作
+//    }
+//    sort(ri.begin(), ri.end());//从小到大排序
+//    priority_queue<int> pq;
+//    int i = 0, sumQ = 0;
+//    for (;i < k;i++)
+//    {//记录前k个工人
+//        sumQ += ri[i].second;//记录总质量
+//        pq.push(ri[i].second);
+//    }
+//    //ri是经过排序的，所以ri[k - 1].first是前 k 个工人中最大的 r_max，以他为基准发工资一定满足要求（就是给他发最低工资）
+//    double res = sumQ * ri[k - 1].first;//k 个工资总工资的初始值
+//    for (;i < n;i++)
+//    {
+//        if (ri[i].second < pq.top())
+//        {//出现了一个更小的q[i]，选择这名工人可以使sumQ减小，从而可能减少最低工资
+//            sumQ -= pq.top();//从当前的sumQ里面减去最大的 q[i]
+//            sumQ += ri[i].second;//加上当前工人的 q[i]
+//            pq.pop();//优先队列也要做相应调整
+//            pq.push(ri[i].second);
+//        }
+//        res = min(res, sumQ * ri[i].first);//更新最低总工资
+//    }
+//    cout<<res;
+//}
