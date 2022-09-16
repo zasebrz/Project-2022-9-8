@@ -7903,7 +7903,7 @@ T m_lcm(T a, T b)
 //    cout << res << endl;
 //}
 
-/////////////////////////////////////////// 计算任意两个矩形的总面积////////////////////////////////////////
+/////////////////////////////////////////// 计算矩形面积Ⅰ////////////////////////////////////////
 
 //https://leetcode-cn.com/problems/rectangle-area/solution/ju-xing-mian-ji-by-leetcode-solution-xzbl/
 //void main()
@@ -7920,6 +7920,195 @@ T m_lcm(T a, T b)
 //    //·同理
 //    int bottom = max(0, min(ax2, bx2) - max(ax1, bx1));
 //    res -= bottom * high;//减去重叠部分的面积
+//}
+
+/////////////////////////////////////////// 850.计算矩形面积Ⅱ（扫描线）////////////////////////////////////////
+
+//https://leetcode.cn/problems/rectangle-area-ii/solution/gong-shui-san-xie-by-ac_oier-9r36/
+//将所有给定的矩形的左右边对应的 x 端点提取出来并排序，每个端点可看作是一条竖直的线段（红色），
+//问题转换为求解「由多条竖直线段分割开」的多个矩形的面积总和（黄色）：
+//相邻线段之间的宽度为单个矩形的「宽度」（通过 x 差值直接算得），问题转换为求该区间内高度的并集（即矩形的高度）。
+//由于数据范围只有 200，我们可以对给定的所有矩形进行遍历，统计所有对此段区间有贡献的矩形（即有哪些矩形是“经过”该区间的）
+//再对这些矩形总高度（矩形高度并集），即可计算出此区间的「高度」，从而计算出来此区间的面积。
+//int main()
+//{
+//    vector<vector<int>> rectangles = { {0, 0, 2, 2},{1, 0, 2, 3},{1, 0, 3, 1} };
+//    vector<int> x;
+//    for (auto r : rectangles)
+//    {//扫描线，先记录矩形的左右两边
+//        x.push_back(r[0]);
+//        x.push_back(r[2]);
+//    }
+//    sort(x.begin(), x.end());//从大到小排序
+//    int res = 0;
+//    for (int i = 1, n = x.size();i < n;i++)
+//    {//遍历区间
+//        int lo = x[i - 1], ri = x[i];//区间的左右边界
+//        if (lo == ri)
+//        {//左右边界相同，直接跳过
+//            continue;
+//        }
+//        vector<vector<int>> cover;//记录有哪些矩形“经过”这一区间
+//        for (auto r : rectangles)
+//        {
+//            if (r[0] <= lo && r[2] >= ri)
+//            {//当一个矩形的左边界小于等于 lo 且右边界大于等于 ri，说明它“经过”了此区间
+//                cover.push_back({ r[1],r[3] });//记录这个矩形的底和高
+//            }
+//        }
+//        sort(cover.begin(), cover.end());//对“经过”此区间的所有矩形排序，按照底边从低到高的顺序
+//        int up = -1, down = -1;//记录重合矩形的底和高
+//        int high = 0;//记录高的并集，也就是总高度
+//        for (auto c : cover)
+//        {
+//            if (c[0] > up)
+//            {//如果一个新的矩形底边大于当前重合矩形的高，说明它与当前重合矩形没有交集
+//                high += up - down;//这时候我们要记录一下之前重合矩形的高度，因为它不可能再和后面的矩形有交集了
+//                up = c[1];//新的重合矩形的高
+//                down = c[0];//新的重合矩形的底
+//            }
+//            else if (c[1] > up)
+//            {//否则一个新的矩形底边小于等于当前重合矩形的高，并且大于当前重合矩形的底，
+//                //说明他只重合一部分，有一部分新的面积没有交集，因此更新当前重合矩形的高
+//                //注意不管重合多少次，我们都只计算一次重合的面积
+//                up = c[1];
+//            }
+//        }
+//        high += up - down;//最后一个重合矩形的高
+//        res = (res + (((long long)ri - lo) * high) % MOD) % MOD;//加到答案里面去
+//    }
+//    cout << res;
+//}
+
+//////////////////////////////////////////391.判断完美矩形以及自定义排序函数的用法（扫描线）////////////////////////////////////////
+
+//https://leetcode-cn.com/problems/perfect-rectangle/solution/gong-shui-san-xie-chang-gui-sao-miao-xia-p4q4/
+//struct Line {//自定义结点Line
+//public:
+//    int x, y1, y2;
+//    bool left;
+//    bool operator< (const Line& l) const {//对这个结点排序，重载的是<，所以<左边的参数就是this，右边的参数就是传入值，true的时候this排在传入值前面，false则相反
+//                                          //const代表这个此函数是静态成员函数，不会更改成员变量的值
+//        if (this->x != l.x) return this->x < l.x;
+//        else return this->y1 < l.y1;
+//    }
+//    //*********************sort排序不能重载大于号,因为默认是less模板***********************
+//    //bool operator>(const Line& l) const {//由于sort用小于号<来比较大小，因此要用sort的话必须重载小于号<,重载>用sort会报错，除非规定排序模板是greater
+//    //    if (this->x != l.x) return this->x < l.x;
+//    //    else return this->y2 > l.y2;
+//    //}
+//};
+//struct Point//自定义结点Point
+//{
+//    int x,y;
+//    bool operator<(const Point& p)
+//    {
+//        return this->x < p.x || ((this->x == p.x) && (this->y) < p.y);
+//    }
+//};
+////********************声明比较类来排序，这个结构体放在类内类外都可以(前提是自定义的结点不在类内，否则没办法访问)******************************
+//// struct cmp
+//// {
+////     bool operator()(const Line& l1,const Line& l2)
+////     {
+////         return l1.x<l2.x || ((l1.x==l2.x)&&(l1.y1<l2.y1));
+////     }
+//// };
+////********************结构体、类外重载<，相当于sort函数在使用<排序的时候就会使用此规则，对于排序其他的结构体就会出错******************************
+////bool operator< (const Line& l1,const Line& l2){//这样重载的话对Point排序的时候会报错，所以最好的方法是在结构体内重载<，其次是申明不同的比较类或函数
+////    if (l1.x != l2.x) return l1.x < l2.x;
+////    else return l1.y1 < l2.y1;
+////}
+//
+//class Solution {
+//public:
+//    //********************自定义比较函数排序,放在类内的话要加static，放在类外则不用******************************
+//    //因为类构造的时候会自动给非静态成员函数加上this指针，而sort函数接受的比较函数只有两个参数，因此会报错
+//    static bool cmp(const Line& l1, const Line& l2)
+//    {
+//        return l1.x < l2.x || ((l1.x == l2.x) && (l1.y1 < l2.y1));
+//    }
+//    //bool operator<(const Line& l1, const Line& l2)//如果在类内结构体外（如果结构体是在类内的话）重载<的话，他默认<左边的参数是本身类，也就是this，传入参数是<右边的参数，应该是另一个类（Solution），
+//    //而不是我们要排序的Line，所以在类内结构体外只能对class排序
+//    //{
+//    //    return l1.x < l2.x || ((l1.x == l2.x) && (l1.y1 < l2.y1));
+//    //}
+//    bool isRectangleCover(vector<vector<int>>& rects) {
+//        vector<Line> lines;
+//        for (auto& rect : rects) {
+//            int x = rect[0], y = rect[1], a = rect[2], b = rect[3];//（x,y）是左下角，（a,b）是右上角
+//            lines.push_back({ x, y, b, true });//true代表左边,vector::push_back接受initializer_list为参数，emplace_back不行
+//            lines.push_back({ a, y, b, false });//false代表右边
+//        }
+//        // sort lines
+//        sort(lines.begin(), lines.end());//重载<排序
+//        /*vector<Point> v;
+//        v.push_back({ 1,2 });
+//        v.push_back({ 2,3 });
+//        sort(v.begin(), v.end());
+//        for (const auto& vv : v)
+//        {
+//            cout << vv.x << ' ';
+//        }
+//        cout << endl;
+//        for (const auto& l : lines)
+//        {
+//            cout << l.x << ' ';
+//        }
+//        cout << endl;*/
+//        int n = lines.size();
+//        for (int i = 0,j=0; i < n; i=j) {
+//            while (j < n && lines[j].x == lines[i].x) 
+//                j++;//退出循环时，lines[i].x ！= lines[j].x，j已经是右领边了
+//            vector<vector<int>> seg_l, seg_r;//注意这里的seg_l和seg_r在每次i更新后都会重新定义，也就是说每一个seg_l和seg_r里面存放的竖边对应的x都是相同的
+//            for (int k = i; k < j; k++) {//把x相等的竖线分成左边和右边
+//                bool flag = true;
+//                if (lines[k].left)
+//                    merge(seg_l, lines[k], flag);//如果lines[k]是左边，就把它和原来的左边拼接起来
+//                else 
+//                    merge(seg_r, lines[k], flag);//如果lines[k]是右边，就把它和原来的右边拼接起来
+//                if (!flag) 
+//                    return false;
+//            }
+//            if (i > 0 && j < n) {//除了最左边和最右边，非边缘竖边必然有成对的左右两条完全相同的竖边重叠在一起；
+//                if (seg_l.size() != seg_r.size()) 
+//                    return false;//完美矩形某个相接的地方必定存在相同长度和方向的左边和右边，因此seg_l和seg_r的尺寸必须相同
+//                for (int k = 0; k < seg_l.size(); k++) {//seg_l和seg_r能连起来的地方都连起来了，所以如果左边右边还不能完全对齐的话，就不是完美矩形
+//                    if (seg_l[k][0] != seg_r[k][0] || seg_l[k][1] != seg_r[k][1]) return false;
+//                }
+//            }
+//            else if (i == 0) {//最左边只应该有一条左边，而且左边是完全连续的，否则就不是完美矩形
+//                if (!(seg_l.size() == 1 && seg_r.empty())) return false;
+//            }
+//            else {//最右边只应该有一条右边，而且右边是完全连续的，否则就不是完美矩形
+//                if (!(seg_r.size() == 1 && seg_l.empty())) return false;
+//            }
+//        }
+//        return true;
+//    }
+//    void merge(vector<vector<int>>& seg, struct Line& line, bool& flag) {//注意都是引用传递，这个seg里面存放的竖边对应的x都是相同的
+//        if (seg.empty()) {//第一条左边直接加进来
+//            seg.push_back({ line.y1, line.y2 });
+//            return;
+//        }
+//        else {
+//            auto last = seg.back();
+//            if (line.y1 < last[1]) {//同一个x，如果新竖边的底边要小于旧竖边的顶边的话，说明有两个矩形是重叠的，那么就直接返回false
+//                flag = false;
+//                return;
+//            }
+//            else if (line.y1 == last[1]) 
+//                last[1] = line.y2;//同一个x，如果新竖边的底边等于旧竖边的顶边的话，说明可以拼接起来，此时新的顶边就是y2
+//            else 
+//                seg.push_back({ line.y1, line.y2 });//否则的话先保存起来，这里不能返回false，因为这两个矩形之间后面可能插入一个细长的矩阵，其左边的x比这个x小，右边的x比这个x大
+//        }
+//    }
+//};
+//int main()
+//{
+//    Solution so;
+//    vector<vector<int>> vec = { {1, 1, 3, 3},{3, 1, 4, 2},{3, 2, 4, 4},{1, 3, 2, 4},{2, 3, 3, 4} };
+//    cout<<so.isRectangleCover(vec)<<endl;
 //}
 
 /////////////////////////////////////////// 将十进制数int转换为16进制的形式////////////////////////////////////////
@@ -8957,136 +9146,6 @@ T m_lcm(T a, T b)
 //        }
 //    }
 //    cout << f[n & 1][k] << endl;//不知道n是第几行，所以n & 1
-//}
-
-//////////////////////////////////////////判断完美矩形以及自定义排序函数的用法////////////////////////////////////////
-
-//https://leetcode-cn.com/problems/perfect-rectangle/solution/gong-shui-san-xie-chang-gui-sao-miao-xia-p4q4/
-//struct Line {//自定义结点Line
-//public:
-//    int x, y1, y2;
-//    bool left;
-//    bool operator< (const Line& l) const {//对这个结点排序，重载的是<，所以<左边的参数就是this，右边的参数就是传入值，true的时候this排在传入值前面，false则相反
-//                                          //const代表这个此函数是静态成员函数，不会更改成员变量的值
-//        if (this->x != l.x) return this->x < l.x;
-//        else return this->y1 < l.y1;
-//    }
-//    //*********************sort排序不能重载大于号,因为默认是less模板***********************
-//    //bool operator>(const Line& l) const {//由于sort用小于号<来比较大小，因此要用sort的话必须重载小于号<,重载>用sort会报错，除非规定排序模板是greater
-//    //    if (this->x != l.x) return this->x < l.x;
-//    //    else return this->y2 > l.y2;
-//    //}
-//};
-//struct Point//自定义结点Point
-//{
-//    int x,y;
-//    bool operator<(const Point& p)
-//    {
-//        return this->x < p.x || ((this->x == p.x) && (this->y) < p.y);
-//    }
-//};
-////********************声明比较类来排序，这个结构体放在类内类外都可以(前提是自定义的结点不在类内，否则没办法访问)******************************
-//// struct cmp
-//// {
-////     bool operator()(const Line& l1,const Line& l2)
-////     {
-////         return l1.x<l2.x || ((l1.x==l2.x)&&(l1.y1<l2.y1));
-////     }
-//// };
-////********************结构体、类外重载<，相当于sort函数在使用<排序的时候就会使用此规则，对于排序其他的结构体就会出错******************************
-////bool operator< (const Line& l1,const Line& l2){//这样重载的话对Point排序的时候会报错，所以最好的方法是在结构体内重载<，其次是申明不同的比较类或函数
-////    if (l1.x != l2.x) return l1.x < l2.x;
-////    else return l1.y1 < l2.y1;
-////}
-//
-//class Solution {
-//public:
-//    //********************自定义比较函数排序,放在类内的话要加static，放在类外则不用******************************
-//    static bool cmp(const Line& l1, const Line& l2)
-//    {
-//        return l1.x < l2.x || ((l1.x == l2.x) && (l1.y1 < l2.y1));
-//    }
-//    //bool operator<(const Line& l1, const Line& l2)//如果在类内结构体外（如果结构体是在类内的话）重载<的话，他默认<左边的参数是本身类，也就是this，传入参数是<右边的参数，应该是另一个类（Solution），
-//    //而不是我们要排序的Line，所以在类内结构体外只能对class排序
-//    //{
-//    //    return l1.x < l2.x || ((l1.x == l2.x) && (l1.y1 < l2.y1));
-//    //}
-//    bool isRectangleCover(vector<vector<int>>& rects) {
-//        vector<Line> lines;
-//        for (auto& rect : rects) {
-//            int x = rect[0], y = rect[1], a = rect[2], b = rect[3];//（x,y）是左下角，（a,b）是右上角
-//            lines.push_back({ x, y, b, true });//true代表左边,vector::push_back接受initializer_list为参数，emplace_back不行
-//            lines.push_back({ a, y, b, false });//false代表右边
-//        }
-//        // sort lines
-//        sort(lines.begin(), lines.end());//重载<排序
-//        /*vector<Point> v;
-//        v.push_back({ 1,2 });
-//        v.push_back({ 2,3 });
-//        sort(v.begin(), v.end());
-//        for (const auto& vv : v)
-//        {
-//            cout << vv.x << ' ';
-//        }
-//        cout << endl;
-//        for (const auto& l : lines)
-//        {
-//            cout << l.x << ' ';
-//        }
-//        cout << endl;*/
-//        int n = lines.size();
-//        for (int i = 0,j=0; i < n; i=j) {
-//            while (j < n && lines[j].x == lines[i].x) 
-//                j++;//退出循环时，lines[i].x ！= lines[j].x，j已经是右领边了
-//            vector<vector<int>> seg_l, seg_r;//注意这里的seg_l和seg_r在每次i更新后都会重新定义，也就是说每一个seg_l和seg_r里面存放的竖边对应的x都是相同的
-//            for (int k = i; k < j; k++) {//把x相等的竖线分成左边和右边
-//                bool flag = true;
-//                if (lines[k].left)
-//                    merge(seg_l, lines[k], flag);//如果lines[k]是左边，就把它和原来的左边拼接起来
-//                else 
-//                    merge(seg_r, lines[k], flag);//如果lines[k]是右边，就把它和原来的右边拼接起来
-//                if (!flag) 
-//                    return false;
-//            }
-//            if (i > 0 && j < n) {//除了最左边和最右边，非边缘竖边必然有成对的左右两条完全相同的竖边重叠在一起；
-//                if (seg_l.size() != seg_r.size()) 
-//                    return false;//完美矩形某个相接的地方必定存在相同长度和方向的左边和右边，因此seg_l和seg_r的尺寸必须相同
-//                for (int k = 0; k < seg_l.size(); k++) {//seg_l和seg_r能连起来的地方都连起来了，所以如果左边右边还不能完全对齐的话，就不是完美矩形
-//                    if (seg_l[k][0] != seg_r[k][0] || seg_l[k][1] != seg_r[k][1]) return false;
-//                }
-//            }
-//            else if (i == 0) {//最左边只应该有一条左边，而且左边是完全连续的，否则就不是完美矩形
-//                if (!(seg_l.size() == 1 && seg_r.empty())) return false;
-//            }
-//            else {//最右边只应该有一条右边，而且右边是完全连续的，否则就不是完美矩形
-//                if (!(seg_r.size() == 1 && seg_l.empty())) return false;
-//            }
-//        }
-//        return true;
-//    }
-//    void merge(vector<vector<int>>& seg, struct Line& line, bool& flag) {//注意都是引用传递，这个seg里面存放的竖边对应的x都是相同的
-//        if (seg.empty()) {//第一条左边直接加进来
-//            seg.push_back({ line.y1, line.y2 });
-//            return;
-//        }
-//        else {
-//            auto last = seg.back();
-//            if (line.y1 < last[1]) {//同一个x，如果新竖边的底边要小于旧竖边的顶边的话，说明有两个矩形是重叠的，那么就直接返回false
-//                flag = false;
-//                return;
-//            }
-//            else if (line.y1 == last[1]) 
-//                last[1] = line.y2;//同一个x，如果新竖边的底边等于旧竖边的顶边的话，说明可以拼接起来，此时新的顶边就是y2
-//            else 
-//                seg.push_back({ line.y1, line.y2 });//否则的话先保存起来，这里不能返回false，因为这两个矩形之间后面可能插入一个细长的矩阵，其左边的x比这个x小，右边的x比这个x大
-//        }
-//    }
-//};
-//int main()
-//{
-//    Solution so;
-//    vector<vector<int>> vec = { {1, 1, 3, 3},{3, 1, 4, 2},{3, 2, 4, 4},{1, 3, 2, 4},{2, 3, 3, 4} };
-//    cout<<so.isRectangleCover(vec)<<endl;
 //}
 
 //////////////////////////////////////////不含相同字符的两个单词长度的最大值////////////////////////////////////////
@@ -20696,4 +20755,120 @@ T m_lcm(T a, T b)
 //        res = min(res, sumQ * ri[i].first);//更新最低总工资
 //    }
 //    cout<<res;
+//}
+
+
+//int main()
+//{
+//    clock_t start, finish;
+//    double totaltime;
+//    start = clock();
+//    for (int i = 0;i < 10000000;i++)
+//    {
+//        ;
+//    }
+//    finish = clock();
+//    totaltime = (double)(finish - start) / CLOCKS_PER_SEC*1000000;
+//    cout << totaltime << "微秒";
+//}
+
+/////////////////////////////////////////887. 鸡蛋掉落///////////////////////////
+
+//输入：k = 1, n = 2
+//输出：2
+//解释：
+//鸡蛋从 1 楼掉落。如果它碎了，肯定能得出 f = 0 。
+//否则，鸡蛋从 2 楼掉落。如果它碎了，肯定能得出 f = 1 。
+//如果它没碎，那么肯定能得出 f = 2 。
+//因此，在最坏的情况下我们需要移动 2 次以确定 f 是多少。
+//https://blog.csdn.net/qq_39144436/article/details/123617917
+//https://leetcode.cn/problems/super-egg-drop/solution/dong-tai-gui-hua-zhi-jie-shi-guan-fang-ti-jie-fang/
+//int main()
+//{
+//    /*
+//       dp+二分:参考liweiwei的题解比较好懂(太难了了解即可)
+//       dp五部曲:
+//       1.状态定义:dp[i][j]表示总楼层数为i(注意是总楼层数),鸡蛋数为 j 时确定 f（鸡蛋破碎的临界楼层）的最少操作次数
+//       2.状态转移:dp[i][j]=min<k∈[1,i]>(max(dp[k-1][j-1],dp[i-k][j])+1),其中外层min的k∈[1,i]
+//           其中dp[k-1][j-1]为鸡蛋从 k 楼扔下碎了:那么f只可能是[1,k-1],鸡蛋数-1
+//               dp[i-k][j]为鸡蛋从 k 楼扔下没碎:那么f只可能是[k+1,i],鸡蛋数不变
+//               两者中取较大的值,这是鸡蛋碎与不碎的最坏情况下转移过来的dp[i][j],也就是保证能找出 f 的最少次数
+//               +1当前在 k 楼扔鸡蛋的这一次
+//               而最小操作次数怎么算?很显然就是在尝试所有楼层分别扔一次然后取最少的操作数来确定这个 f 出自哪里
+//               因为这个k取值范围内的都是合格的范围,所以要找出最少的操作数必然要在[1,i]内进行比较
+//               说白了:max比较出 k 层碎与不碎的最坏情形;min负责找出[1,i]这么多最坏情形决策行为的最小操作数
+//       3.初始化:从转移方程来看的话,i=0,1与j=0,1需要初始化
+//       4.遍历顺序:显然是正序遍历
+//       5.返回形式:直接返回dp[n][k]就是所求
+//       时间复杂度:O(nklogn),空间复杂度:O(nk)
+//       */
+//    int k = 1, n = 2;
+//    // 初始化
+//    // 要与原来的dp比较求小的值,必定要初始化为最大值才不会对第一个值大的比较产生影响
+//    vector<vector<int>> dp(n + 1, vector<int>(k + 1, INT_MAX));
+//    // 初始化i=0,1与j=0,1
+//    // j=0时,鸡蛋数目为0:操作数怎样都是0(无法操作)
+//    // j=1时,鸡蛋数目为1:当楼层数n>=1时候为n,因为只有一个鸡蛋，只能一层一层试
+//    for (int i = 1; i <= n; i++) {
+//        dp[i][0] = 0;
+//        dp[i][1] = i;
+//    }
+//    // i=0时,楼层数目为0:操作数怎样都是0(无法上楼)
+//    for (int j = 0; j <= k; j++) 
+//    {
+//        dp[0][j] = 0;
+//    }
+//    // i=1时,楼层数目为1:当鸡蛋数j>=1时候为1,只需要扔一次即可
+//    for (int j = 1; j <= k; j++) {
+//        dp[1][j] = 1;
+//    }
+//    // 之后遍历范围为i∈[2,n],j∈[2,k]
+//    for (int i = 2; i <= n; i++) {
+//        for (int j = 2; j <= k; j++) {
+//            // 通过二分法在区间[1,i]确定一个最优值，注意这里的总楼层为 i，也就是本次我们猜测的 k 就在 [1:i]之间
+//            // 当然i=1已经初始化了，所以从2直接开始
+//            int left = 1, right = i;
+//            int ans;
+//            // 这里用二分查找k∈[1,i]中最小的那个dp(k)->一个v形函数
+//            // 最低点在中间,可以通过二分在O(logn)时间复杂度内找到最小的k值
+//            while (left <= right) {
+//                int mid = left + (right - left) / 2;
+//                // 碎了，就需要往低层继续扔：层数少 1 ，鸡蛋也少 1
+//                // 不碎，就需要往高层继续扔：层数是当前层到最高层的距离差，鸡蛋数量不少
+//                // 两种情况都做了一次尝试，所以加 1
+//                int breakConut = dp[mid - 1][j - 1];    // 递增
+//                int notBreakCount = dp[i - mid][j];     // 递减
+//                //我们观察到 dp(n, k) 是一个关于 n 的单调递增函数，也就是说在鸡蛋数 k 固定的情况下，楼层数 n 越多，
+//                //需要的步数一定不会变少。在上述的状态转移方程中，
+//                //第一项 dp(mid−1, j−1) 是一个随 mid 的增加而单调递增的函数，
+//                //第二项 dp(i−mid,j) 是一个随着 mid 的增加而单调递减的函数。
+//                //这如何帮助我们来优化这个问题呢？当 x 增加时，T1(x) 单调递增而 T2(x) 单调递减，
+//                //我们可以想象在一个直角坐标系中，横坐标为 x，纵坐标为 T1(x) 和T2(x) 。
+//                //当一个函数单调递增而另一个函数单调递减时，我们如何找到一个位置使得它们的最大值最小呢？
+//                //如上图所示，如果这两个函数都是连续函数，那么我们只需要找出这两个函数的交点，
+//                //在交点处就能保证这两个函数的最大值最小
+//                //breakConut=T1(x)，notBreakCount=T2(x)，所以当breakConut>notBreakCount,这时的mid一定位于交点的右边
+//                //所以我们要往左边找，right = mid - 1;
+//                if (breakConut > notBreakCount) {
+//                    // 排除法（减治思想）写对二分见第 35 题，先想什么时候不是解
+//                // 严格大于的时候一定不是解，此时 mid 一定不是解
+//                // 下一轮搜索区间是 [left, mid - 1]                 
+//                    right = mid - 1;
+//                }
+//                else {
+//                    //否则的话，这时的mid一定位于交点的左边或者等于交点，所以我们先记录一下这个可能的答案，再往右边去找
+//                    // 这个区间一定是上一个区间的反面，即 [mid, right]
+//                    ans = mid;//此时mid有可能是答案，记录一下
+//                    left = mid + 1;
+//                }
+//            }
+//            //退出循环时，ans一定位于交点的左边或者等于交点（因为两个连续函数的交点不一定是整数）
+//            //那么ans+1也是一个有可能的答案，所以要比较一下max(T1(ans),T2(ans))和max(T1(ans+1),T2(ans+1))的最小值
+//            //也就是ans和ans+1谁更靠近交点，其实如果交点不是整数的话，ans和ans+1都是正确的值
+//            //另外，这里我们其实只需要比较T2(ans)和T1(ans+1)的最小值就行了，因为交点左边，T2一定大于T1，交点右边T1一定大于T2
+//            dp[i][j] = min(max(dp[ans - 1][j - 1], dp[i - ans][j]),
+//                        max(dp[(ans + 1) - 1][j - 1], dp[i - (ans + 1)][j])) + 1;
+//        }
+//    }
+//    return dp[n][k];
 //}
