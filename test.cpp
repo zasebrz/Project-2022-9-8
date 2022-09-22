@@ -20757,6 +20757,7 @@ T m_lcm(T a, T b)
 //    cout<<res;
 //}
 
+/////////////////////////////////////////程序微秒计时///////////////////////////
 
 //int main()
 //{
@@ -20871,4 +20872,250 @@ T m_lcm(T a, T b)
 //        }
 //    }
 //    return dp[n][k];
+//}
+
+
+//class Solution {
+//public:
+//    void func(vector<TreeNode*>& v)
+//    {
+//        for (int i = 0, j = v.size() - 1;i < j;i++, j--)
+//        {
+//            swap(v[i]->val, v[j]->val);
+//        }
+//    }
+//    TreeNode* reverseOddLevels(TreeNode* root) {
+//        if (!root)
+//        {
+//            return nullptr;
+//        }
+//        queue<TreeNode*> q;
+//        q.push(root);
+//        int depth = 0;
+//        while (!q.empty())
+//        {
+//            int sz = q.size();
+//            vector<TreeNode*> v;
+//            while (sz--)
+//            {
+//                auto t = q.front();
+//                q.pop();
+//                if (depth & 1)
+//                {
+//                    v.push_back(t);
+//                }
+//                if (t->left)
+//                {
+//                    q.push(t->left);
+//                }
+//                if (t->right)
+//                {
+//                    q.push(t->right);
+//                }
+//            }
+//            if (!v.empty())
+//            {
+//                func(v);
+//            }
+//        }
+//        return root;
+//    }
+//};
+//int main()
+//{
+//    TreeNode* one = new TreeNode(8);
+//    TreeNode* two = new TreeNode(13);
+//    TreeNode* thr = new TreeNode(21);
+//    TreeNode* fou = new TreeNode(34);
+//    TreeNode* fiv = new TreeNode(3,one,two);
+//    TreeNode* six = new TreeNode(5,thr,fou);
+//    TreeNode* root = new TreeNode(2,fiv,six);
+//    Solution so;
+//    so.reverseOddLevels(root);
+//}
+
+
+//class Solution {
+//public:
+//    struct StringTree
+//    {
+//        int cnt = 0;
+//        vector<StringTree*> children;//利用vector实现，不能在声明的时候直接定义，需要在构造函数里定义
+//        bool isEnd;//表示单词是否已经结束了，防止已经add的单词比search的单词多几个单词，比如已经add了badge，要查找bad这个单词，查找到d的时候发现index已经到头，但是此节点的isEnd是false，表示字典树里
+//                  //没有bad但是有比bad多几个字母的单词，这时候应该返回false，不匹配
+//        StringTree() :isEnd(false) {
+//            this->children = vector<StringTree*>(26, nullptr);
+//        }
+//    };
+//    StringTree* root = new StringTree();;//首先建立一个根节点
+//    void addWord(string word)
+//    {
+//        int n = word.size();
+//        StringTree* node = root;//root不能动，所以要新建一个结点node
+//        for (int i = 0;i < n;i++)
+//        {
+//            if ((node->children[word[i] - 'a']) == nullptr)//不存在就新建
+//            {
+//                node->children[word[i] - 'a'] = new StringTree();
+//            }
+//            node = node->children[word[i] - 'a'];//向下转移
+//            node->cnt++;
+//        }
+//        node->isEnd = true;//所有单词添加完毕，node指向最后一个字母的节点，那么此节点的isEnd赋值为true，表示单词结尾
+//    }
+//    int dfs(string s)
+//    {
+//        int n = s.size();
+//        StringTree* node = root;//root不能动，所以要新建一个结点node
+//        int ans = 0;
+//        for (int i = 0;i < n;i++)
+//        {
+//            if ((node->children[s[i] - 'a']) == nullptr)//不存在就新建
+//            {
+//                return ans;
+//            }
+//            
+//            node = node->children[s[i] - 'a'];//向下转移
+//            ans += node->cnt;
+//        }
+//        return ans;
+//    }
+//    vector<int> sumPrefixScores(vector<string>& words) {
+//        int n = words.size();
+//        for (auto w : words)
+//        {
+//            addWord(w);
+//        }
+//        vector<int> res;
+//        for (int i = 0;i < n;i++)
+//        {
+//            int k = dfs(words[i]);
+//            res.push_back(k);
+//        }
+//        return res;
+//    }
+//};
+//int main()
+//{
+//    vector<string> words = { "abc", "ab", "bc", "b" };
+//    Solution so;
+//    so.sumPrefixScores(words);
+//}
+
+/////////////////////////////////////////2409. 统计共同度过的日子数///////////////////////////
+
+//https://leetcode.cn/problems/count-days-spent-together/solution/by-endlesscheng-3r0d/1759511
+//vector<int> cnt{ 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+//int getDay(string s) 
+//{//日期统一转化为天数
+//    int m = stoi(s.substr(0, 2)), d = stoi(s.substr(3));
+//    return accumulate(cnt.begin(), cnt.begin() + m - 1, 0) + d;
+//}
+//int main()
+//{
+//    string arriveAlice = "04-22", leaveAlice = "12-31",arriveBob = "12-02",leaveBob = "12-14";
+//    int st1 = getDay(arriveAlice), end1 = getDay(leaveAlice);
+//    int st2 = getDay(arriveBob), end2 = getDay(leaveBob);
+//    int res = 0;
+//    res = max(min(end1, end2) - max(st1, st2) + 1, 0);//如果没有交集的话，min(end1, end2)<max(st1, st2),则
+//                                                      //min(end1, end2) - max(st1, st2) + 1<=0，所以取最大值
+//    cout << res;
+//}
+
+/////////////////////////////////////////2410. 运动员和训练师的最大匹配数///////////////////////////
+
+//https://leetcode.cn/problems/maximum-matching-of-players-with-trainers/solution/pai-xu-shuang-zhi-zhen-by-endlesscheng-h54k/
+//如果第 i 名运动员的能力值 小于等于 第 j 名训练师的能力值，那么第 i 名运动员可以 匹配 第 j 名训练师。
+//除此以外，每名运动员至多可以匹配一位训练师，每位训练师最多可以匹配一位运动员。
+//请你返回满足上述要求 players 和 trainers 的 最大 匹配数。
+//输入：players = [4, 7, 9], trainers = [8, 2, 5, 8]
+//输出：2
+//解释：
+//得到两个匹配的一种方案是：
+//- players[0] 与 trainers[0] 匹配，因为 4 <= 8 。
+//- players[1] 与 trainers[3] 匹配，因为 7 <= 8 。
+//可以证明 2 是可以形成的最大匹配数。
+//int main()
+//{
+//    vector<int> players = { 4, 7, 9 }, trainers = { 8, 2, 5, 8 };
+//    sort(players.begin(), players.end()), sort(trainers.begin(), trainers.end());
+//    int n = players.size(), m = trainers.size();
+//    int i = 0, res = 0;//i表示运动员，j是教练
+//    for (int j = 0;j < m;++j)
+//    {
+//        if (players[i] <= trainers[j])
+//        {//满足条件,匹配，运动员指针后移，教练指针后移在for循环里
+//            i++;
+//            res++;
+//        }
+//        if (i >= n)//运动员已经匹配完了，退出循环
+//            break;
+//    }
+//    cout<<res;
+//}
+
+/////////////////////////////////////////2411. 按位或最大的最小子数组长度///////////////////////////
+
+//https://leetcode.cn/problems/smallest-subarrays-with-maximum-bitwise-or/solution/by-endlesscheng-zai1/
+//我们可以把二进制数看成集合，二进制数第 i 位为 1 表示 i 在集合中。两个二进制数的或，就可以看成是两个集合的并集。
+//对于两个二进制数 a 和 b，如果 a∣b = a，从集合的角度上看，b 对应的集合是 a 对应的集合的子集。
+//据此我们可以提出如下改进后的算法：
+//从左到右正向遍历 nums，对于 x = nums[i]，从 i - 1开始倒着遍历 nums[j]：
+//相当于固定右端点，依次更新左端点的值
+//·如果 nums[j]∣x != nums[j]，说明 nums[j] 可以变大（集合元素增多），更新 nums[j] = nums[j]∣x；
+//  注意此时的 nums[j]是原本数组 nums从 j 到 i 所有数中能使 nums[j]变大的数的 或值
+//·如果 nums[j]∣x = nums[j]，从集合的角度看，此时 x 不仅是 nums[j] 的子集，同时也是 nums[k](k < j) 的子集
+//（因为 nums[j] 是 nums[k] 的子集，不可能再使nums[k]变大了，循环保证了每个集合都是其左侧相邻集合的子集，
+//  每一个数都会融入到它左边的集合里面去，不可能超过左边集合），
+//  那么后续的循环都无法让元素变大，退出循环；
+//在循环中，如果 nums[j] 可以变大，则更新 ans[j] = i−j + 1。
+//int main()
+//{
+//    vector<int> nums = { 1, 0, 2, 1, 3 };
+//    int n = nums.size();
+//    vector<int> ans(n,1);//原本长度是 1
+//    for (int i = 0; i < n; ++i) {
+//        for (int j = i - 1; j >= 0 && (nums[j] | nums[i]) != nums[j]; --j) 
+//        {
+//            nums[j] |= nums[i];//集合增大
+//            ans[j] = i - j + 1;//长度变大
+//        }
+//    }
+//    for (auto i : ans)
+//    {
+//        cout << i << ' ';
+//    }
+//}
+
+/////////////////////////////////////////微信红包模拟///////////////////////////
+
+//int main()
+//{
+//    double sum = 50.50;
+//    int count = 2;
+//    double max_ = 0.0;
+//    
+//    srand((unsigned)time(NULL));
+//    while (count--)
+//    {
+//        double money;
+//        if (count == 0)
+//        {//最后一个人把钱全都拿走
+//            money = sum;
+//            max_ = max(money, max_);
+//            printf("%.3f\n", money);
+//            break;
+//        }
+//        double k = (double)(1 + rand() % 999) / 1000;//精度，一般是100
+//        money = sum * k;
+//        sum -= money;
+//        max_ = max(money, max_);
+//        printf("%.3f\n", money);//保留小数点后三位
+//    }
+//    printf("%.3f\n", max_);
+//    //double a = 3.1415926;
+//    //cout << setprecision(3) << a << endl;  //3.14,输出的总位数是3
+//    //cout << setprecision(9) << a << endl;  //3.1415926，输出的总位数是9
+//    //cout << fixed << setprecision(3) << a << endl;  //3.142，输出小数点后面位数是3
+//    //cout << fixed << setprecision(9) << a << endl;  //3.141592600，输出小数点后面位数是9
 //}
