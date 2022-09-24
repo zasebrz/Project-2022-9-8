@@ -21120,193 +21120,109 @@ T m_lcm(T a, T b)
 //    //cout << fixed << setprecision(9) << a << endl;  //3.141592600，输出小数点后面位数是9
 //}
 
+/////////////////////////////////////////从边界射入弹珠，哪些能落入洞里///////////////////////////
 
-//class MyLinkedList {
+//https://leetcode.cn/contest/season/2022-fall/problems/EXvqDp/
+////输入：
+////num = 5
+////plate = [".....", "..E..", ".WO..", "....."]
+////输出： [[0, 1], [1, 0], [2, 4], [3, 2]]
+////解释：
+////在[0, 1] 处打入弹珠，弹珠前进 2 步，遇到转向器后前进方向逆时针旋转 90 度，再前进 1 步进入洞中。
+////在[1, 0] 处打入弹珠，弹珠前进 2 步，遇到转向器后前进方向顺时针旋转 90 度，再前进 1 步进入洞中。
+////在[2, 4] 处打入弹珠，弹珠前进 2 步后进入洞中。
+////在[3, 2] 处打入弹珠，弹珠前进 1 步后进入洞中。
+//const int N = 1005, 
+//dx[] = { 1,0,-1,0 }, 
+//dy[] = { 0,-1,0,1 }, //下左上右，按照顺时针顺序排列
+//inf = 0x3f3f3f3f;
+//int n, m, dp[N][N][4];//dp[x][y][d]表示在（x，y）坐标，方向为d的状态下，到达弹珠洞需要多少步
+//bool vis[N][N][4];//表示此状态是否遇到过
+//vector<string> plate;
+//int dfs(int x, int y, int d) 
+//{//x,y,d表示当前状态
+//    if (x >= n || x < 0 || y >= m || y < 0)
+//        return inf;//已经出界，则永远无法到达洞里
+//    if (dp[x][y][d] != -1)//之前已经计算过该状态到洞里需要多少步，直接返回
+//        return dp[x][y][d];
+//    if (vis[x][y][d])//如果上面没有返回，那么就说明进入了一个环，永远无法到达洞里，因为dp[x][y][d]==-1，说明
+//                    //还没有计算出该状态到洞里需要多少步，也就是dfs还没有返回上一层，而vis[x][y][d]==1说明
+//                    //之前遇到过这个状态，并且还没有计算出结果，正在等待下层dfs返回结果，这样就是一个环
+//                    //不加这个剪枝也可以，因为不可能出现一个环
+//        return dp[x][y][d] = inf;//返回永远不可能到达洞里
+//    vis[x][y][d] = 1;//此状态已访问
+//    if (plate[x][y] == '.') 
+//    {//当前位置是“平地”则保持原有方向，dfs(x + dx[d], y + dy[d], d)表示在（x + dx[d]，y + dy[d]）坐标，方向为 d 的状态下，
+//        //到达弹珠洞需要多少步，加 1 表示向前走一步，从x --> x + dx[d]
+//        dp[x][y][d] = dfs(x + dx[d], y + dy[d], d) + 1;
+//    }
+//    else if (plate[x][y] == 'O')//已经到洞里了
+//        dp[x][y][d] = 0;
+//    else if (plate[x][y] == 'W') 
+//    {//W表示逆时针转向器（弹珠经过时方向将逆时针旋转 90 度），原来方向为d，d+1为顺时针旋转，d-1位逆时针旋转
+//        int D = ((d-1)+4) % 4;
+//        dp[x][y][d] = dfs(x + dx[D], y + dy[D], D) + 1;
+//    }
+//    else 
+//    {//E表示顺时针转向器（弹珠经过时方向将顺时针旋转 90 度），原来方向为d，d+1为顺时针旋转，d-1位逆时针旋转
+//        int D = (d + 1) % 4;
+//        dp[x][y][d] = dfs(x + dx[D], y + dy[D], D) + 1;
+//    }
+//    vis[x][y][d] = 0;//不回溯可以，这是因为同一位置，同一方向，不管从哪个边界射入，此状态到达洞里的步数是不会变的
+//                     //这里回溯的话就是说，每一次从不同边界射入，所有状态都是未知的，但是因为dp没有被重置，所以还是会剪枝
+//                    //不会超时
+//    return dp[x][y][d];//返回此状态到达洞里需要多少步
+//}
+//class Solution {
 //public:
-//    ListNode* dummyhead, * tail;
-//    int sz;
-//    MyLinkedList() {
-//        tail = nullptr;
-//        dummyhead = new ListNode(0, tail);
-//        sz = 0;
-//    }
-//
-//    int get(int index) {
-//        if (index > sz)
-//        {
-//            return -1;
-//        }
-//        ListNode* cur = dummyhead->next;
-//        while (index--)
-//        {
-//            cur = cur->next;
-//        }
-//        return cur->val;
-//    }
-//    void addnode(ListNode* node, int val)
-//    {
-//        ListNode* new_node = new ListNode(val);
-//        new_node->next = node->next;
-//        node->next = new_node;
-//        ++sz;
-//    }
-//
-//    void addAtHead(int val) {
-//        addnode(dummyhead, val);
-//    }
-//
-//    void addAtTail(int val) {
-//        ListNode* cur = dummyhead;
-//        while (cur->next)
-//        {
-//            cur = cur->next;
-//        }
-//        addnode(cur, val);
-//    }
-//
-//    void addAtIndex(int index, int val) {
-//        if (index == sz)
-//        {
-//            addAtTail(val);
-//        }
-//        else if (index < 0)
-//        {
-//            addAtHead(val);
-//        }
-//        ListNode* cur = dummyhead;
-//        while (index--)
-//        {
-//            cur = cur->next;
-//        }
-//        addnode(cur, val);
-//    }
-//
-//    void deleteAtIndex(int index) {
-//        if (index > sz)
-//        {
-//            return;
-//        }
-//        ListNode* cur = dummyhead;
-//        while (index--)
-//        {
-//            cur = cur->next;
-//        }
-//        cur->next = cur->next->next;
+//    vector<vector<int>> ballGame(int num, vector<string>& plate) {
+//        ::plate = plate;
+//        n = plate.size(), m = plate[0].size();
+//        memset(vis, 0, sizeof(vis));
+//        memset(dp, -1, sizeof(dp));//初始化
+//        vector<vector<int>> ans;
+//        for (int i = 0;i < n;++i)
+//            for (int j = 0;j < m;++j)
+//                if ((i == 0 || j == 0 || i == n - 1 || j == m - 1) && plate[i][j] == '.')
+//                {//从边界的“平地”开始射入弹珠
+//                    if (i == 0 && j == 0)
+//                        continue;//四个角都不算
+//                    if (i == 0 && j == m - 1)
+//                        continue;
+//                    if (i == n - 1 && j == 0)
+//                        continue;
+//                    if (i == n - 1 && j == m - 1)
+//                        continue;
+//                    if (i == 0) 
+//                    {//从上边界射入，方向向下
+//                        if (dfs(i, j, 0) <= num)//能到达洞里
+//                            ans.push_back({ i,j });
+//                    }
+//                    else if (i == n - 1) 
+//                    {//从下边界射入，方向向上
+//                        if (dfs(i, j, 2) <= num)
+//                            ans.push_back({ i,j });
+//                    }
+//                    else if (j == 0) 
+//                    {//从左边界射入，方向向右
+//                        if (dfs(i, j, 3) <= num)
+//                            ans.push_back({ i,j });
+//                    }
+//                    else 
+//                    {//从右边界射入，方向向左
+//                        if (dfs(i, j, 1) <= num)
+//                            ans.push_back({ i,j });
+//                    }
+//                }
+//        return ans;
 //    }
 //};
 //int main()
 //{
-//    MyLinkedList linkedList;
-//    linkedList.addAtHead(1);
-//    linkedList.addAtTail(3);
-//    linkedList.addAtIndex(1, 2);   //链表变为1-> 2-> 3
-//    linkedList.get(1);            //返回2
-//    linkedList.deleteAtIndex(1);  //现在链表是1-> 3
-//    linkedList.get(1);            //返回3
+//    vector<string> s = { ".....","..E..",".WO..","....." };
+//    Solution so;
+//    for (auto v : so.ballGame(5, s))
+//    {
+//        cout << v[0] << ' '<<v[1] << endl;
+//    }
 //}
-
-
-
-//输入：
-//num = 5
-//plate = [".....", "..E..", ".WO..", "....."]
-//输出： [[0, 1], [1, 0], [2, 4], [3, 2]]
-//解释：
-//在[0, 1] 处打入弹珠，弹珠前进 2 步，遇到转向器后前进方向逆时针旋转 90 度，再前进 1 步进入洞中。
-//在[1, 0] 处打入弹珠，弹珠前进 2 步，遇到转向器后前进方向顺时针旋转 90 度，再前进 1 步进入洞中。
-//在[2, 4] 处打入弹珠，弹珠前进 2 步后进入洞中。
-//在[3, 2] 处打入弹珠，弹珠前进 1 步后进入洞中。
-const int N = 1005, 
-dx[] = { 1,0,-1,0 }, 
-dy[] = { 0,-1,0,1 }, //下左上右，按照顺时针顺序排列
-inf = 0x3f3f3f3f;
-int n, m, dp[N][N][4];//dp[x][y][d]表示在（x，y）坐标，方向为d的状态下，到达弹珠洞需要多少步
-bool vis[N][N][4];//表示此状态是否遇到过
-vector<string> plate;
-int dfs(int x, int y, int d) 
-{//x,y,d表示当前状态
-    if (x >= n || x < 0 || y >= m || y < 0)
-        return inf;//已经出界，则永远无法到达洞里
-    if (dp[x][y][d] != -1)//之前已经计算过该状态到洞里需要多少步，直接返回
-        return dp[x][y][d];
-    if (vis[x][y][d])//如果上面没有返回，那么就说明进入了一个环，永远无法到达洞里，因为dp[x][y][d]==-1，说明
-                    //还没有计算出该状态到洞里需要多少步，也就是dfs还没有返回上一层，而vis[x][y][d]==1说明
-                    //之前遇到过这个状态，并且还没有计算出结果，正在等待下层dfs返回结果，这样就是一个环
-                    //不加这个剪枝也可以，因为不可能出现一个环
-        return dp[x][y][d] = inf;//返回永远不可能到达洞里
-    vis[x][y][d] = 1;//此状态已访问
-    if (plate[x][y] == '.') 
-    {//当前位置是“平地”则保持原有方向，dfs(x + dx[d], y + dy[d], d)表示在（x + dx[d]，y + dy[d]）坐标，方向为 d 的状态下，
-        //到达弹珠洞需要多少步，加 1 表示向前走一步，从x --> x + dx[d]
-        dp[x][y][d] = dfs(x + dx[d], y + dy[d], d) + 1;
-    }
-    else if (plate[x][y] == 'O')//已经到洞里了
-        dp[x][y][d] = 0;
-    else if (plate[x][y] == 'W') 
-    {//W表示逆时针转向器（弹珠经过时方向将逆时针旋转 90 度），原来方向为d，d+1为顺时针旋转，d-1位逆时针旋转
-        int D = ((d-1)+4) % 4;
-        dp[x][y][d] = dfs(x + dx[D], y + dy[D], D) + 1;
-    }
-    else 
-    {//E表示顺时针转向器（弹珠经过时方向将顺时针旋转 90 度），原来方向为d，d+1为顺时针旋转，d-1位逆时针旋转
-        int D = (d + 1) % 4;
-        dp[x][y][d] = dfs(x + dx[D], y + dy[D], D) + 1;
-    }
-    vis[x][y][d] = 0;//不回溯可以，这是因为同一位置，同一方向，不管从哪个边界射入，此状态到达洞里的步数是不会变的
-                     //这里回溯的话就是说，每一次从不同边界射入，所有状态都是未知的，但是因为dp没有被重置，所以还是会剪枝
-                    //不会超时
-    return dp[x][y][d];//返回此状态到达洞里需要多少步
-}
-class Solution {
-public:
-    vector<vector<int>> ballGame(int num, vector<string>& plate) {
-        ::plate = plate;
-        n = plate.size(), m = plate[0].size();
-        memset(vis, 0, sizeof(vis));
-        memset(dp, -1, sizeof(dp));//初始化
-        vector<vector<int>> ans;
-        for (int i = 0;i < n;++i)
-            for (int j = 0;j < m;++j)
-                if ((i == 0 || j == 0 || i == n - 1 || j == m - 1) && plate[i][j] == '.')
-                {//从边界的“平地”开始射入弹珠
-                    if (i == 0 && j == 0)
-                        continue;//四个角都不算
-                    if (i == 0 && j == m - 1)
-                        continue;
-                    if (i == n - 1 && j == 0)
-                        continue;
-                    if (i == n - 1 && j == m - 1)
-                        continue;
-                    if (i == 0) 
-                    {//从上边界射入，方向向下
-                        if (dfs(i, j, 0) <= num)//能到达洞里
-                            ans.push_back({ i,j });
-                    }
-                    else if (i == n - 1) 
-                    {//从下边界射入，方向向上
-                        if (dfs(i, j, 2) <= num)
-                            ans.push_back({ i,j });
-                    }
-                    else if (j == 0) 
-                    {//从左边界射入，方向向右
-                        if (dfs(i, j, 3) <= num)
-                            ans.push_back({ i,j });
-                    }
-                    else 
-                    {//从右边界射入，方向向左
-                        if (dfs(i, j, 1) <= num)
-                            ans.push_back({ i,j });
-                    }
-                }
-        return ans;
-    }
-};
-int main()
-{
-    vector<string> s = { ".....","..E..",".WO..","....." };
-    Solution so;
-    for (auto v : so.ballGame(5, s))
-    {
-        cout << v[0] << ' '<<v[1] << endl;
-    }
-}
