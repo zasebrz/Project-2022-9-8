@@ -12,6 +12,7 @@
 #include<time.h>
 #include<string>
 #include<sstream>
+#include<fstream>
 #include<unordered_map>
 #include<stack>
 #include<numeric>
@@ -21241,3 +21242,136 @@ T m_lcm(T a, T b)
 //        cout << v[0] << ' '<<v[1] << endl;
 //    }
 //}
+
+/////////////////////////////////////////读写文件，并根据字符串长度排序///////////////////////////
+
+//打开文件并根据文件中的字符串长度排序
+//int standard(vector<string>& nums, int low, int high)
+//{
+//    int k = rand() % (high - low + 1) + low;//在[low,high]之间随机产生一个下标，并以这个下标的值为后面的判断依据
+//    swap(nums[low], nums[k]);//必须要交换，如果不交换而直接用nums[k]去比较的话，会丢失最左端nums[left]的值，因为后面直接把nums[low] = nums[high]，而此时nums[low]没有保存
+//	string temp = nums[low];//而交换的话就可以用temp去保存nums[k]的值，而nums[k]保存的就是nums[low]的值
+//	while (low < high)
+//	{
+//		while (low < high && nums[high].length()>=temp.length()) //如果这里不加low<high的话，在升序排列的数组中high会一直减小到-1，造成数组越界
+//		{
+//			--high;
+//		}
+//		nums[low] = nums[high];
+//		while (low < high && nums[low].length() <= temp.length())//同理
+//		{
+//			++low;
+//		}
+//		nums[high] = nums[low];
+//	}
+//	nums[low] = temp;
+//	return low;
+//}
+//void quicksort(vector<string>& nums, int low, int high)
+//{
+//	if (low < high)
+//	{
+//		int index=standard(nums, low, high);
+//		quicksort(nums, low, index - 1);
+//		quicksort(nums, index+1, high);
+//	}
+//}
+//void merge(vector<string>& array, int start, int mid, int end, vector<string>& tmp)
+//{
+//    int i = start;//start是左边分支的开头，mid是左边分支的结尾，则左边分支个数是 mid-left+1
+//    int j = mid + 1;//mid + 1 是右边分支的开头，end是右边分支的结尾，则右边分支个数是 end - (mid + 1) + 1 = end - mid，左右分支总共有 end - left + 1 个数
+//    for (int k = start;k <= end;k++)
+//    {
+//        tmp[k] = array[k];
+//    }
+//    //将左右两个分支比较合并，这是 归并 的实现
+//    for (int k = start; k <= end; ++k)
+//    {//要处理的数总共有 end-left+1 个，从start开始，到end结束，注意两个都是闭区间
+//        //此处会发生合并，分别进行比较，总共比较k次，复杂度O(k)
+//        if ((i <= mid && j <= end && tmp[i].length() >= tmp[j].length()) || j == end+1)
+//        {
+//            array[k] = tmp[i];
+//            i = i + 1;
+//        }
+//        else if ((i <= mid && j <= end && tmp[i].length() < tmp[j].length()) || i==mid+1)
+//        {
+//            array[k] = tmp[j];
+//            j = j + 1;
+//        } 
+//    }
+//}
+//void mergesort(vector<string>& array, int start, int end, vector<string>& tmp)
+//{
+//    if (start < end)
+//    {//start，end都是闭区间，所以 start==end 的时候就只有一个数了，不需要再分了
+//        int temp = (start + end) / 2;
+//        //开始递归
+//        mergesort(array, start, temp, tmp);//左分支
+//        //关于传参temp + 1 如果start和end之间的差为1，则直接对两个数进行排序
+//        mergesort(array, temp + 1, end, tmp);//右分支
+//        merge(array, start, temp, end,tmp);//左右分支合并，左分支可能比右分支多一个数
+//    }
+//}
+//int main()
+//{
+//    fstream infile("test.txt",ios::in), outfile("test1.txt", ios::out);//只有声明为out的时候才会新建文件并写入，其他模式不会新建也不会报错
+//    vector<string> v;
+//    string s;
+//    while (infile>>s)
+//    {
+//        v.push_back(s);
+//    }
+//    /*sort(v.begin(), v.end(), [](const string& a, const string& b)
+//        {
+//            return a.length() > b.length();
+//        });*/
+//    int n = v.size();
+//    //quicksort(v, 0, n - 1);//快排
+//    vector<string> tmp(n);
+//    mergesort(v, 0, n - 1, tmp);//归并
+//    for (auto s : v)
+//    {
+//        cout << s << endl;
+//        outfile << s <<'\n';
+//    }
+//    infile.close(); //关闭文件
+//    outfile.close();//必须关闭以后才能打开另一个文件
+//    outfile.open("test2.txt", ios::out);//写入另一个文件
+//    for (auto s : v)
+//    {
+//        outfile << s <<'\n';
+//    }
+//    outfile.close();
+//}
+
+
+int main()
+{
+    int n = 20;
+    string s = to_string(n);
+    int m = s.length();
+    vector<vector<int>> dp(m, vector<int>(m,-1));
+    function<int(int, bool, int)> fun = [&](int i, bool is_limit, int hasone)->int
+    {
+        if (i == m)
+        {
+            return hasone;
+        }
+        if (!is_limit && dp[i][hasone] != -1)
+        {
+            return dp[i][hasone];
+        }
+        int up = is_limit ? s[i] - '0' : 9;
+        int res = 0;
+        for (int d = 0;d <= up;++d)
+        {
+            res += fun(i + 1, is_limit && d == up, hasone + (d == 1));
+        }
+        if (!is_limit)
+        {
+            dp[i][hasone] = res;
+        }
+        return res;
+    };
+    cout << fun(0, true, 0) << endl;
+}
