@@ -21345,33 +21345,90 @@ T m_lcm(T a, T b)
 //}
 
 
+//int main()
+//{
+//    int n = 20;
+//    string s = to_string(n);
+//    int m = s.length();
+//    vector<vector<int>> dp(m, vector<int>(m,-1));
+//    function<int(int, bool, int)> fun = [&](int i, bool is_limit, int hasone)->int
+//    {
+//        if (i == m)
+//        {
+//            return hasone;
+//        }
+//        if (!is_limit && dp[i][hasone] != -1)
+//        {
+//            return dp[i][hasone];
+//        }
+//        int up = is_limit ? s[i] - '0' : 9;
+//        int res = 0;
+//        for (int d = 0;d <= up;++d)
+//        {
+//            res += fun(i + 1, is_limit && d == up, hasone + (d == 1));
+//        }
+//        if (!is_limit)
+//        {
+//            dp[i][hasone] = res;
+//        }
+//        return res;
+//    };
+//    cout << fun(0, true, 0) << endl;
+//}
+
+/////////////////////////////////////////777. 在LR字符串中交换相邻字符///////////////////////////
+
+//https://leetcode.cn/problems/swap-adjacent-in-lr-string/solution/by-ac_oier-ye71/
+//输入: start = "RXXLRXRXL", end = "XRLXXRRLX"
+//输出 : True
+//解释 :
+//我们可以通过以下几步将start转换成end:
+//RXXLRXRXL ->
+//XRXLRXRXL ->
+//XRLXRXRXL ->
+//XRLXXRRXL ->
+//XRLXXRRLX
 int main()
 {
-    int n = 20;
-    string s = to_string(n);
-    int m = s.length();
-    vector<vector<int>> dp(m, vector<int>(m,-1));
-    function<int(int, bool, int)> fun = [&](int i, bool is_limit, int hasone)->int
+    string start = "RXXLRXRXL", end = "XRLXXRRLX";
+    int left = 0, right = 0, n = start.size();
+    while (left < n || right < n)
     {
-        if (i == m)
-        {
-            return hasone;
+        while (left < n && start[left] == 'X')
+        {//在start字符串中，从左往右找到一个不是X的值
+            left++;
         }
-        if (!is_limit && dp[i][hasone] != -1)
-        {
-            return dp[i][hasone];
+        while (right < n && end[right] == 'X')
+        {//在end字符串中，从左往右找到一个不是X的值
+            right++;
         }
-        int up = is_limit ? s[i] - '0' : 9;
-        int res = 0;
-        for (int d = 0;d <= up;++d)
+        //判断是否有一个串遍历完成，而另一个串遍历没有完成的情况,
+        // 如果出现了就只有两种结果：
+        //      1.两个串都只有 X 但是长度不相同(题目保证了长度相同，所以这种情况不可能）
+        //      2.其中一个串都是X，另一个串有一个其他字符，这样就会出现一个串遍历完了，但另一个还没有
+        //可以用 i==j 这个判断式来直接判断结果
+        if (left == n || right == n)
         {
-            res += fun(i + 1, is_limit && d == up, hasone + (d == 1));
+            return left == right;
         }
-        if (!is_limit)
-        {
-            dp[i][hasone] = res;
+        if (start[left] != end[right])
+        {//两个串中'L'和'R'出现的顺序必须相同，也就是去掉所有的 X 后，两个串是相同的
+            //此时start[left] 和 end[right] 都不是 X,则他们必须相同，否则顺序不相同
+            return false;
         }
-        return res;
-    };
-    cout << fun(0, true, 0) << endl;
+        //此时start[left] 和 end[right] 都是 L 或都是 R 
+        if (start[left] == 'L' && left < right)
+        {//start串的找到的 L 必须大于等于 end串的 L 的索引，否则返回false，因为start的 L 不能右移 
+            return false;
+        }
+        if (start[left] == 'R' && left > right)
+        {//start串的找到的 R 必须小于等于 end串的 R 的索引，否则返回false，因为start的 R 不能左移 
+            return false;
+        }
+        ++right;
+        ++left;
+    }
+    return true;//这里返回什么都行，因为上面的循环里一定会返回
+
 }
+
