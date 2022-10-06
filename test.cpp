@@ -21388,47 +21388,80 @@ T m_lcm(T a, T b)
 //XRLXRXRXL ->
 //XRLXXRRXL ->
 //XRLXXRRLX
-int main()
-{
-    string start = "RXXLRXRXL", end = "XRLXXRRLX";
-    int left = 0, right = 0, n = start.size();
-    while (left < n || right < n)
-    {
-        while (left < n && start[left] == 'X')
-        {//在start字符串中，从左往右找到一个不是X的值
-            left++;
-        }
-        while (right < n && end[right] == 'X')
-        {//在end字符串中，从左往右找到一个不是X的值
-            right++;
-        }
-        //判断是否有一个串遍历完成，而另一个串遍历没有完成的情况,
-        // 如果出现了就只有两种结果：
-        //      1.两个串都只有 X 但是长度不相同(题目保证了长度相同，所以这种情况不可能）
-        //      2.其中一个串都是X，另一个串有一个其他字符，这样就会出现一个串遍历完了，但另一个还没有
-        //可以用 i==j 这个判断式来直接判断结果
-        if (left == n || right == n)
-        {
-            return left == right;
-        }
-        if (start[left] != end[right])
-        {//两个串中'L'和'R'出现的顺序必须相同，也就是去掉所有的 X 后，两个串是相同的
-            //此时start[left] 和 end[right] 都不是 X,则他们必须相同，否则顺序不相同
-            return false;
-        }
-        //此时start[left] 和 end[right] 都是 L 或都是 R 
-        if (start[left] == 'L' && left < right)
-        {//start串的找到的 L 必须大于等于 end串的 L 的索引，否则返回false，因为start的 L 不能右移 
-            return false;
-        }
-        if (start[left] == 'R' && left > right)
-        {//start串的找到的 R 必须小于等于 end串的 R 的索引，否则返回false，因为start的 R 不能左移 
-            return false;
-        }
-        ++right;
-        ++left;
-    }
-    return true;//这里返回什么都行，因为上面的循环里一定会返回
+//int main()
+//{
+//    string start = "RXXLRXRXL", end = "XRLXXRRLX";
+//    int left = 0, right = 0, n = start.size();
+//    while (left < n || right < n)
+//    {
+//        while (left < n && start[left] == 'X')
+//        {//在start字符串中，从左往右找到一个不是X的值
+//            left++;
+//        }
+//        while (right < n && end[right] == 'X')
+//        {//在end字符串中，从左往右找到一个不是X的值
+//            right++;
+//        }
+//        //判断是否有一个串遍历完成，而另一个串遍历没有完成的情况,
+//        // 如果出现了就只有两种结果：
+//        //      1.两个串都只有 X 但是长度不相同(题目保证了长度相同，所以这种情况不可能）
+//        //      2.其中一个串都是X，另一个串有一个其他字符，这样就会出现一个串遍历完了，但另一个还没有
+//        //可以用 i==j 这个判断式来直接判断结果
+//        if (left == n || right == n)
+//        {
+//            return left == right;
+//        }
+//        if (start[left] != end[right])
+//        {//两个串中'L'和'R'出现的顺序必须相同，也就是去掉所有的 X 后，两个串是相同的
+//            //此时start[left] 和 end[right] 都不是 X,则他们必须相同，否则顺序不相同
+//            return false;
+//        }
+//        //此时start[left] 和 end[right] 都是 L 或都是 R 
+//        if (start[left] == 'L' && left < right)
+//        {//start串的找到的 L 必须大于等于 end串的 L 的索引，否则返回false，因为start的 L 不能右移 
+//            return false;
+//        }
+//        if (start[left] == 'R' && left > right)
+//        {//start串的找到的 R 必须小于等于 end串的 R 的索引，否则返回false，因为start的 R 不能左移 
+//            return false;
+//        }
+//        ++right;
+//        ++left;
+//    }
+//    return true;//这里返回什么都行，因为上面的循环里一定会返回
+//
+//}
 
-}
+/////////////////////////////////////////C语言中字符数组和字符串指针的区别///////////////////////////
+
+//https://blog.csdn.net/dahuang1016/article/details/108519382
+//https://blog.csdn.net/qq_43353179/article/details/109353528
+//int main()
+//{
+//    char str1[] = "abcd";//字符数组，两份内存，一份在栈里面，一份在静态变量区，栈中的允许修改
+//    char str2[] = "abcd";
+//
+//    const char str3[] = "abcd";
+//    const char str4[] = "abcd";
+//
+//    str1[0] = 'A';//正确，str1是字符数组，且不是const
+//    //str3[0] = 'A';//错误，str3是字符数组，但它是const
+//
+//    const char* str5 = "abcd";//字符串指针，一份内存，在静态变量区，不允许修改
+//    const char* str6 = "abcd";
+//
+//    char* str7 = "abcd";
+//    char* str8 = "abcd";
+//
+//    //str5[0] = 'A';//错误，str5是字符串指针，但它声明为指向常量的指针，所以不能修改
+//    //str7[0] = 'A';//错误，str7是字符串指针，且不是const，所以可以通过指针去修改对象，但是对象存在静态变量区，不允许修改
+//                  //所以这条语句可以通过编译，不能运行
+//
+//    cout << (str1 == str2) << endl;
+//    cout << (str3 == str4) << endl;
+//    cout << (str5 == str7) << endl;
+//    cout << (str7 == str8) << endl;
+//
+//    cout << str1 << endl << str2 << endl << str3 << endl << str4 << endl << str5 << endl << str6 << endl << str7 << endl << str8 << endl;
+//}
 
