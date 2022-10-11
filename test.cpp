@@ -8675,7 +8675,7 @@ T m_lcm(T a, T b)
 //            nums[k] = tmp[j++];
 //        else if (j == r + 1 || tmp[i] <= tmp[j])//如果右边子数组遍历完了，或者左边子数字的数小于等于右边子数组里的数，那就添加左子数组当前元素 tmp[i]
 //            nums[k] = tmp[i++];
-//        else {//否则说明左边子数字的数大于右边子数组里的数，构成逆序对，而在合并阶段的两个子数组[l,m]和[m+1,r]都是排好序的，所以一旦左边子数组里的某个数大于右边子数组的某个值，那么左边子数组
+//        else {//否则说明左边子数组的数大于右边子数组里的数，构成逆序对，而在合并阶段的两个子数组[l,m]和[m+1,r]都是排好序的，所以一旦左边子数组里的某个数大于右边子数组的某个值，那么左边子数组
 //              //后面的所有数都和右边子数组中的这个数构成逆序对，因此res += m - i + 1。
 //            nums[k] = tmp[j++];
 //            res += m - i + 1; // 统计逆序对
@@ -8693,6 +8693,77 @@ T m_lcm(T a, T b)
 //        cout << i << ' ';
 //    }
 //    cout << endl << res << endl;
+//}
+//**********************************************值域离散化+树状数组求逆序对******************************************
+class BIT {
+private:
+    vector<int> tree;
+    int n;
+
+public:
+    BIT(int _n) : n(_n), tree(_n + 1) {}//+1是因为树状数组从下标1 开始才算是有效的，也就是[1-n]时有效下标
+
+    static int lowbit(int x) 
+    {
+        return x & (-x);
+    }
+
+    int query(int x) 
+    {//查询操作是由树顶层往树底层查询的
+        int ret = 0;
+        while (x) {
+            ret += tree[x];
+            x -= lowbit(x);//因此是减
+        }
+        return ret;
+    }
+
+    void update(int x) 
+    {//更新操作是由树底层往树顶层更新的
+        while (x <= n) {
+            ++tree[x];
+            x += lowbit(x);//因此是加
+        }
+    }
+};
+//记题目给定的序列为 a，我们规定 a 的取值集合为 a 的「值域」。我们用桶来表示值域中的每一个数，桶中记录这些数字出现的次数。
+//假设a = { 5,5,2,3,6 }，那么遍历这个序列得到的桶是这样的：
+//  桶   ->  1 2 3 4 5 6 7 8 9
+//value  ->  0 1 1 0 2 1 0 0 0
+//·我们可以看出它第 i−1 位的前缀和表示「有多少个数比 i 小」，比如i=5，i-1=4的前缀和为 2，表示有 2 个数比 5 小，分别是2 和 3。
+//  那么我们可以 从后往前 遍历序列 a，记当前遍历到的元素为 ai​
+//  我们把 ai对应的桶的值自增 1，把 i−1 位置的前缀和加入到答案中算贡献。为什么这么做是对的呢，因为我们在循环的过程中，
+//  我们把原序列分成了两部分，后半部分已经遍历过（已入桶），前半部分是待遍历的（未入桶），
+//  那么我们求到的 i−1 位置的前缀和就是「已入桶」的元素中比 ai 小的元素的总和，这些元素在原序列中排在 ai的后面，
+//  因为我们是从后往前遍历的，而这些元素先入桶了，但它们本应该排在 ai 的前面，这样就形成了逆序对。
+//·我们显然可以用数组来实现这个桶，可问题是如果 ai​中有很大的元素，比如 10^9，我们就要开一个大小为 10^9的桶，
+//  内存中是存不下的。这个桶数组中很多位置是 0，有效位置是稀疏的，我们要想一个办法让有效的位置全聚集到一起，
+//  减少无效位置的出现，这个时候我们就需要用到一个方法——离散化。
+//  离散化一个序列的前提是我们只关心这个序列里面元素的相对大小，而不关心绝对大小（即只关心元素在序列中的排名）；
+//  离散化的目的是让原来分布零散的值聚集到一起，减少空间浪费。那么如何获得元素排名呢，我们可以对原序列排序后去重，
+//  对于每一个 ai 通过二分查找的方式计算排名作为离散化之后的值。当然这里也可以不去重，不影响排名。
+
+//int main()
+//{
+//    vector<int> nums = { 7,2,2,6,0,1,5,4 };
+//    int n = nums.size();
+//    vector<int> tmp = nums;//原序列保持不变
+//    // 离散化
+//    sort(tmp.begin(), tmp.end());//对新序列排序
+//    for (int& num : nums) 
+//    {//注意这里是引用，找到原序列中每个数在桶中的相对位置，也就是 num 变成 第几小的数 ，这样保证了序列最大值是 n，
+//        //num = lower_bound(tmp.begin(), tmp.end(), num) - tmp.begin()+1;//效果是一样的，这里必须加 1，否则最小的数就成了 第0小的数
+//        num = upper_bound(tmp.begin(), tmp.end(), num) - tmp.begin();
+//    }
+//    // 树状数组统计逆序对
+//    BIT bit(n);//申明一个树状数组
+//    int ans = 0;
+//    for (int i = n - 1; i >= 0; --i) 
+//    {//从后往前遍历
+//        ans += bit.query(nums[i] - 1);//对于第 i 位，求 i-1的前缀和即时求有多少个比他小的数 位置在它后面，就构成多少逆序对
+//        bit.update(nums[i]);//递增第 i 位的数值
+//    }
+//    return ans;
 //}
 
 /////////////////////////////////////////// 给表达式添加运算符+-*,使结果等于target////////////////////////////////////////
@@ -15018,6 +15089,7 @@ T m_lcm(T a, T b)
 //https://leetcode.cn/problems/random-pick-index/solution/by-ac_oier-zhml/
 //https://mp.weixin.qq.com/s?__biz=MzU4NDE3MTEyMA==&mid=2247490892&idx=1&sn=c1fe373edc88142cbabd383ef3c0669b
 //https://blog.csdn.net/weixin_40418080/article/details/124417080
+//https://blog.csdn.net/anshuai_aw1/article/details/88750673
 //整理题意：总的样本数量未知，从所有样本中抽取若干个，要求每个样本被抽到的概率相等。
 //具体做法为：从前往后处理每个样本，每个样本成为答案的概率为 1/i，其中 i 为样本编号（编号从 1 开始），
 //最终可以确保每个样本成为答案的概率均为 1/n（其中 n 为样本总数）。
@@ -21465,3 +21537,342 @@ T m_lcm(T a, T b)
 //    cout << str1 << endl << str2 << endl << str3 << endl << str4 << endl << str5 << endl << str6 << endl << str7 << endl << str8 << endl;
 //}
 
+/////////////////////////////////////////927. 三等分///////////////////////////
+
+//https://leetcode.cn/problems/three-equal-parts/solution/by-lcbin-7ir1/
+//vector<int> threeEqualParts(vector<int>& arr) {
+//    int sum = accumulate(arr.begin(), arr.end(), 0);//计算 1 的个数
+//    int n = arr.size();
+//    if (sum % 3)
+//    {//不能平分成三份
+//        return { -1,-1 };
+//    }
+//    if (sum == 0)
+//    {//没有 1 ，返回任意分隔位置
+//        return { 0,2 };
+//    }
+//    int cnt = sum / 3;//每一份应该拥有的 1的个数
+//    int i=-1, j=-1, k=-1;
+//    int s = 0;
+//    for (int p = 0; p < n; ++p)
+//    {//寻找每一份中第一个 1 的位置
+//        s += arr[p];
+//        if (s == 1 && i==-1)
+//        {//第一份的第一个 1 的位置
+//            i = p;
+//        }
+//        if (s == cnt + 1 && j == -1)
+//        {//第二份的第一个 1 的位置，由于第一份里面有cnt个 1 ，则第二份的第一个 1 一定是 cnt+1的位置
+//            j = p;
+//        }
+//        if (s == 2 * cnt + 1 && k == -1)
+//        {//第三份的第一个 1 的位置，由于第一、二份里面有 2*cnt 个 1 ，则第三份的第一个 1 一定是 2*cnt+1的位置
+//            k = p;
+//        }
+//    }
+//    for (; k < n && arr[i] == arr[j] && arr[j] == arr[k]; ++i, ++j, ++k)
+//    {//已经找到了每一份的首位，往后比较，其实关键就是第三组末尾的0数量是确定的，
+//        //所以想着怎么用第三组的大小去找前两个指针的位置。 
+//        //如果和第三组的比较没能全部完成说明就是不符合的
+//
+//    }
+//    if (k == n)
+//    {//比较到了末尾，说明可以找到一种分组方式，现在 i 和 j 已经是第二份的第一个数和第三份的第一个数的，所以 i-1
+//        return { i - 1, j };
+//    }
+//    return { -1, -1 };
+//}
+//int main()
+//{
+//    vector<int> a = { 1,0,1,0,1 };
+//    threeEqualParts(a);
+//}
+
+/////////////////////////////////////////2420. 找到所有好下标///////////////////////////
+
+//输入：nums = [2, 1, 1, 1, 3, 4, 1], k = 2
+//输出：[2, 3]
+//解释：数组中有两个好下标：
+//- 下标 2 。子数组[2, 1] 是非递增的，子数组[1, 3] 是非递减的。
+//- 下标 3 。子数组[1, 1] 是非递增的，子数组[3, 4] 是非递减的。
+//注意，下标 4 不是好下标，因为[4, 1] 不是非递减的。
+//https://leetcode.cn/problems/find-all-good-indices/solution/zhao-dao-suo-you-hao-xia-biao-by-leetcod-w5ar/
+//int main()
+//{
+//    vector<int> nums = { 2,1,1,1,3,4,1 };
+//    int k = 2;
+//    int n = nums.size();
+//    vector<int> left(n, 1), right(n, 1);//left[i]表示以下标 i 结尾的非递增子数组的长度，初始化为 1
+//                                        //right[i]表示以下标 i 开头的非递减子数组的长度，初始化为 1
+//    for (int i = 1;i < n;i++)
+//    {//i从 1开始
+//        if (nums[i] <= nums[i - 1])
+//        {//如果nums[i]小于等于 前一个数，说明他可以跟在前一个数后面，形成一个更长的非递增子数组，则长度加 1，否则只能单独组成子数组，长度为 1
+//            left[i] = left[i - 1] + 1;
+//        }
+//        if (nums[n - i - 1] <= nums[n - i])
+//        {//同理，n-i-1从 n-2 开始
+//            right[n - i - 1] = right[n - i] + 1;
+//        }
+//    }
+//    vector<int> res;
+//    for (int i = k;i <= n - k - 1;i++)
+//    {//对于每个大于等于k的下标
+//        if (left[i - 1] >= k && right[i + 1] >= k)
+//        {//如果以前一个数结尾的非递增子数组长度和以下一个数开头的非递减子数组长度都大于等于k，说明他是一个好下标，这里
+//            //不能是left[i]和right[i]，因为这两个都是以 nums[i]结尾和开头的，题目对nums[i]没有要求
+//            res.push_back(i);
+//        }
+//    }
+//    for (auto i : res)
+//    {
+//        cout << i << ' ';
+//    }
+//}
+
+/////////////////////////////////////////2421. 好路径的数目///////////////////////////
+
+//一条 好路径 需要满足以下条件：
+//开始节点和结束节点的值 相同 。
+//开始节点和结束节点中间的所有节点值都 小于等于 开始节点的值（也就是说开始节点的值应该是路径上所有节点的最大值）。
+//https://leetcode.cn/problems/number-of-good-paths/solution/bing-cha-ji-by-endlesscheng-tbz8/
+//int main()
+//{
+//    vector<int> vals = { 2,5,5,1,5,2,3,5,1,5 };// i 号节点的值为 vals[i]
+//    vector<vector<int>> edges = { { 0,1},{2,1},{3,2},{3,4},{3,5},{5,6},{1,7},{8,4},{9,7}};//{a,b}，节点a和节点b之间有一条路径
+//    //vector<int> vals = { 1,1,2,2,3};
+//    //vector<vector<int>> edges = { { 0,1},{1,2 }, { 2,3},{2,4 } };
+//    int n = vals.size();
+//    vector<vector<int>> g(n);
+//    for (auto& e : edges) {
+//        int x = e[0], y = e[1];
+//        g[x].push_back(y);
+//        g[y].push_back(x); // 建图
+//    }
+//
+//    // 并查集模板
+//    // size[x] 表示节点值等于 vals[x] 的节点个数，如果按照节点值从小到大合并，size[x] 也是连通块内的等于最大节点值的节点个数
+//    vector<int> id(n), fa(n), size(n,1);
+//    iota(id.begin(), id.end(), 0);
+//    iota(fa.begin(), fa.end(), 0);
+//    function<int(int)> find = [&](int x) -> int 
+//    { 
+//        return fa[x] == x ? x : fa[x] = find(fa[x]); 
+//    };
+//    int ans = n;
+//    sort(id.begin(), id.end(), [&](int i, int j) 
+//        {//根据vals的值给id排序，保证我们从前往后访问时，是从vals值最小的开始的
+//            return vals[i] < vals[j]; 
+//        });
+//    for (int x : id) {//x是节点序号，vx是节点值
+//        int fx = find(x);//fx是x的帮主，帮主是帮派里值最大的
+//        for (int y : g[x]) 
+//        {//对于x的邻居节点
+//            int fy = find(y);
+//            //为什么要先找 y 的帮主？
+//            //因为可以快速帮助我们判断是否存在合理路径。
+//            //先找到y的帮主，此时的 fy 在他所在的帮派里具有最大的值,fy可能是之前遍历过的或者没有遍历过的
+//            //·对于已经遍历过的，vals[fy]一定小于等于vx，若小于vx，fy的帮派里不可能有节点值和vx相同（因为fy是他们帮派里值最大的，连他都小于vx）
+//            //若等于vx，则在之前遍历到fy时，相邻的都已经划分进帮派里了，比如遍历第一个 1 的时候，作为邻居节点的第二个 1就已经成为第一个 1 的小弟了
+//            //而不相邻的节点则需要等待之后的遍历，所以下面仍然需要size（fx）*size（fy），而不能是size（fx）* 1
+//            //此时他们的帮主是第一个 1 ，那么在遍历到第二个 1 时，fx=0，y=0，则不需要在计算一次这条路径了，避免了重复计算
+//            //·对于没有遍历过的，vals[fy]一定大于等于vx，若大于vx，则不可能再有和vx相同的节点，直接遍历下一邻居
+//            //若等于vx，则把它计算进答案里，就像上面遍历第一个 1 那样
+//            if (fy == fx || vals[fy] > vals[x]) //x和fy可能之前就已经属于同一帮派了，这样的话他们的帮主是相同的，那么不需要合并
+//                continue; //或者 帮主 fy节点值大于vx，不可能再有值相同的节点
+//            if (vals[fy] == vals[x]) 
+//            {//因为fx和fy都是他们各自连通域内最大的值，所以只要统计一下各自连通域内有多少个相同的最大值就可以了
+//                //当前我们遍历到的数是 x，由于是从小到大遍历，那么此时的 x 一定大于等于它所属连通域内的值
+//                //如果大于，那么fx = x，说明我们是第一次访问此节点，那么此时的 size[fx]=1
+//                //如果等于，那么fx != x（因为对于相同值且相邻的节点，我们优先把先访问的节点设为帮主）
+//                //那么整个帮派内相同的最大值是记录在size[fx]里面的，不是size[x]，所以用size[x]会少算一部分
+//                //不可能出现 x 小于他所属连通域内的值，因为对于所有之前遍历到的节点，如果他们的邻居节点的值大于 当前遍历节点的值
+//                //我们是直接跳过此邻居节点的，不会把他加入连通域（vals[fy] > vals[x]）
+//                //基于上述原因，x 要么是帮主 fx，要么和帮主的值相同，所以当vals[fy] == vals[x]时，我们可以认为是
+//                //vals[fy] == vals[fx]，所以size[fx]*size[fy]是成立的
+//                ans += size[fx]*size[fy]; // 乘法原理,
+//                size[fx] += size[fy]; // 统计连通块内节点值等于 vx 的节点个数
+//            }
+//            fa[fy] = fx; // 把节点值小的或者 相同但是后访问 的节点合并到节点值大的 或者 先访问的节点 上
+//        }
+//    }
+//    cout << ans << endl;
+//}
+
+/////////////////////////////////////////多线程执行///////////////////////////
+
+// 创建一个在线程中运行的函数
+//void thread1_func(int num)
+//{
+//    for (int i = 0; i < num; i++) {
+//        cout << "线程1正在运行" << endl;
+//    }
+//}
+//
+//// 创建一个类作为线程
+//class thread2_func {
+//public:
+//    // 重载运算符()
+//    void operator() (int num)
+//    {
+//        for (int i = 0; i < num; i++)
+//            cout << "线程2正在运行" << endl;
+//    }
+//};
+//
+//// 用于测试多线程运行效果的主函数
+//int main(int argc, char** argv) {
+//
+//    // 创建线程的同时也输入了函数的参数
+//    thread thread1(thread1_func, 5);
+//    cout << thread1.get_id() << endl;
+//    thread2_func t;//函数对象，可以向使用函数那样使用它
+//    thread thread2(t, 5);//这里我们需要一个函数作为线程入口，所以可以用t来代替
+//    //thread thread2(thread2_func(), 5);//这里实际上是创建了一个无名的thread2_func对象，这是函数对象的第二种用法，不建议用
+//    cout << thread2.get_id() << endl;
+//    
+//    // thread thread2(thread2_func(), 5);
+//
+//    // 使用lambda表达式创建线程
+//    // 定义  表达式
+//    auto thread3_func = [](int num) {
+//        for (int i = 0; i < num; i++)
+//            cout << "线程3正在运行" << endl;
+//    };
+//
+//    // 使用 lambda 表达式作为创建线程的参数
+//    thread thread3(thread3_func, 5);
+//    cout << thread3.get_id() << endl;
+//
+//    // 运行线程
+//    thread1.join();
+//    thread2.join();
+//    thread3.join();
+//   
+//    // 结束程序
+//    cout << "Done." << endl;
+//    return 0;
+//}
+
+/////////////////////////////////////////870. 优势洗牌///////////////////////////
+
+//https://leetcode.cn/problems/advantage-shuffle/solution/tian-ji-sai-ma-by-endlesscheng-yxm6/
+//nums1 相对于 nums2 的优势可以用满足 nums1[i] > nums2[i] 的索引 i 的数目来描述。
+//返回 nums1 的任意排列，使其相对于 nums2 的优势最大化。
+//输入：nums1 = [2,0,4,1,2], nums2 = [1,3,0,0,2]
+//输出：[2,0,2,1,4]或[2,0,1,2,4]，总共有4个优势
+//把 nums1当成是田忌的马，nums2当成是齐威王的马。讨论田忌的下等马nums1​的最小值：
+//·如果它能比过齐威王的下等马nums2的最小值，那这一分田忌直接拿下；
+//·如果它比不过齐威王的下等马，则用田忌的下等马比齐威王的上等马nums2的最大值，相当于用最小的代价取得最大的价值。
+//去掉这两匹马，问题变成一个规模更小（n - 1）的子问题。重复上述过程，即得到了所有马的对应关系。
+//int main()
+//{
+//    vector<int> nums1 = { 2,0,4,1,2 }, nums2 = { 1,3,0,0,2 };
+//    int n = nums1.size();
+//    vector<int> idx(n), res(n);
+//    sort(nums1.begin(), nums1.end());//只需要nums1的任意排列，所以可以排序
+//    iota(idx.begin(), idx.end(), 0);
+//    //由于 nums2不能排序，我们可以创建一个下标数组 ids，对ids 排序，即 ids[0] 对应 nums2
+//    //中最小值的下标，ids[1] 对应 nums2中第二小值的下标，……。
+//    sort(idx.begin(), idx.end(), [&](const int a, const int b)
+//        {
+//            return nums2[a] < nums2[b];
+//        });
+//    int lhs = 0, rhs = n - 1;//表示当前nums2中最小的值和最大的值，他们在ids中的下标分别是0和n-1
+//    for (auto x : nums1)
+//    {//对于每一个田忌的马
+//        //idx[lhs]表示齐威王最小的马，idx[rhs--]表示齐威王最大的马
+//        //如果 x 大于idx[lhs]，这一分直接拿下，并且没有任何的浪费，因为 x 是当前田忌最小的马
+//        //否则的话，直接用最小的马去抵消对方最大的马
+//        //k是当前要抵消的齐威王的马的下标
+//        int k = x > nums2[idx[lhs]] ? idx[lhs++] : idx[rhs--];
+//        res[k] = x;//把当前田忌的马放到要抵消的齐威王的马的下标上
+//    }
+//}
+
+/////////////////////////////////////////801. 使序列递增的最小交换次数///////////////////////////
+
+//https://leetcode.cn/problems/minimum-swaps-to-make-sequences-increasing/solutions/1880884/dong-tai-gui-hua-kao-lu-xiang-lin-yuan-s-ni0p/
+//考虑状态如何定义。由于当前元素的「交换」与「不交换」会影响到后续元素的「交换」与「不交换」，
+//因此需要在下标 i 的基础上，额外加上一个维度表示是否发生交换。
+//具体地，定义 f[i][0 / 1] 表示让 nums1​和 nums2​的前 i 个元素严格递增所需操作的最小次数，
+//其中 f[i][0] 表示不交换 nums1[i]和 nums2[i]，f[i][1]表示交换 nums1和 nums2[i]
+//记 a1 = nums1[i−1], a2 = nums1[i], b1 = nums2[i−1], b2 = nums2[i]。在计算 f[i][0 / 1]时，
+//根据这四个数的大小关系来决定转移来源，分类讨论如下：
+//如果 a1 < a2 且 b1 < b2，那么这两对数可以都不交换，即 f[i][0] = f[i−1][0]；也可以都交换，即 f[i][1] = f[i−1][1] + 1。
+//如果 b1 < a2 且 a1 < b2，那么可以交换其中一对，即 f[i][0] = f[i−1][1]，f[i][1] = f[i−1][0] + 1。
+//如果同时满足上述两种情况，则在转移时取较小值。
+//最后答案为 min⁡(f[n−1][0], f[n−1][1])。
+//int main()
+//{
+//    vector<int> nums1 = { 1, 3, 5, 4 }, nums2 = { 1, 2, 3, 7 };
+//    int n = nums1.size();
+//    vector<vector<int>> dp(n + 1, vector<int>(2, n+1));
+//    //dp[i]表示交换或不交换nums1和nums2的第 i 个元素组成严格递增序列所需的最小操作数
+//    //因为要去最小值，所以初始化为最大值
+//    dp[1][0] = 0;//第一个元素可以不交换，操作数为 0
+//    dp[1][1] = 1;//第一个元素可以交换，操作数为 1
+//    for (int i = 2;i <= n;i++)
+//    {
+//        if (nums1[i - 2] < nums1[i - 1] && nums2[i - 2] < nums2[i - 1])
+//        {//如果 a1 < a2 且 b1 < b2，那么这两对数可以都不交换
+//            dp[i][0] = dp[i - 1][0];
+//            dp[i][1] = dp[i - 1][1] + 1;
+//        }
+//        if (nums1[i - 2] < nums2[i - 1] && nums2[i - 2] < nums1[i - 1])
+//        {//如果 b1 < a2 且 a1 < b2，那么可以交换其中一对
+//            dp[i][0] = min(dp[i][0], dp[i - 1][1]);//本对元素不交换时，交换前面一对元素，看看是否能有更小的操作数
+//            dp[i][1] = min(dp[i][1], dp[i - 1][0] + 1);//本对元素交换时，不交换前面一对元素，看看是否能有更小的操作数
+//        }
+//    }
+//    return min(dp[n][0], dp[n][1]);//取最小值
+//}
+
+//template <typename T>
+//bool compare(const T& lhs, const T& rhs)
+//{
+//    typedef vector<T>::size_type size_type;
+//    size_type a;
+//    if (less<T>()(lhs,rhs))
+//    { 
+//        return true;
+//    }
+//    return false;
+//}
+//template <unsigned N>
+//constexpr unsigned mysize(const int (&arr)[N])
+//{
+//    return N;
+//}
+//template <typename T>
+//class Blob
+//{
+//public:
+//    Blob()
+//    {
+//        cout << "无参构造";
+//    }
+//    Blob(std::initializer_list<int> i1)
+//    {
+//        cout << "初始化列表构造" << endl;
+//    }
+//};
+//int main()
+//{
+//    const char* p1 = "123";
+//    cout << strlen(p1) << endl;
+//    string a = "123";
+//    cout << a.length() << endl;
+//    if (compare(1,2))
+//    {
+//        cout << 1 << endl;
+//    }
+//    else
+//    {
+//        cout << 0 << endl;
+//    }
+//    int a1[10] = { 0 };
+//    cout << mysize(a1) << endl;
+//    Blob<int> ia;
+//    Blob<int> ia2 = { 0,1,2 };
+//}
