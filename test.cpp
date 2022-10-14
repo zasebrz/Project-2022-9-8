@@ -3193,13 +3193,13 @@ T m_lcm(T a, T b)
 //    so.flatten(one);  
 //}
 
-//////////////////////////////////////////////字符串匹配次数（DP）////////////////////////////////////////////////////
+//////////////////////////////////////////////115. 不同的子序列（DP）////////////////////////////////////////////////////
 
 //int main(){
 //    string s = "babgbag", t = "bag";
 //    int sz = s.size();
 //    int tz = t.size();
-//    vector<vector<long long>> dp(sz + 1, vector<long long>(tz + 1, 0));//dp[i][j]表示s[0:i-1]字串和t[0:j-1]字串能够匹配的次数(可以删除s中的字符）
+//    vector<vector<unsigned long long>> dp(sz + 1, vector<unsigned long long>(tz + 1, 0));//dp[i][j]表示s[0:i-1]字串和t[0:j-1]字串能够匹配的次数(可以删除s中的字符）
 //    for (int i = 0; i <= sz; ++i)//t是空串时，任意s都只能匹配一次，s是空串时，任意t都不能匹配（初始值为0）
 //        dp[i][0] = 1;
 //    for (int i = 1; i <= sz; ++i)//从s的第一个字符s[0]开始遍历
@@ -3215,6 +3215,51 @@ T m_lcm(T a, T b)
 //            }
 //        }
 //    cout<<dp[sz][tz]<<endl;
+//}
+
+//////////////////////////////////////////////940. 不同的子序列 II（DP）////////////////////////////////////////////////////
+
+//https://leetcode.cn/problems/distinct-subsequences-ii/solutions/1890716/xi-fen-wen-ti-fu-za-du-you-hua-pythonjav-1ihu/
+//输入：s = "aba"
+//输出：6
+//解释：6 个不同的子序列分别是 "a", "b", "ab", "ba", "aa" 以及 "aba"。
+//·对于子序列问题，通常可以从每个元素「选或不选」的角度入手。
+//麻烦的地方在于，如何保证对同样的子序列，我们只统计一次？
+//·比如示例 2，从左往右遍历‘aba’，对于前两个字符 ‘ab’ 可以得到 ‘a’,‘b’,‘ab’这三个不同的子序列，
+//  但是遍历到第三个字符‘a’ 时，如果选‘a’ 单独作为子序列，会和前面得到的‘a’ 重复。
+//·你可能会想，如果我把这个‘a’ 加到‘a’,‘b’,‘ab’ 的末尾呢？这样可以得到不同的子序列 ‘aa’,‘ba’,‘aba’，
+//  同时把‘a’ 单独作为一个子序列，也不会和这些子序列重复。
+//  这个想法不错，但是这种做法没有把 ‘b’,‘ab’计入（即不选第三个字符‘a’ 的情况）。不过注意到这两个都不是以 ‘a’ 结尾的，
+//  那如果把原问题细分一下，改为分别统计以 ‘a’,‘b’,⋯ ,‘z’结尾的不同子序列的个数，问题就迎刃而解了。
+//·具体来说，在遍历 s 的过程中，把 s[i] 加到前 i−1个字符组成的 不同子序列 的末尾，同时把 s[i] 单独作为一个子序列，
+//  即得到了前 i 个字符以 s[i] 结尾的不同子序列的个数。遍历结束后把以 ‘a’,‘b’,⋯ ,‘z’结尾的不同子序列的个数相加，就得到了答案。
+//你也可以这样理解：这种做法对于相同的子序列，只会考虑其 最后一次出现的位置（下标序列的字典序最大）。
+//int main()
+//{
+//    string s = "aba";
+//    int res = 0, mod = 1e9 + 7;
+//    long long dp[26] = { 0 };//dp[i]表示 以 ‘a’+i字符结尾的不同子序列的个数
+//    dp[s[0] - 'a'] = 1;//对于第一个字符，只有一种可能
+//    for (int i = 1, n = s.size();i < n;i++)
+//    {//依次遍历，注意到这里是赋值而不是累加，这样就避免了重复计算相同子序列的个数
+//        dp[s[i] - 'a'] = accumulate(begin(dp), end(dp), 1LL) % mod;
+//    }
+//    return  accumulate(begin(dp), end(dp), 0LL) % mod;//最后把26个字符结尾的不同字序列个数相加
+//    //还能够更加一步，在 total=∑(j=[0:25]dp[j]中，每次只有 dp[s[i]-'a'] 在变动，
+//    //因此我们可以直接更新 dp[s[i]-'a'] 和 total，不需要每次都重新算一遍 total。
+//    long long dp[26] = { 0 };
+//    dp[s[0] - 'a'] = 1;
+//    res = 1;//最开始的总和为 1，也可以是 0，然后从第一个字符开始
+//    for (int i = 1, n = s.size();i < n;i++)
+//    {
+//        long long other = res - dp[s[i] - 'a'];//当前字符只会影响 dp[s[i] - 'a']，所以其他值是不变的，不需要重新计算
+//        //这里other有可能出现负数，所以下面要加上 mod
+//        dp[s[i] - 'a'] = (1 + res) % mod;//res是 遍历完前面一个字符后，
+//        //所有的不同字序列的个数（包含了所有不同的字符结尾的子序列），也就是res是上一次更新完 dp[s[i-1] - 'a']后
+//        //dp[0],dp[1]...dp[25]的总和，同时更新dp[s[i] - 'a']
+//        res = ((dp[s[i] - 'a'] + other + mod) % mod);//重新更新res
+//    }
+//    return  res;
 //}
 
 //////////////////////////////////////////////合并区间和插入区间////////////////////////////////////////////////////
@@ -4608,7 +4653,7 @@ T m_lcm(T a, T b)
 // https://leetcode.cn/problems/lfu-cache/
 //struct DoubleList;
 //struct Node
-//{
+//{//内层链表节点
 //    int freq = 1;
 //    Node* next, *pre;
 //    int key, value;
@@ -4709,8 +4754,8 @@ T m_lcm(T a, T b)
 //            }
 //            Node* new_node = new Node(key_, value_);
 //            cache[key_] = new_node;
-//            //每当有新频次的 DoubleLinkedList 需要添加进来的时候，直接插入到 lastLinkedList 这个哨兵前面，
-//            //因此 lastLinkedList.pre 就是一个最小频次的内部链表。
+//            //每当有新频次的 DoubleList 需要添加进来的时候，直接插入到 tail 这个哨兵前面，
+//            //因此 tail->pre 就是一个最小频次的外部链表节点。
 //            if (tail->pre->freq != 1)
 //            {//没有频率为1的外层链表节点，新增一个
 //                DoubleList* new_DoubleList = new DoubleList(1);
@@ -21827,6 +21872,191 @@ public:
 //    }
 //    return min(dp[n][0], dp[n][1]);//取最小值
 //}
+
+/////////////////////////////////////////给定入栈顺序，有多少种出栈方案///////////////////////////
+
+//int main()
+//{
+//    vector<int> nums = { 1,2,3,4,5 };
+//    int n = nums.size();
+//    //*******************************第一个元素是在什么时候出栈的？*******************************
+//    //https://zhuanlan.zhihu.com/p/391237550
+//    //假设 n 个元素共有 f(n) 种合法的出栈顺序
+//    //顾名思义，这个方法是讨论第一个入栈的元素 a1 在出栈时可能在第几号位置来构造的。
+//    //我们假设 a1 的出栈顺序在 i 号位置，记这个顺序为 OUTi=（....,a1(第 i位）,....）。
+//    //这个意思是有 i-1 个元素先于 a1 出栈，剩下 n-i 个元素在 a1 出栈后再出栈，当然，他们的进栈顺序是从 a1 开始到 an 的。
+//    //·在 a1 之前, OUTi 的前 i-1 个元素，他们的出栈方案是多少？这是原问题的一个 n1=i-1 的子问题​。
+//    //  因为 a1 放进去之后在栈底的位置，在 a1 这个元素出栈前的 i-1 个元素的进出操作可以看作在一个空栈上进行的，
+//    //  根据定义，出栈总数有 f(i-1) 种。
+//    //·在 a1 之后，OUTi 的后 n-i 个元素，他们的出栈方案是多少？这是原问题的一个 n2=n-i 的子问题。
+//    //  因为 a1 出栈后，此时的栈变成了一个空栈，这时，问题变成了剩下 n-i 个元素，进出一个空栈的合法出栈数，
+//    //  这和原问题的叙述一模一样，根据定义，出栈总数有 f(n-i) 种。
+//    //讨论完上述情况后，简单的排列组合知识告诉我们 a1 在位置 i 的出栈的方法数为： f(i-1)*f(n-i)，
+//    //这里记 f(0)=1(空栈的顺序为1种）
+//    //显然，计算所有的顺序可以遍历 i , 即遍历 a1 的所有出栈的位置并求和就是 f(n) 的值 ，给出公式：
+//    //f(n)=∑(i=[1:n])f(i-1)*f(n-i)
+//    //要计算后面的数必须先计算前面的数
+//    vector<int> dp(n + 1, 0);
+//    dp[0] = 1;
+//    for (int i = 1;i <= n;i++)
+//    {//要计算大的 n 必须先计算小的 n
+//        for (int j = 1;j <= i;j++)
+//        {//a1可能的出栈序号为 j，此时 i 就是上面的 n
+//            dp[i] += dp[i - j] * dp[j - 1];
+//        }
+//    }
+//    //*******************************二维动态规划*******************************
+//    //https://blog.csdn.net/jiangpeng59/article/details/54754986
+//    //https://www.cnblogs.com/popodynasty/p/13703879.html
+//    vector<vector<int>> dp1(n + 1, vector<int>(n + 1, 0));//dp1[i][j]表示入栈了 i 个元素，出栈了 j 个元素，所得到的出栈序列数
+//    for (int i = 0;i <= n;i++) 
+//    {//入栈 i 个元素，出栈 0 个元素的方案只有 1 种，那就是 反序出栈
+//        dp1[i][0] = 1;//第一列置1
+//    }
+//    //入栈了 i 次，出栈了 j 次的出栈序列数有以下两种情况:
+//    //·入栈了 i−1 次，出栈了 j 次，第 i 个入栈元素不弹出：dp[i−1][j] 需要i−1 >= j
+//    //·入栈了 i 次，出栈了 j 次，并且第 i 个入栈元素弹出：dp[i][j−1] 需要 i >= j
+//    for (int i = 1;i <= n;i++) 
+//    {
+//        for (int j = 1;j <= i;j++) 
+//        {//不用考虑i−1 >= j的问题是因为初始值都是0，不会影响计算
+//            dp1[i][j] = dp1[i - 1][j] + dp1[i][j - 1];
+//        }
+//    }
+//    cout << dp[n] << endl;
+//    cout << dp1[n][n] << endl;
+//    return 0;
+//}
+
+/////////////////////////////////////////1654. 到家的最少跳跃次数///////////////////////////
+
+//https://leetcode.cn/problems/minimum-jumps-to-reach-home/discussion/comments/667505
+//https://leetcode.cn/problems/minimum-jumps-to-reach-home/solutions/761677/1654-cchao-100de-di-gui-ha-xi-jie-fa-by-hmvk5/
+//struct point {
+//    bool back;//上一步是否是后退
+//    int pos;//当前位置
+//    int step;//到达当前位置花费的步数
+//    point(bool back, int pos, int step) {
+//        this->back = back;
+//        this->pos = pos;
+//        this->step = step;
+//    }
+//};
+//int main() 
+//{
+//    //不能跳到负整数位置 和 forbidden 位置
+//    //不能连续往后跳两次
+//    vector<int> forbidden = { 14,4,18,1,15 };
+//    int a = 3, b = 15, x = 9;//可以前进 a，后退 b，到达 x 的最小步数
+//    unordered_set<int> uset(forbidden.begin(),forbidden.end());
+//    queue<point> q;
+//    q.push(point(false, 0, 0));//初始位于0，上一步不是后退，花费步数为0
+//    while (!q.empty()) 
+//    {//bfs
+//        point p = q.front();
+//        q.pop();
+//        if (p.pos == x) //已经到达x
+//            return p.step;//返回步数
+//        //前进 a
+//        if (uset.count(p.pos + a) == 0 && p.pos + a <= 6000) 
+//        {//前进的下一个位置没有被禁止，并且不能无限往远处前进
+//            q.push(point(0, p.pos + a, p.step + 1));//前进到下一位置
+//            uset.insert(p.pos + a); //加入队列就标记为访问过
+//        }
+//        //后退 b
+//        if (p.pos - b >= 0 && uset.count(p.pos - b) == 0 && p.back == 0) 
+//        {//不能后退到 负数，并且没有被前进访问过，并且上一步不是后退
+//            q.push(point(1, p.pos - b, p.step + 1));//后退到下一位置
+//            //向后不需要标记为访问过，这是因为对于前进所到达的位置，我们一定会考虑在这一位置上前进和后退所有场景
+//            //因此下一次不管是前进还是后退再次到达这里的时候，不需要再一次重复这个过程，否则会无限递归下去
+//            //而对于后退所到达的位置，由于上一步是后退，那么下一步不能是后退，只能前进，因此在这一位置上
+//            //只考虑了前进的场景，而没有考虑后退的场景，所以我们需要通过前进来考虑后退的场景
+//        }
+//    }
+//    return -1;
+//}
+////*********************************DFS*************************************
+//// curr 表示当前的位置
+//// steps表示步数，默认从0开始
+//// lastBack表示上一步是否是back，避免连续两次的back
+//void dfs(bool* visited, int a, int b, int x, int& res, int curr, int steps, bool lastBack)
+//{
+//    if (res == -1 && curr >= 0 && curr <= 6000)
+//    {
+//        if (curr != x)
+//        {
+//            // cout << curr << endl;
+//            // 要过滤掉已经遍历过的情况
+//            // 先前进
+//            if (!visited[curr + a])
+//            {
+//                visited[curr + a] = true;
+//                dfs(visited, a, b, x, res, curr + a, steps + 1, false);
+//            }
+//            // 再后退
+//            if (!lastBack && (curr - b >= 0) && !visited[curr - b])
+//            {
+//                dfs(visited, a, b, x, res, curr - b, steps + 1, true);
+//            }
+//        }
+//        else
+//        {
+//            // 达到终点了，直接返回
+//            res = steps;
+//        }
+//    }
+//}
+//int main()
+//{
+//    vector<int> forbidden = { 14,4,18,1,15 };
+//    int a = 3, b = 15, x = 9;//可以前进 a，后退 b，到达 x 的最小步数
+//    bool visited[8000];//要开8000，否则如果到达6000的位置，再往右移1999的话就会越界
+//    memset(visited, 0, sizeof(visited));
+//    // 默认把forbidden插入已经遍历的里面表示不可达
+//    for (int f : forbidden)
+//    {
+//        visited[f] = true;
+//    }
+//
+//    // 默认-1表示不可达
+//    int res = -1;
+//    dfs(visited, a, b, x, res, 0, 0, false);
+//    return res;
+//}
+
+
+//给定一个字符串 s 和一个字符串 t ，计算在 s 的子序列中 t 出现的个数。
+//字符串的一个 子序列 是指，通过删除一些（也可以不删除）字符且不干扰剩余字符相对位置所组成的新字符串。
+//（例如，"ACE" 是 "ABCDE" 的一个子序列，而 "AEC" 不是）
+//题目数据保证答案符合 32 位带符号整数范围。
+//输入：s = "rabbbit", t = "rabbit"
+//输出：3
+//解释：
+//如下图所示, 有 3 种可以从 s 中得到 "rabbit" 的方案。
+//RABBbIT（大写代表我们用到了它，小写说明没有用到）
+//RABbBIT
+//RAbBBIT
+int main()
+{
+
+    vector<vector<unsigned long long>>dp(s.size() + 1, vector<unsigned long long>(t.size() + 1, 0));//不用unsigned long long会溢出
+    for (int i = 0;i <= s.size();i++)
+        dp[i][0] = 1;//初始化
+    for (int i = 1;i <= s.size();i++)
+    {
+        for (int j = 1;j <= t.size() && j <= i;j++)
+        {
+            if (s[i - 1] == t[j - 1])
+                dp[i][j] += dp[i - 1][j - 1] + dp[i - 1][j];
+            else
+                dp[i][j] += dp[i - 1][j];
+        }
+    }
+    return dp[s.size()][t.size()];
+}
+
+
+
 
 //template <typename T>
 //bool compare(const T& lhs, const T& rhs)
