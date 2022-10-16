@@ -3195,6 +3195,17 @@ T m_lcm(T a, T b)
 
 //////////////////////////////////////////////115. 不同的子序列（DP）////////////////////////////////////////////////////
 
+//给定一个字符串 s 和一个字符串 t ，计算在 s 的子序列中 t 出现的个数。
+//字符串的一个 子序列 是指，通过删除一些（也可以不删除）字符且不干扰剩余字符相对位置所组成的新字符串。
+//（例如，"ACE" 是 "ABCDE" 的一个子序列，而 "AEC" 不是）
+//题目数据保证答案符合 32 位带符号整数范围。
+//输入：s = "rabbbit", t = "rabbit"
+//输出：3
+//解释：
+//如下图所示, 有 3 种可以从 s 中得到 "rabbit" 的方案。
+//RABBbIT（大写代表我们用到了它，小写说明没有用到）
+//RABbBIT
+//RAbBBIT
 //int main(){
 //    string s = "babgbag", t = "bag";
 //    int sz = s.size();
@@ -8740,37 +8751,36 @@ T m_lcm(T a, T b)
 //    cout << endl << res << endl;
 //}
 //**********************************************值域离散化+树状数组求逆序对******************************************
-class BIT {
-private:
-    vector<int> tree;
-    int n;
-
-public:
-    BIT(int _n) : n(_n), tree(_n + 1) {}//+1是因为树状数组从下标1 开始才算是有效的，也就是[1-n]时有效下标
-
-    static int lowbit(int x) 
-    {
-        return x & (-x);
-    }
-
-    int query(int x) 
-    {//查询操作是由树顶层往树底层查询的
-        int ret = 0;
-        while (x) {
-            ret += tree[x];
-            x -= lowbit(x);//因此是减
-        }
-        return ret;
-    }
-
-    void update(int x) 
-    {//更新操作是由树底层往树顶层更新的
-        while (x <= n) {
-            ++tree[x];
-            x += lowbit(x);//因此是加
-        }
-    }
-};
+//class BIT {
+//private:
+//    vector<int> tree;
+//    int n;
+//public:
+//    BIT(int _n) : n(_n), tree(_n + 1) {}//+1是因为树状数组从下标1 开始才算是有效的，也就是[1-n]时有效下标
+//
+//    static int lowbit(int x) 
+//    {
+//        return x & (-x);
+//    }
+//
+//    int query(int x) 
+//    {//查询操作是由树顶层往树底层查询的
+//        int ret = 0;
+//        while (x) {
+//            ret += tree[x];
+//            x -= lowbit(x);//因此是减
+//        }
+//        return ret;
+//    }
+//
+//    void update(int x) 
+//    {//更新操作是由树底层往树顶层更新的
+//        while (x <= n) {
+//            ++tree[x];
+//            x += lowbit(x);//因此是加
+//        }
+//    }
+//};
 //记题目给定的序列为 a，我们规定 a 的取值集合为 a 的「值域」。我们用桶来表示值域中的每一个数，桶中记录这些数字出现的次数。
 //假设a = { 5,5,2,3,6 }，那么遍历这个序列得到的桶是这样的：
 //  桶   ->  1 2 3 4 5 6 7 8 9
@@ -8787,7 +8797,6 @@ public:
 //  离散化一个序列的前提是我们只关心这个序列里面元素的相对大小，而不关心绝对大小（即只关心元素在序列中的排名）；
 //  离散化的目的是让原来分布零散的值聚集到一起，减少空间浪费。那么如何获得元素排名呢，我们可以对原序列排序后去重，
 //  对于每一个 ai 通过二分查找的方式计算排名作为离散化之后的值。当然这里也可以不去重，不影响排名。
-
 //int main()
 //{
 //    vector<int> nums = { 7,2,2,6,0,1,5,4 };
@@ -8805,7 +8814,8 @@ public:
 //    int ans = 0;
 //    for (int i = n - 1; i >= 0; --i) 
 //    {//从后往前遍历
-//        ans += bit.query(nums[i] - 1);//对于第 i 位，求 i-1的前缀和即时求有多少个比他小的数 位置在它后面，就构成多少逆序对
+//        ans += bit.query(nums[i] - 1);//对于第 i 位（此时的 nums[i] 已经变成了桶的编号），这里说的 i 是指桶的编号
+//        //求 nums[i]-1的前缀和即是求有多少个比他小的数（相对小） 位置在它后面，就构成多少逆序对
 //        bit.update(nums[i]);//递增第 i 位的数值
 //    }
 //    return ans;
@@ -22024,38 +22034,97 @@ public:
 //    return res;
 //}
 
+/////////////////////////////////////////2426. 满足不等式的数对数目///////////////////////////
 
-//给定一个字符串 s 和一个字符串 t ，计算在 s 的子序列中 t 出现的个数。
-//字符串的一个 子序列 是指，通过删除一些（也可以不删除）字符且不干扰剩余字符相对位置所组成的新字符串。
-//（例如，"ACE" 是 "ABCDE" 的一个子序列，而 "AEC" 不是）
-//题目数据保证答案符合 32 位带符号整数范围。
-//输入：s = "rabbbit", t = "rabbit"
-//输出：3
-//解释：
-//如下图所示, 有 3 种可以从 s 中得到 "rabbit" 的方案。
-//RABBbIT（大写代表我们用到了它，小写说明没有用到）
-//RABbBIT
-//RAbBBIT
-int main()
-{
+//https://leetcode.cn/problems/number-of-pairs-satisfying-inequality/solutions/1863557/by-endlesscheng-9prc/
+//class BIT {
+//private:
+//    vector<int> tree;
+//
+//public:
+//    BIT(int n) : tree(n) {}
+//
+//    void add(int x) {
+//        while (x < tree.size()) {
+//            ++tree[x];
+//            x += x & -x;
+//        }
+//    }
+//
+//    int query(int x) {
+//        int res = 0;
+//        while (x > 0) {
+//            res += tree[x];
+//            x -= x & -x;
+//        }
+//        return res;
+//    }
+//};
+////给你两个下标从 0 开始的整数数组 nums1 和 nums2 ，两个数组的大小都为 n ，同时给你一个整数 diff ，
+////统计满足以下条件的 数对(i, j) ：
+////·0 <= i < j <= n - 1 且
+////·nums1[i] - nums1[j] <= nums2[i] - nums2[j] + diff.
+////请你返回满足条件的 数对数目 。
+////条件2变形可得nums1[i]−nums2[i]<=nums1[j]−nums2[j] + diff,令a[i]=nums1[i]-nums2[i]，上式为a[i]<=a[j] + diff
+////可用树状数组或归并排序求解
+//class Solution {
+//public:
+//    long long numberOfPairs(vector<int>& a, vector<int>& nums2, int diff) {
+//        int n = a.size();
+//        for (int i = 0; i < n; ++i)
+//            a[i] -= nums2[i];
+//        auto b = a;
+//        sort(b.begin(), b.end()); // 配合下面的二分，离散化
+//        //这里我们不能直接将 a 离散化，因为这道题要求的是a[i]<=a[j] + diff，只用相对大小是不行的，必须用原值
+//        long ans = 0L;
+//        auto t = new BIT(n + 1);
+//        for (int x : a) 
+//        {//正序遍历，对于每一个 x，通过upper_bound找到比 x+diff 的第一个元素（假设是 m），那么
+//            //在这个b这个有序数组里面，从 0 到 m-1的这些数，他们都满足 m<=x+diff，这里 m 相当于 a[i]，x 相当于 a[j]
+//            //当然，这 m 个满足条件的数并不都在位于 x 的前面（在原数组中），所以要求桶里的[0:m]的前缀和
+//            //由于我们是由前往后遍历原数组的，所以如果有元素满足条件（也就是它属于上面的 m 个数）
+//            //那么在对应位置的桶里就不是0，这样求前缀和就把 满足条件并且位于 x 的前面（在原数组中）的元素都找到了
+//            //它们和 x 都满足条件，因此组成了题目中的数对，累加到答案里
+//            ans += t->query(upper_bound(b.begin(), b.end(), x + diff) - b.begin());
+//            //我们还是把相对大小记录到桶里面，注意不能提前做离散化，因为上面还要用到原值（x+diff）
+//            t->add(lower_bound(b.begin(), b.end(), x) - b.begin() + 1);
+//        }
+//        return ans;
+//    }
+//};
 
-    vector<vector<unsigned long long>>dp(s.size() + 1, vector<unsigned long long>(t.size() + 1, 0));//不用unsigned long long会溢出
-    for (int i = 0;i <= s.size();i++)
-        dp[i][0] = 1;//初始化
-    for (int i = 1;i <= s.size();i++)
-    {
-        for (int j = 1;j <= t.size() && j <= i;j++)
-        {
-            if (s[i - 1] == t[j - 1])
-                dp[i][j] += dp[i - 1][j - 1] + dp[i - 1][j];
-            else
-                dp[i][j] += dp[i - 1][j];
-        }
-    }
-    return dp[s.size()][t.size()];
-}
+/////////////////////////////////////////6207. 统计定界子数组的数目///////////////////////////
 
-
+//https://leetcode.cn/problems/count-subarrays-with-fixed-bounds/solutions/1895713/jian-ji-xie-fa-pythonjavacgo-by-endlessc-gag2/
+//首先考虑一个简单的情况，nums 的所有元素都在[minK, maxK] 范围内。
+//在这种情况下，相当于要统计同时包含 minK 和 maxK 的子数组的个数。
+//我们可以枚举子数组的右端点。遍历 nums，记录 minK 上一次出现的位置 minI 和 maxK 上一次出现的位置 maxI，
+//当遍历到 nums[i] 时，如果 minK 和 maxK 之前出现过，则左端点 <=min⁡(minI, maxI)的子数组都是合法的，
+//合法子数组的个数为 min⁡(minI, maxI) + 1，左端点的范围是[0:min(minI, maxI)]，右端点是 nums[i]，
+//这样组成的合法子数组有 min⁡(minI, maxI) + 1个，minI和maxI是下标，所以加 1
+//回到原问题，由于子数组不能包含在[minK, maxK] 范围之外的元素，因此我们还需要记录上一个在[minK, maxK]
+//范围之外的 nums[i] 的下标，记作 i0​。此时合法子数组的个数为 min⁡(minI, maxI)−i0
+//代码实现时：
+//为方便计算，可以初始化 minI, maxI, i0​均为 -1。
+//如果 min⁡(minI, maxI)−i0 < 0，则表示在 i0 右侧 minK 和 maxK 没有同时出现，此时合法子数组的个数为 0。
+//int main()
+//{
+//    vector<int> nums = { 1,3,5,2,7,5 };
+//    int minK = 1, maxK = 5;
+//    long long ans = 0LL;
+//    int n = nums.size(), min_i = -1, max_i = -1, i0 = -1;
+//    for (int i = 0; i < n; ++i) {
+//        int x = nums[i];
+//        if (x == minK) //记录最小值的位置
+//            min_i = i;
+//        if (x == maxK) //记录最大值的位置。有可能和最小值的位置相同
+//            max_i = i;
+//        if (x < minK || x > maxK) 
+//            i0 = i; // 子数组不能包含 nums[i0]
+//        ans += max(min(min_i, max_i) - i0, 0);//只要最大最小值没有同时出现，那么min(min_i, max_i)就会小于等于i0
+//    }
+//    return ans;
+//}
 
 
 //template <typename T>
