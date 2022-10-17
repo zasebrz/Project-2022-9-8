@@ -22297,23 +22297,37 @@ T m_lcm(T a, T b)
 //        cout << "初始化列表构造" << endl;
 //    }
 //};
-//int main()
-//{
-//    const char* p1 = "123";
-//    cout << strlen(p1) << endl;
-//    string a = "123";
-//    cout << a.length() << endl;
-//    if (compare(1,2))
-//    {
-//        cout << 1 << endl;
-//    }
-//    else
-//    {
-//        cout << 0 << endl;
-//    }
-//    int a1[10] = { 0 };
-//    cout << mysize(a1) << endl;
-//    Blob<int> ia;
-//    Blob<int> ia2 = { 0,1,2 };
-//}
+
+int main()
+{
+    vector<int> fruits = {3, 3, 3, 1, 2, 1, 1, 2, 3, 3, 4};
+    int n = fruits.size();
+    int lhs = 0, rhs = 0;
+    int res = 0;
+    unordered_map<int, int> umap;
+    while (rhs < n)
+    {
+        while (rhs < n && umap.size() <= 2)
+        {
+            if (umap.find(fruits[rhs]) == umap.end())
+            {
+                if (umap.size() == 2)
+                {
+                    break;
+                }
+            }
+            umap[fruits[rhs++]]++;
+        }
+        res = max(res, rhs - lhs);
+        while (lhs <= rhs && umap[fruits[lhs]] && umap.size() >= 2)
+        {
+            umap[fruits[lhs++]]--;
+            if (lhs > 0 && umap[fruits[lhs - 1]] == 0)
+            {
+                umap.erase(fruits[lhs - 1]);
+            }
+        }
+    }
+    return res;
+}
 
