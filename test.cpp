@@ -22126,6 +22126,147 @@ T m_lcm(T a, T b)
 //    return ans;
 //}
 
+/////////////////////////////////////////2430. 对字母串可执行的最大删除数///////////////////////////
+
+//https://leetcode.cn/problems/maximum-deletions-on-a-string/solutions/1864083/lcp-wen-ti-shen-qi-hou-zhui-shu-zu-rmq-b-xhqc/
+//int main()
+//{
+//    string s = "aaabaab";
+//    int n = s.length();
+//    if (equal(s.begin() + 1, s.end(), s.begin())) // 特判全部相同的情况
+//        return n;
+//    vector<vector<int>> lcp(n + 1,vector<int>(n + 1,0)); // lcp[i][j] 表示 s[i:] 和 s[j:] 的最长相同前缀的长度
+//    for (int i = n - 1; i >= 0; --i)
+//        for (int j = n - 1; j > i; --j)
+//            if (s[i] == s[j])
+//                lcp[i][j] = lcp[i + 1][j + 1] + 1;
+//    vector<int> f(n,0);//定义 f[i] 表示删除 后缀 s[i:] 所需的最大操作数。
+//    for (int i = n - 1; i >= 0; --i) 
+//    {//从后往前开始删除，根据题意，我们可以枚举删除字母的长度 j，如果 s[i:i+j]=s[i+j:i+2*j]，
+//        //那么可以删除，此时有转移 f[i]=f[i+j]+1。如果不存在两个子串相等的情况，则 f[i]=1。f[i] 取所有情况的最大值。
+//        //倒着计算 f[i]，答案为 f[0]。
+//        //为什么要从后往前删除？
+//        //·因为题目要求从前往后删除之后，剩下的字符串相当于之前字符串的后缀，我们想求删除完整的字符串需要多少操作次数
+//        //  只需要 求删除之后的字符串 被删除所需要的操作次数+1，这样一直递归下去，就变成了从最后往最前进行计算
+//        //  简而言之，我们知道了 删除 后缀子串需要的次数 再加上 1 就是删除当前字符串的操作次数
+//        for (int j = 1; i + j * 2 <= n; ++j)//枚举长度，从1开始，直到超出边界
+//            if (lcp[i][i + j] >= j) //lcp[i][i + j] 表示 s[i:] 和 s[i + j:] 的最长相同前缀的长度，如果大于等于 j
+//                                    //说明 s[i:i+j] == s[i+j:i+j*2]
+//                f[i] = max(f[i], f[i + j]);//加 1 的操作放在后面
+//        ++f[i];//由于f初始化为 0，所以不存在两个子串相等的时候，f[i]就变成了 1，当存在的时候，也在这里加 1
+//    }
+//    return f[0];//删除所有字符需要的最大操作数
+//}
+
+/////////////////////////////////////////886. 是否可能将所有人分成两组//////////////////////////
+
+//https://leetcode.cn/problems/possible-bipartition/solutions/1895287/by-ac_oier-6j0n/
+//const int N = 2010, M = 20020;
+//int h[N], e[M], ne[M], idx = 0; //邻接表
+//int color[N]; //表示每个点的颜色，0表示未染色，1表示红色，2表示黑色
+//void add(int a, int b) //加边操作
+//{
+//    e[idx] = b;
+//    ne[idx] = h[a];
+//    h[a] = idx++;
+//}
+//// 参数：u表示当前节点，c表示要对当前点染的颜色
+//bool dfs(int u, int c)
+//{
+//    color[u] = c;
+//    for (int i = h[u];i != -1;i = ne[i])
+//    {//遍历邻居节点，这些节点都是当前节点讨厌的人，不能染成相同颜色
+//        int j = e[i];
+//        if (color[j] == c) 
+//            return false; //不能和讨厌的人一组（相同颜色）
+//        if (color[j] == 0 && !dfs(j, 3 - c)) 
+//            return false; //3-c表示对立的颜色，给讨厌的人染成对立的颜色，然后继续往下递归，看最后能否分成两组
+//    }                                                     
+//    return true;//上面两种情况都没返回的话，就说明能够分成两组，返回true
+//}
+//int main()
+//{
+//    int n = 4;
+//    vector<vector<int>> dislikes = { {1, 2},{1, 3},{2, 4} };
+//    memset(h, -1, sizeof h); //点初始化为-1
+//    for (auto info : dislikes)
+//    {//对于不能放在一组的那些人建立无向图
+//        add(info[0], info[1]); 
+//        add(info[1], info[0]);
+//    }
+//    for (int i = 1;i <= n;i++) 
+//    {//遍历所有人，对所有人进行染红色（1），中途出现不喜欢的人就染成对立的颜色
+//     //如果这个过程存在冲突，则无法分成两组
+//        if (color[i] != 0)//已经染过颜色，也就是已经放到某个组里面了，不需要再染色
+//            continue;
+//        if (!dfs(i, 1))//染成红色，并且递归
+//            return false;
+//    }
+//    return true;
+//}
+//******************************************并查集（附标准模板）*****************************************
+//https://leetcode.cn/problems/possible-bipartition/solutions/1895336/by-lcbin-rgi1/
+//class Union_find
+//{
+//public:
+//    vector<int> fa;
+//    vector<int> size;
+//    Union_find(int n)
+//    {
+//        fa = vector<int>(n);
+//        iota(fa.begin(), fa.end(), 0);
+//        fa = vector<int>(n,1);
+//    }
+//    int find(int x) {
+//        if (fa[x] != x) {
+//            // 路径压缩
+//            fa[x] = find(fa[x]);
+//        }
+//        return fa[x];
+//    }
+//
+//    void unite(int a, int b) {
+//        int pa = find(a), pb = find(b);
+//        if (pa == pb) 
+//            return;
+//        fa[pa] = pb;
+//        size[pb] += size[pa];
+//    }
+//};
+//int main()
+//{
+//    int n = 4;
+//    vector<vector<int>> dislikes = { {1, 2},{1, 3},{2, 4} };
+//    vector<int> fa(n);
+//    iota(fa.begin(), fa.end(), 0);
+//    unordered_map<int, vector<int>> g;
+//    for (auto& e : dislikes) 
+//    {//建图
+//        int a = e[0] - 1, b = e[1] - 1;
+//        g[a].push_back(b);
+//        g[b].push_back(a);
+//    }
+//    function<int(int)> find = [&](int x) -> int 
+//    {//可调用对象绑定匿名函数
+//        if (fa[x] != x) 
+//            fa[x] = find(fa[x]);
+//        return fa[x];
+//    };
+//    for (int i = 0; i < n; ++i) 
+//    {//对于每一个人遍历
+//        for (int j : g[i]) 
+//        {//j 是 i 不喜欢的人
+//            if (find(i) == find(j)) //如果他们被分在同一组，返回false
+//                return false;
+//            fa[find(j)] = find(g[i][0]);
+//            //g[i][0]是 i 第一个不喜欢的人，j 是 i 不喜欢的人，这里就是把 i 所有不喜欢的人分到一组
+//            //这里用fa[find[j]]和fa[j]没区别，一个是直接把“帮主”合并到另一个帮派里，另一个是把“小弟”合并到另一个帮派里
+//            //但之后会通过find函数把“帮主”合并
+//        }
+//    }
+//    return true;
+//}
+
 
 //template <typename T>
 //bool compare(const T& lhs, const T& rhs)
@@ -22175,3 +22316,4 @@ T m_lcm(T a, T b)
 //    Blob<int> ia;
 //    Blob<int> ia2 = { 0,1,2 };
 //}
+
