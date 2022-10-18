@@ -25,6 +25,7 @@
 #include<thread>
 #include<mutex>
 #include<forward_list>
+#include<bitset>
 #include <iomanip> // 包含头文件
 //#include "Sales_data.h"
 using namespace std;
@@ -22267,6 +22268,111 @@ T m_lcm(T a, T b)
 //    return true;
 //}
 
+/////////////////////////////////////////904. 水果成篮//////////////////////////
+
+//https://leetcode.cn/problems/fruit-into-baskets/solutions/1897490/by-ac_oier-skgk/
+//int main()
+//{
+//    vector<int> fruits = {3, 3, 3, 1, 2, 1, 1, 2, 3, 3, 4};
+//    int n = fruits.size();
+//    int lhs = 0, rhs = 0;//滑动窗口
+//    int res = 0;
+//    unordered_map<int, int> umap;//用来记录篮子中不同种类的水果以及各自的数量
+//    while (rhs < n)
+//    {
+//        while (rhs < n && umap.size() <= 2)
+//        {//篮子里可能有0,1,2种水果
+//            if (umap.find(fruits[rhs]) == umap.end())
+//            {//如果已经有两种水果，并且出现了一种新的水果
+//                if (umap.size() == 2)
+//                {
+//                    break;//那么当前这种水果 fruits[rhs++] 不能放到篮子里，结束while循环
+//                }
+//            }
+//            umap[fruits[rhs++]]++;//其他情况下都可以把当前这个水果放到篮子里
+//        }
+//        res = max(res, rhs - lhs);//刷新篮子里水果的最大数量
+//        while (umap.size() >= 2)
+//        {//准备拿出水果
+//            umap[fruits[lhs++]]--;//直接拿出并右移
+//            if (lhs > 0 && umap[fruits[lhs - 1]] == 0)
+//            {//右移后，如果篮子里没有 fruits[lhs - 1] 这种水果了，去除记录
+//                umap.erase(fruits[lhs - 1]);
+//            }
+//        }
+//    }
+//    return res;
+//}
+
+/////////////////////////////////////////2434. 使用机器人打印字典序最小的字符串//////////////////////////
+
+//https://leetcode.cn/problems/using-a-robot-to-print-the-lexicographically-smallest-string/solutions/1878827/tan-xin-zhan-by-endlesscheng-ldds/
+//为了让字典序最小，在遍历 s 的过程中，如果栈顶字符 <= 后续字符（未入栈）的 最小值，
+//那么应该出栈并加到答案末尾，否则应当继续遍历，取到比栈顶字符小的那个字符，这样才能保证字典序最小。
+//为了快速判断剩余字符的最小值，我们可以先统计 s 每个字符的出现次数 cnt，然后在遍历 s 的过程中更新 cnt，
+//这样 cnt 中第一个正数对应的字符就是剩余字符中最小的。
+//int main()
+//{
+//    string s = "bydizfve";
+//    string ans;
+//    int cnt[26]{}, min = 0; // cnt记录的是s中剩余字符的次数，min 表示剩余最小字母
+//    for (char c : s)
+//        ++cnt[c - 'a'];//记录频次
+//    stack<char> st;//辅助栈
+//    for (char c : s) 
+//    {
+//        --cnt[c - 'a'];//放到栈里，s中剩余次数-1
+//        //遍历到最后一个字母的时候，因为剩余没有字母了，那么此时的min=27，所有栈里面的字母依序出栈
+//        while (min < 26 && cnt[min] == 0) 
+//            ++min;//找到剩余最小字母
+//        st.push(c);//当前字母入栈
+//        while (!st.empty() && st.top() - 'a' <= min) 
+//        {//栈顶字符 <= 后续字符（未入栈）的 最小值，那么栈顶元素出栈就是最佳选择，加到答案末尾
+//            //必须要有等于号，因为如果等于剩余最小字母的时候不出栈的话，有可能被剩余较大的字母“堵”在栈里
+//            //导致出栈顺序晚于后面更大的字母，这不是最优选择
+//            ans += st.top();
+//            st.pop();
+//        }
+//    }
+//    cout << ans << endl;
+//}
+
+/////////////////////////////////////////2435. 矩阵中和能被 K 整除的路径（DP）//////////////////////////
+
+//https://leetcode.cn/problems/paths-in-matrix-whose-sum-is-divisible-by-k/solutions/1878910/dong-tai-gui-hua-pythonjavacgo-by-endles-94wq/
+//int main()
+//{
+//    vector<vector<int>> grid = { {7,3,4,9},{2,3,6,2},{2,3,7,0 }};
+//    int k = 1;
+//    int mod = 1e9 + 7;
+//    int m = grid.size(), n = grid[0].size();
+//    vector<vector<long long>> dp(m * n, vector<long long>(k, 0));//dp[i][j]表示到达位置 i 的路径和中 除k余j 的方案数
+//    for (int i = 0;i < m;i++)
+//    {
+//        for (int j = 0;j < n;j++)
+//        {
+//            int a = grid[i][j] % k;//当前元素除k的余数，那么我们需要从上边和左边中寻找 能与a互补的 方案数
+//            //比如 a=1，k=3，当前我们在计算 除k余2 的方案，那么我们就需要从上面和左边找 除k余1 的方案数、
+//            //对这些方案数，给他们加上当前元素，余1+余1=余2，就算出了我们需要的方案数
+//            int a1 = i * n + j, a2 = i * n + j - 1, a3 = (i - 1) * n + j;//a1是当前坐标，a2是左边，a3是上边
+//            if (i == 0 && j == 0)
+//            {//第一个元素需要特判一下
+//                dp[0][a] = 1;
+//                continue;
+//            }
+//            for (int k1 = 0;k1 < k;k1++)
+//            {//枚举到达当前位置的路径和 除k余k1的方案数，就是定义里面的j
+//                int b = (k1 - a + k) % k;//这个就是要找的能与 a 互补的数，余a+余b=余k1
+//                int c = j > 0 ? dp[a2][b] : 0;//左边，要保证j>0（不是第一列），否则只能从上面寻找
+//                int d = i > 0 ? dp[a3][b] : 0;//上边，要保证i>0（不是第一行），否则只能从左边寻找
+//                dp[a1][k1] = (c + d) % mod;//加起来取模
+//                cout << dp[a1][k1] << ' ';
+//            }
+//            cout << endl;
+//        }
+//    }
+//    cout<<dp[(m-1) * n+n-1][0];//到达最后一行最后一列，并且除k余0（整除k）的方案数
+//}
 
 //template <typename T>
 //bool compare(const T& lhs, const T& rhs)
@@ -22298,36 +22404,7 @@ T m_lcm(T a, T b)
 //    }
 //};
 
-int main()
-{
-    vector<int> fruits = {3, 3, 3, 1, 2, 1, 1, 2, 3, 3, 4};
-    int n = fruits.size();
-    int lhs = 0, rhs = 0;
-    int res = 0;
-    unordered_map<int, int> umap;
-    while (rhs < n)
-    {
-        while (rhs < n && umap.size() <= 2)
-        {
-            if (umap.find(fruits[rhs]) == umap.end())
-            {
-                if (umap.size() == 2)
-                {
-                    break;
-                }
-            }
-            umap[fruits[rhs++]]++;
-        }
-        res = max(res, rhs - lhs);
-        while (lhs <= rhs && umap[fruits[lhs]] && umap.size() >= 2)
-        {
-            umap[fruits[lhs++]]--;
-            if (lhs > 0 && umap[fruits[lhs - 1]] == 0)
-            {
-                umap.erase(fruits[lhs - 1]);
-            }
-        }
-    }
-    return res;
-}
+
+
+
 
