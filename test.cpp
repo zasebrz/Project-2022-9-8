@@ -26,6 +26,9 @@
 #include<mutex>
 #include<forward_list>
 #include<bitset>
+#include<regex>
+#include<random>
+#include<cmath>
 #include <iomanip> // 包含头文件
 //#include "Sales_data.h"
 using namespace std;
@@ -22372,6 +22375,52 @@ T m_lcm(T a, T b)
 //        }
 //    }
 //    cout<<dp[(m-1) * n+n-1][0];//到达最后一行最后一列，并且除k余0（整除k）的方案数
+//}
+
+/////////////////////////////////////////902. 最大为 N 的数字组合（数位DP）//////////////////////////
+
+//https://leetcode.cn/problems/numbers-at-most-n-given-digit-set/solutions/1900101/shu-wei-dp-tong-yong-mo-ban-xiang-xi-zhu-e5dg/
+//int main()
+//{
+//    int n = 100;
+//    vector<int> digits = { 1,3,5,7 };
+//    string s = to_string(n);
+//    int m = s.length();
+//    vector<int> dp(m,-1);//数位DP，
+//    //dp[i]记录的是遍历到下标 i 的位置 不受到约束下 的从这一位（包含）到最后一位 填数字会有多少种合法方案数
+//    sort(digits.begin(), digits.end());//从小到大排序，方便剪枝
+//    function<int(int, bool,bool)> fun = [&](int i, bool is_limit, bool is_num)->int
+//    {//is_num记录前面是否真正放了数字，还是说是用 0 占位的
+//        if (i == m)
+//        {//如果所有位都是占位，那么到这里is_num是false，肯定不能算一个数，返回 0
+//            //如果前面真正填了数字，那么返回 1，找到了一个数
+//            return is_num;
+//        }
+//        if (!is_limit && is_num && dp[i] != -1)
+//        {//在不受到约束，且前面已经放了数字的情况下，如果之前已经在这一下标填过数，已经计算出
+//            //从这一位（包含）到最后一位 填数字会有多少种合法方案数，直接返回这个方案数 dp[i]
+//            return dp[i];
+//        }
+//        int res=0;
+//        if (!is_num)//一般来说，数位DP都是从最后一位往前填，并且做记忆化，
+//        {//前面是占位的话，这一位也可以是占位，然后进入下一坐标，直到最后一位开始真正填数，保证了个位数也能正确填进去
+//            //因为个位数可以理解为前面都是占位，那么下一层is_limit和is_num肯定都是false
+//            res = fun(i + 1, false, false); 
+//        }
+//        int up = is_limit ? s[i] - '0' : 9;//上界
+//        for (int j = 0;j < digits.size() && digits[j]<=up;++j)
+//        {//只能从digits里面选，并且还要小于等于上界，由于我们提前对digits排序了，所以如果当前这个 digits[j] 超过上界了
+//            //那么后面的数一定也超过上界了，直接结束循环
+//            int d = digits[j];
+//            res += fun(i + 1, is_limit && d == up, true);//已经填了真正的数字，所以下一层的is_num是true
+//        }
+//        if (!is_limit && is_num)
+//        {//记忆化，前提是不受到约束，且前面已经放了数字的情况下
+//            dp[i] = res;
+//        }
+//        return res;
+//    };
+//    cout<<fun(0, true, false);
 //}
 
 //template <typename T>
