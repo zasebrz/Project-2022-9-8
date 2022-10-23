@@ -22492,38 +22492,50 @@ T m_lcm(T a, T b)
 //    cout<<(__builtin_popcount(k - 1) & 1);
 //}
 
+/////////////////////////////////////////1235. 规划兼职工作//////////////////////////
 
-//template <typename T>
-//bool compare(const T& lhs, const T& rhs)
+//https://leetcode.cn/problems/maximum-profit-in-job-scheduling/solutions/1913089/dong-tai-gui-hua-er-fen-cha-zhao-you-hua-zkcg/
+//可以分类讨论，求出按照结束时间排序后的前 i 个工作的最大报酬：
+//·不选第 i 个工作，那么最大报酬等于前 i−1 个工作的最大报酬（转换成了一个规模更小的子问题）；
+//·选第 i 个工作，由于工作时间不能重叠，设 j 是最大的满足 endTime[j]<=startTime[i] 的 j，
+//  那么最大报酬等于前 j 个工作的最大报酬加上 profit[i]（同样转换成了一个规模更小的子问题）；
+//这两种决策取最大值。
+//注：由于按照结束时间排序，前 j 个工作中的任意一个都不会与第 i 个工作的时间重叠，因为结束时间最晚的 j 都小于等于 i 的开始时间。
+//上述思路是一个标准的关于递推的描述，定义 f[i] 表示按照结束时间排序后的前 i 个工作的最大报酬，分类讨论：
+//·不选第 i 个工作：f[i] = f[i−1]；
+//·选第 i 个工作：f[i] = f[j] + profit[i]，其中 j 是最大的满足 endTime[j]<=startTime[i]的 j，不存在时为 −1。
+//  两者取最大值，即
+//  f[i] = max⁡(f[i−1], f[j] + profit[i])
+//·由于结束时间是有序的，j 可以用二分查找计算出来。
+//int main()
 //{
-//    typedef vector<T>::size_type size_type;
-//    size_type a;
-//    if (less<T>()(lhs,rhs))
-//    { 
-//        return true;
+//    vector<int> startTime = { 1, 2, 3, 3 }, endTime = { 3, 4, 5, 6 }, profit = { 50, 10, 40, 70 };
+//    int n = startTime.size();
+//    vector<vector<int>> jobs(n, vector<int>(3, 0));
+//    for (int i = 0;i < n;i++)
+//    {//结束时间放在前面，后面二分查找才能更方便
+//        jobs[i] = { endTime[i],startTime[i],profit[i] };
 //    }
-//    return false;
+//    sort(jobs.begin(), jobs.end(), [&](const vector<int>& a, const vector<int>& b)
+//        {//按照结束时间从小到大排序
+//            return a[0] < b[0];
+//        });
+//    vector<int> dp(n + 1, 0);//dp[i] 表示按照结束时间排序后的前 i 个工作（包括第 i 个）的最大报酬
+//    //第 0 个任务的最大报酬肯定是0
+//    for (int i = 1;i <= n;++i)
+//    {//从第 1 个任务开始
+//        //在 第 1 个 到 第 i 个任务之间查找，找到结束时间 大于 第 i 个任务开始时间的第一个任务
+//        //让它减一就是 结束时间小于等于第 i 个任务开始时间的最后一个任务，jobs[i - 1][1]代表第 i 个任务的开始时间
+//        //第二个参数必须是 INT_MAX，因为upper_bound 比较vector时，如果第一个参数相等，就会看后面的参数，
+//        //如果有某个任务的结束时间正好等于第 i 个任务的开始时间，就要看第二个参数，如果第二个参数是 INT_MIN，那么随便一个
+//        //数都能满足条件，这样的话，我们选出来的 j 有有可能是 结束时间 等于 第 i 个任务开始时间的第一个任务，而不是 大于
+//        //最后减一以后就不再是结束时间小于等于第 i 个任务开始时间的最后一个任务，而是倒数第二个任务，导致少算一部分收益
+//        //而如果第二个参数是 INT_MAX，那么就强迫我们去找 结束时间大于第 i 个任务开始时间的任务，减一以后才能满足定义
+//        //第三个参数可写可不写
+//        int j = upper_bound(jobs.begin(), jobs.begin() + i, vector<int>{jobs[i - 1][1],INT_MAX,INT_MIN}) - jobs.begin()-1;
+//        //j 代表任务下标，而dp里面则需要的是任务序号，所以要用 i-1 和 j+1，因为 i 是序号，j是下标
+//        //就比如 j=0时，表示第 j+1=1个任务满足要求
+//        dp[i] = max(dp[i - 1], (j>=0?dp[j+1]:0) + jobs[i-1][2]);
+//    }
+//    return dp[n];
 //}
-//template <unsigned N>
-//constexpr unsigned mysize(const int (&arr)[N])
-//{
-//    return N;
-//}
-//template <typename T>
-//class Blob
-//{
-//public:
-//    Blob()
-//    {
-//        cout << "无参构造";
-//    }
-//    Blob(std::initializer_list<int> i1)
-//    {
-//        cout << "初始化列表构造" << endl;
-//    }
-//};
-
-
-
-
-
