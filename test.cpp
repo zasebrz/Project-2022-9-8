@@ -22645,21 +22645,100 @@ T m_lcm(T a, T b)
 //    return ans;
 //}
 
+/////////////////////////////////////////2449. 使数组相似的最少操作次数//////////////////////////
+
+//https://leetcode.cn/problems/minimum-number-of-operations-to-make-arrays-similar/solutions/1917413/by-endlesscheng-lusx/
 //输入：nums = [1, 2, 5], target = [4, 1, 3]
 //输出：1
 //解释：一步操作可以使 nums 变得与 target 相似：
 //- 选择 i = 1 和 j = 2 ，nums = [1, 4, 3] 。
-int main()
-{
-    vector<int> nums = { 1, 2, 5 }, target = { 4, 1, 3 };
-    sort(nums.begin(), nums.end());
-    sort(target.begin(), target.end());
-    long long ans = 0L;
-    int js[2]{}; // 用数组表示两个下标，这样不用讨论奇偶性
-    for (int x : nums) {
-        int p = x % 2, & j = js[p];
-        while (target[j] % 2 != p) ++j; // 找 target 中奇偶性相同的元素
-        ans += abs(x - target[j++]);
-    }
-    return ans / 4;
-}
+//如果把问题中的 + 2 和 −2 改成 + 1和 −1 要怎么做？
+//例如 nums = [2, 8]，target = [4, 6]，那么应该让 2 和 4 一对，8 和 6 一对。
+//如果让 2 和 6 一对，8 和 4 一对，是会让变化量的和变得更大的。
+//通过这种邻项交换法，我们可以证明，让最小的一对，次小的一对，第三小的一对，……，
+//累加每对元素的差的绝对值，就得到了每个数的变化量的和的最小值。
+//回到原问题， + 2和 −2会导致无法直接排序然后一一匹配，但注意到 + 2 和 −2 并不会改变元素的奇偶性，
+//因此我们可以把偶数分为一组，奇数分为一组，每组分别计算，这样就像提示 1 那样一一匹配了。
+//最后把变化量的和除以 4，即为答案。
+//int main()
+//{
+//    vector<int> nums = { 1, 2, 5 }, target = { 4, 1, 3 };
+//    sort(nums.begin(), nums.end());//分别排序
+//    sort(target.begin(), target.end());
+//    long long ans = 0L;
+//    int js[2]{}; // 用数组表示两个下标，js[0]指向的是target数组下一个应该匹配的偶数，
+//                  //js[1]指向的是target数组下一个应该匹配的奇数，这样不用讨论奇偶性
+//    for (int x : nums) {
+//        int p = x % 2, &j = js[p];//j是对应的target数组的下标
+//        while (target[j] % 2 != p) 
+//           ++j; // 找 target 中奇偶性相同的元素
+//        ans += abs(x - target[j++]);//计算差值，对应的下标加 1 。
+//    }
+//    return ans / 4;//除以 4 是因为上面累加的是差值，而题目是可以直接 +2 的，所以要先除以2，然后我们可以同时操作两个数（+2 和 -2）
+//                   //使得两个对应数的差值同时缩小，所以可以再除以2，总共除以4
+//}
+
+/////////////////////////////////////////915. 分割数组//////////////////////////
+
+//https://leetcode.cn/problems/partition-array-into-disjoint-intervals/solutions/1918958/by-ac_oier-yyen/
+//根据题意，我们知道本质是求分割点，使得分割点的「左边的子数组的最大值」小于等于「右边的子数组的最小值」。
+//我们可以先通过一次遍历（从后往前）统计出所有后缀的最小值 min，其中 min[i] = x 含义为下标范围在[i, n−1]
+//的 nums[i] 的最小值为 x，然后再通过第二次遍历（从前往后）统计每个前缀的最大值（使用单变量进行维护），
+//找到第一个符合条件的分割点即是答案。
+//int main()
+//{
+//    vector<int> nums = { 5, 0, 3, 8, 6 };
+//    int n = nums.size();
+//    vector<int> a(n);
+//    a[n - 1] = nums[n - 1];
+//    for (int i = n - 2;i >= 0;i--)
+//    {
+//        a[i] = min(nums[i], a[i + 1]);//统计[i:n-1]的最小值
+//    }
+//    int max_ = 0;
+//    for (int i = 0;i < n - 1;i++)
+//    {
+//        max_ = max(max_, nums[i]);//统计[0,i]的最大值
+//        if (max_ <= a[i + 1])//[0,i]的最大值的最大值 小于等于 [i+1:n-1]的最小值，说明i+1是右区间的起点，此时左区间最小，直接返回
+//        {
+//            return i + 1;
+//        }
+//    }
+//    return 0;
+//}
+
+/////////////////////////////////////////862. 和至少为 K 的最短子数组//////////////////////////
+
+//https://leetcode.cn/problems/shortest-subarray-with-sum-at-least-k/solutions/1925036/liang-zhang-tu-miao-dong-dan-diao-dui-li-9fvh/
+//int main()
+//{
+//    vector<int> nums = { -28,81,-20,28,-29 };
+//    int k = 89;
+//    int n = nums.size(), ans = n + 1;
+//    vector<long> presum(n + 1);//测试样例中有超过int范围的
+//    presum[0] = 0L;//第一个元素为0，是因为后续计算子数组和的时候更方便，如果想要计算整个数组的和，只需要用presum[n]-presum[0]
+//                   //就可以了，当然也可以不设 0 ，只需要提前往队列里面压入一个 0 就可以了
+//    for (int i = 0; i < n; ++i)
+//        presum[i + 1] = presum[i] + nums[i]; // 计算前缀和
+//    deque<int> q;//因为我们想要双端弹出，并且末端写入的容器
+//    for (int i = 0; i <= n; ++i) 
+//    {//直接遍历前缀和数组，方便计算子数组和
+//        long cur_s = presum[i];//前缀和数组右端点
+//        while (!q.empty() && cur_s - presum[q.front()] >= k) 
+//        {//遍历到presum[i]时，考虑它左边的某个presum[j]，如果presum[i]-presum[j]>=k
+//            //那么无论presum[i]右边的数字是大是小，都不可能把 j 当做子数组的左端点
+//            //因为这样[j:i]这个子数组都已经满足条件了，我们不可能在得到一个
+//            //比 i-j 更短的子数组，因此presum[j]没有任何作用了，将它弹出队列
+//            //当然，在弹出之前，我们要先计算数组的子数组的长度
+//            ans = min(ans, i - q.front());//这里的 i 不是下标而是序号，所以计算长度的时候不用加 1
+//            q.pop_front(); // 优化一
+//        }
+//        while (!q.empty() && presum[q.back()] >= cur_s)
+//            //遍历到presum[i]时，考虑此时队尾的元素 presum[j]，如果presum[i]<=presum[j]
+//            //加入后续有数字 x 能和 s[j] 组成满足要求的子数组，即 x-s[j]>=k ，那么必然有 x-s[i]>=k
+//            //由于 s[i] 到 x 的这段子数组更短，因此s[j]没有任何作用了，将它弹出队列
+//            q.pop_back(); // 优化二
+//        q.push_back(i);//通过上面两个优化，我们维持了一个单调递增的队列，并且 队尾元素 减去 队首元素 的值小于 k，方便后续计算
+//    }
+//    cout<< (ans > n ? -1 : ans);
+//}
