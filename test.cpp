@@ -22742,3 +22742,104 @@ T m_lcm(T a, T b)
 //    }
 //    cout<< (ans > n ? -1 : ans);
 //}
+
+/////////////////////////////////////////2439. 最小化数组中的最大值//////////////////////////
+
+//https://leetcode.cn/problems/minimize-maximum-of-array/solutions/1894993/cppjava-you-shi-yi-dao-jing-dian-de-er-f-w3i6/
+//bool isValid(int k, vector<int> nums)
+//{
+//    long long have = 0;//前方的数字还可以帮我们后方的大数承载多少数字
+//    for (int i : nums)
+//    {//从前往后遍历
+//        if (i <= k)
+//        {
+//            have += k - i;//较小数，可以算入承载量，承载量就是我们假设了一个数组最大值 k，当前这个数小于等于 k
+//                          //那么它就有一部分空间可以去接收那些 后面的数多余出来的 值，当然我们现在还没办法计算出多余值
+//                          //所以先用一个变量统计前面这些数总共能够接收多少 多余值，方便后续使用
+//        }
+//        else//较大数
+//        {
+//            if (have < i - k)//i-k就是多余值，如果这些多余值无法被前面的数接收，返回false
+//                return false;//承载不了了，该答案不可行
+//            else//否则的话，就让前面的数去接收
+//                have -= (i - k);//减去承载量
+//        }
+//    }
+//    return true;
+//}
+//int main()
+//{
+//    vector<int> nums = { 3,7,1,6 };
+//    int ans;
+//    int left = *min_element(nums.begin(), nums.end());
+//    int right = *max_element(nums.begin(), nums.end());
+//    while (left <= right)
+//    {//二分
+//        int mid = left + (right - left) / 2;
+//        if (isValid(mid, nums))
+//        {//mid有可能是答案，记录下来，继续缩小判断
+//            ans = mid;
+//            right = mid - 1;
+//        }
+//        else
+//        {
+//            left = mid + 1;
+//        }
+//    }
+//    return ans;
+//}
+
+//枚举连通块的个数 i，则删除的边数为 i−1。
+//·设 total 为所有 nums[i] 的和，如果 total 能被 i 整除（i 是 total 的因子），那么每个连通块的价值都应等于 total/i​，记作 target。
+//如何判定存在这些连通块呢？
+//·如果一颗子树的价值等于 target，那么可以将其作为一个连通块，和其父节点断开，换句话说，它对其祖先节点的价值贡献是 0。
+//  DFS 这棵树，统计子树的价值：
+//  如果价值超过 target，那么当前删边方案不合法，返回 −1。
+//  如果价值等于 target，找到了一个连通块，和其父节点断开，返回 0。
+//  如果价值小于 target，尚未找到一个完整的连通块，返回价值。
+//如果 DFS 完了没有返回 −1，则当前删边方案合法。如果从大到小枚举连通块的个数，则此时可以直接返回答案。
+int main()
+{
+    vector<int> nums = { 6,2,2,2,6 };
+    vector<vector<int>> edges = { {0,1},{1,2},{1,3},{3,4 } };
+    vector<vector<int>> g(nums.size());
+    for (auto& e : edges) 
+    {//建图
+        int x = e[0], y = e[1];
+        g[x].push_back(y);
+        g[y].push_back(x);
+    }
+    int target;
+    function<int(int, int)> dfs = [&](int x, int fa) 
+    {//x是当前遍历到的结点编号，fa是从哪个结点过来的，因为图中肯定没有环，所以可以只记录前一个遍历的结点
+        int sum = nums[x]; // sum记录以 x 为根节点的子树价值，初始化为nums[x]
+        for (int y : g[x])//遍历邻居节点
+        {
+            if (y != fa) 
+            {//不能遍历之前遍历过的结点，否则无限递归
+                int res = dfs(y, x);//记录子节点的返回值
+                if (res < 0) 
+                    return -1;//子节点返回-1，说明以子节点为根的子树价值之和已经大于target了，那么以当前节点为根的
+                              //子树价值肯定大于target，不满足条件，所以直接返回-1
+                sum += res;//否则的话，加到sum里
+            }
+        }
+        //邻居节点遍历完成，sum记录以 x 为根节点的子树价值之和
+        if (sum > target)//大于target，返回-1
+            return -1;
+        return sum < target ? sum : 0;//小于target，返回给上层，可以作为上层的子树，等于target，直接断开以当前 x 为根节点的子树
+                                      //将其作为一个连通域，返回0，不作为上层的子树
+    };
+
+    int total = accumulate(nums.begin(), nums.end(), 0);
+    int mx = *max_element(nums.begin(), nums.end());//最大价值
+    for (int i = total / mx;i>=1; --i)
+    {//单个节点最大价值是mx，那么划分之和的连通域价值之和最小值就是 mx，那么连通域的最大数量为 total/mx
+        if (total % i == 0)
+        {//必须要整除，才有必要去进行划分
+            target = total / i;//每个连通域的价值之和
+            if (dfs(0, -1) == 0)//说明找到了一种划分方案，此时连通域数量最多，断开的边数也最多 i-1
+                return i - 1;
+        }
+    }
+}
