@@ -22798,48 +22798,177 @@ T m_lcm(T a, T b)
 //  如果价值等于 target，找到了一个连通块，和其父节点断开，返回 0。
 //  如果价值小于 target，尚未找到一个完整的连通块，返回价值。
 //如果 DFS 完了没有返回 −1，则当前删边方案合法。如果从大到小枚举连通块的个数，则此时可以直接返回答案。
-int main()
-{
-    vector<int> nums = { 6,2,2,2,6 };
-    vector<vector<int>> edges = { {0,1},{1,2},{1,3},{3,4 } };
-    vector<vector<int>> g(nums.size());
-    for (auto& e : edges) 
-    {//建图
-        int x = e[0], y = e[1];
-        g[x].push_back(y);
-        g[y].push_back(x);
-    }
-    int target;
-    function<int(int, int)> dfs = [&](int x, int fa) 
-    {//x是当前遍历到的结点编号，fa是从哪个结点过来的，因为图中肯定没有环，所以可以只记录前一个遍历的结点
-        int sum = nums[x]; // sum记录以 x 为根节点的子树价值，初始化为nums[x]
-        for (int y : g[x])//遍历邻居节点
-        {
-            if (y != fa) 
-            {//不能遍历之前遍历过的结点，否则无限递归
-                int res = dfs(y, x);//记录子节点的返回值
-                if (res < 0) 
-                    return -1;//子节点返回-1，说明以子节点为根的子树价值之和已经大于target了，那么以当前节点为根的
-                              //子树价值肯定大于target，不满足条件，所以直接返回-1
-                sum += res;//否则的话，加到sum里
-            }
-        }
-        //邻居节点遍历完成，sum记录以 x 为根节点的子树价值之和
-        if (sum > target)//大于target，返回-1
-            return -1;
-        return sum < target ? sum : 0;//小于target，返回给上层，可以作为上层的子树，等于target，直接断开以当前 x 为根节点的子树
-                                      //将其作为一个连通域，返回0，不作为上层的子树
-    };
+//int main()
+//{
+//    vector<int> nums = { 6,2,2,2,6 };
+//    vector<vector<int>> edges = { {0,1},{1,2},{1,3},{3,4 } };
+//    vector<vector<int>> g(nums.size());
+//    for (auto& e : edges) 
+//    {//建图
+//        int x = e[0], y = e[1];
+//        g[x].push_back(y);
+//        g[y].push_back(x);
+//    }
+//    int target;
+//    function<int(int, int)> dfs = [&](int x, int fa) 
+//    {//x是当前遍历到的结点编号，fa是从哪个结点过来的，因为图中肯定没有环，所以可以只记录前一个遍历的结点
+//        int sum = nums[x]; // sum记录以 x 为根节点的子树价值，初始化为nums[x]
+//        for (int y : g[x])//遍历邻居节点
+//        {
+//            if (y != fa) 
+//            {//不能遍历之前遍历过的结点，否则无限递归
+//                int res = dfs(y, x);//记录子节点的返回值
+//                if (res < 0) 
+//                    return -1;//子节点返回-1，说明以子节点为根的子树价值之和已经大于target了，那么以当前节点为根的
+//                              //子树价值肯定大于target，不满足条件，所以直接返回-1
+//                sum += res;//否则的话，加到sum里
+//            }
+//        }
+//        //邻居节点遍历完成，sum记录以 x 为根节点的子树价值之和
+//        if (sum > target)//大于target，返回-1
+//            return -1;
+//        return sum < target ? sum : 0;//小于target，返回给上层，可以作为上层的子树，等于target，直接断开以当前 x 为根节点的子树
+//                                      //将其作为一个连通域，返回0，不作为上层的子树
+//    };
+//
+//    int total = accumulate(nums.begin(), nums.end(), 0);
+//    int mx = *max_element(nums.begin(), nums.end());//最大价值
+//    for (int i = total / mx;i>=1; --i)
+//    {//单个节点最大价值是mx，那么划分之和的连通域价值之和最小值就是 mx，那么连通域的最大数量为 total/mx
+//        if (total % i == 0)
+//        {//必须要整除，才有必要去进行划分
+//            target = total / i;//每个连通域的价值之和
+//            if (dfs(0, -1) == 0)//说明找到了一种划分方案，此时连通域数量最多，断开的边数也最多 i-1
+//                return i - 1;
+//        }
+//    }
+//}
 
-    int total = accumulate(nums.begin(), nums.end(), 0);
-    int mx = *max_element(nums.begin(), nums.end());//最大价值
-    for (int i = total / mx;i>=1; --i)
-    {//单个节点最大价值是mx，那么划分之和的连通域价值之和最小值就是 mx，那么连通域的最大数量为 total/mx
-        if (total % i == 0)
-        {//必须要整除，才有必要去进行划分
-            target = total / i;//每个连通域的价值之和
-            if (dfs(0, -1) == 0)//说明找到了一种划分方案，此时连通域数量最多，断开的边数也最多 i-1
-                return i - 1;
-        }
-    }
-}
+//string change(string& s, int k)
+//{
+//    int n = s.size();
+//    string res;
+//    if (k == 0)
+//    {
+//        res = "1" + string(n, '0');
+//    }
+//    else
+//    {
+//        int m = 1;
+//        for (int i = k - 1;i >= 0;--i)
+//        {
+//            int m1 = m;
+//            m = (s[i] - '0' + m) / 10;
+//            s[i] = '0' + (s[i] - '0' + m1) % 10;
+//        }
+//        res = s.substr(0, k) + string(n - k, '0');
+//        if (m)
+//        {
+//            res = "1" + res;
+//        }
+//    }
+//    return res;
+//}
+//int fun(string s)
+//{
+//    int sum = 0;
+//    for (auto ch : s)
+//    {
+//        sum += ch - '0';
+//    }
+//    return sum;
+//}
+//int main()
+//{
+//    long long n = 839;
+//    int target = 11;
+//    string s = to_string(n);
+//    int sum = 0;
+//    string res=s;
+//    while (fun(res) > target)
+//    {
+//        sum = 0;
+//        for (int i = 0;i < res.size();++i)
+//        {
+//            if (sum + res[i] - '0' > target)
+//            {
+//                res = change(res, i);
+//                break;
+//            }
+//            sum += res[i] - '0';
+//        }
+//    }
+//    if (res == "")
+//    {
+//        return 0LL;
+//    }
+//    long long ans = stoll(res) - n;
+//}
+
+//int main()
+//{
+//    TreeNode* one = new TreeNode(2);
+//    TreeNode* two = new TreeNode(6);
+//    TreeNode* thr = new TreeNode(7);
+//    TreeNode* fou = new TreeNode(3, one, nullptr);
+//    TreeNode* fiv = new TreeNode(5, nullptr, thr);
+//    TreeNode* six = new TreeNode(4, two, fiv);
+//    TreeNode* root = new TreeNode(1, fou, six);
+//    vector<int> queries = {4};
+//    unordered_map<TreeNode*, int> height; // 每棵子树的高度
+//    function<int(TreeNode*)> get_height = [&](TreeNode* node) -> int 
+//    {//求出每棵子树的高度，从最底层开始算，叶子节点高度为 1
+//        return node ? height[node] = 1 + max(get_height(node->left), get_height(node->right)) : 0;
+//    };
+//    get_height(root);
+//    vector<int> res(height.size() + 1); // 每个节点的答案
+//    function<void(TreeNode*, int, int)> dfs = [&](TreeNode* node, int depth, int rest_h) 
+//    {//depth是root节点到当前节点的深度，root节点深度为 -1，表示从root到树中某个节点的 最长简单路径中的边数 。
+//        //rest_h表示删除了当前节点 node 以后还剩下的子树的最大高度，这个高度是通过在父节点上假设分别删除左右孩子节点
+//        //之后计算出来的，并且传入左右孩子节点，再记录到答案里
+//        if (node == nullptr) 
+//            return;//节点为空，直接返回
+//        ++depth;//每到下一层，深度+1
+//        res[node->val] = rest_h;//记录一下删除当前节点以后的最大高度，这个最大高度是在上一层父节点哪里计算出来并传入的
+//        //假设分别删除左右孩子节点，先删除左孩子，那么剩下的子树最大高度就等于 从根节点到当前节点的深度 加上
+//        // 右孩子子树的高度，并且要跟之前计算出来的最大高度去一个最大值，因为删除的这个左孩子可能是上层已经假设删除的
+//        //某个节点的子孙节点，删除它不会对最大高度造成影响，就比如删除节点 2，它是节点 3 的孩子节点，但删除它以后
+//        //最大高度仍然是删除节点 3 以后的最大高度 3，所以必须要取最大值，在传入左孩子节点内进行记录
+//        //注意rest_h是值传递，这说明只有删除同层以上节点的最大高度才会被记录下来，保证了不会对接下来的递归造成影响
+//        dfs(node->left, depth, max(rest_h, depth + height[node->right]));
+//        dfs(node->right, depth, max(rest_h, depth + height[node->left]));
+//    };
+//    dfs(root, -1, 0);
+//    for (auto& q : queries) 
+//        q = res[q];//直接把答案记录在queries里面
+//    for (auto i : queries)
+//    {
+//        cout << i << ' ';
+//    }
+//}
+
+
+//int main()
+//{
+//    vector<int> nums = { 272,238,996,406,763,164,102,948,217,760,609 };
+//    deque<int> d1, d2;
+//    int n = nums.size();
+//    vector<int> res(n, -1);
+//    for (int i = 0;i < n;++i)
+//    {
+//        while (!d2.empty() && nums[d2.back()] < nums[i])
+//        {
+//            res[d2.back()] = nums[i];
+//            d2.pop_back();
+//        }
+//        deque<int> tmp;
+//        while (!d1.empty() && nums[d1.back()] < nums[i])
+//        {
+//            tmp.push_front(d1.back());
+//            d1.pop_back();
+//        }
+//        d2.insert(d2.end(), tmp.begin(), tmp.end());
+//        d1.push_back(i);
+//    }
+//}
+
