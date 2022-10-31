@@ -22789,6 +22789,9 @@ T m_lcm(T a, T b)
 //    return ans;
 //}
 
+/////////////////////////////////////////2440. 创建价值相同的连通块//////////////////////////
+
+//https://leetcode.cn/problems/create-components-with-same-value/solutions/1895302/by-endlesscheng-u03q/
 //枚举连通块的个数 i，则删除的边数为 i−1。
 //·设 total 为所有 nums[i] 的和，如果 total 能被 i 整除（i 是 total 的因子），那么每个连通块的价值都应等于 total/i​，记作 target。
 //如何判定存在这些连通块呢？
@@ -22905,6 +22908,9 @@ T m_lcm(T a, T b)
 //    long long ans = stoll(res) - n;
 //}
 
+/////////////////////////////////////////2458. 移除子树后的二叉树高度//////////////////////////
+
+//https://leetcode.cn/problems/height-of-binary-tree-after-subtree-removal-queries/solutions/1936338/liang-bian-dfspythonjavacgo-by-endlessch-vvs4/
 //int main()
 //{
 //    TreeNode* one = new TreeNode(2);
@@ -22947,28 +22953,26 @@ T m_lcm(T a, T b)
 //    }
 //}
 
+/////////////////////////////////////////481. 神奇字符串//////////////////////////
 
+//https://leetcode.cn/problems/magical-string/solutions/1938214/by-endlesscheng-z8o1/
+//根据题意，我们可以把 s 看成是由「1 组」和「2 组」交替组成的，
+//重点在于每组内的数字是一个还是两个，这可以从 s 自身上知道。
+//下面的 PPT 动画演示了从 sss 的前三位 122 开始，构造 s 的过程：
 //int main()
 //{
-//    vector<int> nums = { 272,238,996,406,763,164,102,948,217,760,609 };
-//    deque<int> d1, d2;
-//    int n = nums.size();
-//    vector<int> res(n, -1);
-//    for (int i = 0;i < n;++i)
+//    int n = 6;
+//    string s = "122";
+//    for (int i = 2; s.length() < n; ++i)
 //    {
-//        while (!d2.empty() && nums[d2.back()] < nums[i])
+//        if (s.back() == '1')
 //        {
-//            res[d2.back()] = nums[i];
-//            d2.pop_back();
+//            s += string(s[i] - '0', '2');
 //        }
-//        deque<int> tmp;
-//        while (!d1.empty() && nums[d1.back()] < nums[i])
+//        else
 //        {
-//            tmp.push_front(d1.back());
-//            d1.pop_back();
+//            s += string(s[i] - '0', '1');
 //        }
-//        d2.insert(d2.end(), tmp.begin(), tmp.end());
-//        d1.push_back(i);
 //    }
+//    return count(s.begin(), s.begin() + n, '1');
 //}
-
