@@ -22976,3 +22976,64 @@ T m_lcm(T a, T b)
 //    }
 //    return count(s.begin(), s.begin() + n, '1');
 //}
+
+/////////////////////////////////////////51. N 皇后//////////////////////////
+
+//https://leetcode.cn/problems/n-queens/solutions/735755/dai-ma-sui-xiang-lu-51-n-queenshui-su-fa-2k32/
+//vector<vector<string>> res;
+//bool isValid(int row, int col, vector<string>& path, int n)
+//{
+//    for (int i = 0;i < row;i++)
+//    {
+//        if (path[i][col] == 'Q')
+//        {
+//            return false;
+//        }
+//    }
+//    for (int i = row - 1, j = col - 1;i >= 0 && j >= 0;i--, j--)
+//    {
+//        if (path[i][j] == 'Q')
+//        {
+//            return false;
+//        }
+//    }
+//    for (int i = row - 1, j = col + 1;i >= 0 && j < n;i--, j++)
+//    {
+//        if (path[i][j] == 'Q')
+//        {
+//            return false;
+//        }
+//    }
+//    return true;
+//}
+//void backtrack(int n, int row, vector<string>& path)
+//{
+//    if (row == n)
+//    {
+//        res.push_back(path);
+//        return;
+//    }
+//    for (int col = 0;col < n;col++)
+//    {
+//        if (isValid(row, col, path, n))
+//        {
+//            path[row][col] = 'Q';
+//            backtrack(n, row + 1, path);
+//            path[row][col] = '.';
+//        }
+//    }
+//}
+//int main()
+//{
+//    int n = 4;
+//    vector<string> path(n, string(n, '.'));
+//    backtrack(n, 0, path);
+//    for (auto v : res)
+//    {
+//        for (auto s : v)
+//        {
+//            cout << s << endl;
+//        }
+//        cout << endl;
+//    }
+//}
