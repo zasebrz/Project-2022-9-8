@@ -23037,3 +23037,140 @@ T m_lcm(T a, T b)
 //        cout << endl;
 //    }
 //}
+
+/////////////////////////////////////////1106. 解析布尔表达式//////////////////////////
+
+//https://leetcode.cn/problems/parsing-a-boolean-expression/solutions/1948172/jie-xi-bu-er-biao-da-shi-by-leetcode-sol-vmvg/
+//stack<char> ob;
+//void dfs(int n, int i, string& e)
+//{
+//    if (i == n)
+//    {//已经计算完了，返回上一层
+//        return;
+//    }
+//    if (e[i] == 'f' || e[i] == 't' || e[i] == '(' || e[i] == '!' || e[i] == '|' || e[i] == '&')
+//    {//除了右括号和逗号，都可以直接放进栈里
+//        ob.push(e[i]);
+//    }
+//    else if (e[i] == ')')
+//    {//遇到右括号，说明一个表达式结束了，现在开始计算这个表达式的值
+//        int sz = 0, kf = 0, kt = 0;//sz记录总共有多少个f和t，kf记录有多少个f，kt记录有多少个t
+//        while (ob.top() != '(')
+//        {//左右括号之间才是表达式
+//            if (ob.top() == 'f')
+//            {
+//                kf++;
+//            }
+//            else
+//            {
+//                kt++;
+//            }
+//            ++sz;
+//            ob.pop();
+//        }
+//        ob.pop();//弹出左括号
+//        char ch = ob.top();//此时栈顶元素是逻辑运算符，先记录下来
+//        ob.pop();//然后把栈顶元素弹出，因为我们接下来要往栈里面放运算数
+//        if (ch == '!')
+//        {//运算符是 非，记录对应值
+//            if (kf == 1 && kt == 0)
+//            {
+//                ob.push('t');
+//            }
+//            else {
+//                ob.push('f');
+//            }
+//        }
+//        else if (ch == '|')
+//        {//运算符是 或，只要有一个 t 就是 t
+//            if (kt > 0)
+//            {
+//                ob.push('t');
+//            }
+//            else
+//            {
+//                ob.push('f');
+//            }
+//        }
+//        else
+//        {//运算符是 和，全部运算数是 t 才是 t
+//            if (kt == sz)
+//            {
+//                ob.push('t');
+//            }
+//            else
+//            {
+//                ob.push('f');
+//            }
+//        }
+//    }
+//    dfs(n, i + 1, e);//进入下一层
+//}
+//int main()
+//{
+//    string expression = "|(&(t,f,t),!(t))";
+//    dfs(expression.size(), 0, expression);//运算完毕后，栈顶元素就是整个运算符的值
+//    return ob.top() == 't' ? true : false;
+//}
+
+/////////////////////////////////////////754. 到达终点数字//////////////////////////
+
+//https://leetcode.cn/problems/reach-a-number/solutions/1947254/fen-lei-tao-lun-xiang-xi-zheng-ming-jian-sqj2/
+//int main()
+//{
+//    int target = 5;
+//    target = abs(target);
+//    int s = 0, n = 0;//s表示当前的位置，n表示下一步的大小
+//    while (s < target || (s - target) % 2) // 没有到达（越过）终点，或者相距奇数
+//        s += ++n;//都需要再走一步，使得离终点更近，或者让相距奇数变成偶数，在回到情况二
+//    return n;
+//}
+
+/////////////////////////////////////////816. 模糊坐标//////////////////////////
+
+//https://leetcode.cn/problems/ambiguous-coordinates/solutions/1951931/mo-hu-zuo-biao-by-leetcode-solution-y1yz/
+//vector<string> getPos(string s) 
+//{
+//    vector<string> pos;
+//    if (s[0] != '0' || s == "0") //不含前导0，或者只有一个0字符的时候，s本身不需要添加小数点也是一个合法子串
+//        pos.push_back(s);
+//    if (s.back() == '0')
+//    {//如果s的末尾是字符0，那么不管小数点放在哪里，都是不合法的，直接返回pos
+//        return pos;
+//    }
+//    for (int p = 1; p < s.size(); ++p) 
+//    {//在每个位置放小数点，检测是否是合法的
+//        if (p != 1 && s[0] == '0') 
+//            //如果s的第一个字符是0，并且小数点前面不止一个数，那么小数点前面的整数部分就包含前导0了，不合法
+//            continue;
+//        pos.push_back(s.substr(0, p) + "." + s.substr(p));//否则就是合法的
+//    }
+//    return pos;
+//}
+//int main()
+//{
+//    string s = "(0123)";
+//    vector<string> res;
+//    s = s.substr(1, s.size() - 2);//去掉括号
+//    int n = s.size();//去掉括号之后的长度
+//    for (int i = 1; i < n; ++i) 
+//    {//枚举分界线，把s分成两部分，然后分别找到合法的子字符串，再拼接起来
+//        vector<string> lt = getPos(s.substr(0, i));
+//        if (lt.empty())//左边部分为空代表分界线不能是这里
+//            continue;
+//        vector<string> rt = getPos(s.substr(i));
+//        if (rt.empty())//右边部分为空代表分界线不能是这里
+//            continue;
+//        for (auto& i : lt) 
+//        {//左右两边都是合法子串，开始拼接
+//            for (auto& j : rt) 
+//            {
+//                res.push_back("(" + i + ", " + j + ")");
+//            }
+//        }
+//    }
+//    for (auto s : res)
+//    {
+//        cout << s << ' ';
+//    }
+//}
