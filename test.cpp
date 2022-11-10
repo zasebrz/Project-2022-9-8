@@ -23174,3 +23174,220 @@ T m_lcm(T a, T b)
 //        cout << s << ' ';
 //    }
 //}
+
+/////////////////////////////////////////764. 最大加号标志//////////////////////////
+
+//https://leetcode.cn/problems/largest-plus-sign/solutions/1958299/by-lcbin-m7yb/comments/1828110
+//https://leetcode.cn/problems/largest-plus-sign/solutions/1958456/by-ac_oier-q932/
+//int main()
+//{
+//    int n = 5;
+//    vector<vector<int>> mines = { {4, 2} };//mines[i] = [xi, yi]表示 grid[xi][yi] == 0
+//    //假设点(x, y)能够取得最大长度 k，我们知道 k 取决于以点(x, y)为起点，四联通方向中「最短的连续 1 的长度」。
+//    //定义 dp[i][j] 表示以(i, j)为中心的在四联通方向中「最短的连续 1 的长度」，答案即为所有 dp[i][j]的最大值。
+//    //最短的连续1代表 以（i，j）为中心能得到的最大的十字图案，在对每一个中心取最大值，即可得到整个矩阵中最大的十字图案
+//    vector<vector<int>> dp(n, vector<int>(n, n));
+//    for (auto& e : mines) //grid[xi][yi] = 0表示以这些坐标为中心的最大的十字图案肯定为 0
+//        dp[e[0]][e[1]] = 0;
+//    for (int i = 0; i < n; ++i) 
+//    {
+//        int left = 0, right = 0, up = 0, down = 0;//记录各个方向上连续1的长度
+//        for (int j = 0, k = n - 1; j < n; ++j, --k) 
+//        {
+//            //dp[i][j]是每次遍历的坐标，dp[i][k]是和dp[i][j]横着对称的坐标； j可以从左往右推left，k可以从右往左推right； 
+//            //同时dp[j][i]是和dp[i][j]对角线对称的坐标，可以从上往下遍历推up，dp[k][i]从下往上推down
+//            //如果dp[i][j]不等于0，说明grid[i][j]=1，那么以(i, j)为右端点的左联通方向上，连续 1 的长度要加 1，否则连续 1 的长度重置为0
+//            //如果dp[i][k]不等于0，说明grid[i][k]=1，那么以(i, k)为左端点的右联通方向上，连续 1 的长度要加 1，否则连续 1 的长度重置为0
+//            //如果dp[j][i]不等于0，说明grid[j][i]=1，那么以(j, i)为下端点的上联通方向上，连续 1 的长度要加 1，否则连续 1 的长度重置为0
+//            //如果dp[k][i]不等于0，说明grid[k][i]=1，那么以(k, i)为上端点的下联通方向上，连续 1 的长度要加 1，否则连续 1 的长度重置为0
+//            left = dp[i][j] ? left + 1 : 0;
+//            right = dp[i][k] ? right + 1 : 0;
+//            up = dp[j][i] ? up + 1 : 0;
+//            down = dp[k][i] ? down + 1 : 0;
+//            dp[i][j] = min(dp[i][j], left);//dp[i][j]可能已经记录了右联通、上联通、下联通方向上最大连续1的长度，要在这四个方向中找一个最小值
+//            dp[i][k] = min(dp[i][k], right);
+//            dp[j][i] = min(dp[j][i], up);
+//            dp[k][i] = min(dp[k][i], down);
+//        }
+//    }
+//    int ans = 0;
+//    for (auto& e : dp) //取最大的十字图案
+//        ans = max(ans, *max_element(e.begin(), e.end()));
+//    cout<<ans;
+//}
+
+/////////////////////////////////////////2462. 雇佣 K 位工人的总代价//////////////////////////
+
+//https://leetcode.cn/problems/total-cost-to-hire-k-workers/solutions/1951938/liang-ge-zui-xiao-dui-mo-ni-by-endlessch-nagm/
+//int main()
+//{
+//    vector<int> costs = { 57,33,26,76,14,67,24,90,72,37,30 };
+//    int k = 11, candidates = 2;
+//    auto cmp = [&](const int a, const int b)
+//    {//小数在前面，相同的话下标小的在前面
+//        return costs[a] > costs[b] || costs[a] == costs[b] && a > b;
+//    };
+//    priority_queue<int, vector<int>, decltype(cmp)> pq1(cmp);//两个优先队列，分别存放前、后两组数
+//    priority_queue<int, vector<int>, decltype(cmp)> pq2(cmp);
+//    int n = costs.size();
+//    int i = 0, lhs = 0, rhs = n - 1;//lhs代表下一位应当放入前队列中的值，rhs代表下一位应当放入后队列中的值
+//    while (i++ < candidates && lhs<=rhs)//lhs<=rhs表示每个数只能放到一个队列里面，不能出现在两个队列中
+//    {
+//        pq1.push(lhs++);//放入前队列，然后递增lhs
+//        if (lhs <= rhs)//如果递增之后的lhs仍然小于等于rhs，说明两个队列里没有出现同一个数，那么就可以把rhs放到后队列中
+//                       //否则不能放入
+//            pq2.push(rhs--);
+//    }
+//    long long res = 0;
+//    int j = 0;//j表示已经选出了多少名工人
+//    while (j++ < k)
+//    {
+//        if (pq2.empty() || !pq1.empty() && costs[pq1.top()] <= costs[pq2.top()])
+//        {//后队列为空，或者两个队列都非空时，如果前队列中的最小值小于等于后队列中的最小值，则选择前队列中的最小值
+//            res += costs[pq1.top()];
+//            pq1.pop();//弹出最小值
+//            if (lhs <= rhs)//同样要进行判断，防止一个数在两个队列里重复出现
+//                pq1.push(lhs++);
+//        }
+//        else if (pq1.empty() || !pq2.empty() && costs[pq1.top()] > costs[pq2.top()])
+//        {//前队列为空，或者两个队列都非空时，如果前队列中的最小值大于后队列中的最小值，则选择后队列中的最小值
+//            res += costs[pq2.top()];
+//            pq2.pop();//弹出最小值
+//            if (lhs <= rhs)//同样要进行判断，防止一个数在两个队列里重复出现
+//                pq2.push(rhs--);
+//        }
+//    }
+//    return res;
+//}
+
+/////////////////////////////////////////2463. 最小移动总距离//////////////////////////
+
+//https://leetcode.cn/problems/minimum-total-distance-traveled/solutions/1951947/ji-yi-hua-sou-suo-by-endlesscheng-qctr/
+//int main()
+//{
+//    vector<int> robot = { 0, 4, 6 };
+//    vector<vector<int>> factory = { {2, 2},{6, 2} };
+//    long long inf = 1e16;
+//    int m = robot.size();
+//    int n = factory.size();
+//    //用邻项交换法可以证明，对机器人和工厂按照位置从小到大排序，那么每个工厂修复的机器人就是连续的一段了。
+//    sort(robot.begin(), robot.end());
+//    sort(factory.begin(), factory.end());
+//    //定义 dp(i, j)表示用[i, n - 1]的工厂，修理[j, m - 1]的机器人，这些机器人总共移动的最小距离。
+//    vector<vector<long long>> dp(110, vector<long long>(110, inf));//机器人和工厂都不超过100个
+//    //枚举第 i 个工厂修了 k 个机器人，则有 dp(i, j) = min⁡(k=[0:limit[i]])dp(i + 1, j + k) + cost(i, j, k)。
+//    //就是说，第 i 个工厂修了 0,1,2,3,4...limit[i]（工厂的容量上限） 个机器人，
+//    //则第 [i+1:n-1] 个工厂就要负责修理 [j+0,j+1,j+2,j+3,j+4..j+limit[i]:m-1] 个机器人，从而找出最少的移动距离
+//    //这里 cost(i, j, k)表示第 i 个工厂修复从 j 到 j + k−1 的机器人，移动距离就是这些机器人到第 i 个工厂的距离之和。
+//    //注意 k<=limit[i]。
+//    function<long long(int, int)> dfs = [&](int i, int j) {
+//        //用[i, n - 1]的工厂修理[j, m - 1]的机器人
+//        if (j == m) 
+//            return 0LL; //j==m说明机器人修完了，不管 i 是多少（右边还有几个工厂，都不需要修了），直接返回 0
+//        if (i == n) 
+//            return inf; //如果上面没放，并且i == n，说明机器人没修完，但是没有工厂能够修了，这样左边的某个工厂肯定修多了
+//        if (dp[i][j] != inf) //不等于inf表示之前已经计算过了这种情况，有记忆化，直接返回
+//            return dp[i][j];
+//        long long res = dfs(i + 1, j); //第 i 个工厂一个也不修，全都扔给 [i+1:n-1]这些工厂
+//        long long sum = 0;//记录第 i 个工厂修理的这些机器人的移动距离，也就是cost(i,j,k)
+//        for (int k = 1; k <= factory[i][1] && j + k - 1 < m; k++) 
+//        {//枚举 第 i 个工厂修理的机器人个数，从 1 开始，不能超过工厂的容量上限，并且不能超过机器人的总个数
+//            sum += abs(robot[j + k - 1] - factory[i][0]);//连续的一段机器人，所以可以累加
+//            res = min(res, sum + dfs(i + 1, j + k));//res记录的是[i, n - 1]的工厂，修理[j, m - 1]的机器人总移动距离的最小值
+//        }
+//        dp[i][j] = res;//记忆化，下次就不需要再重新计算这一段了
+//        return res;
+//    };
+//    return dfs(0, 0);
+//}
+
+/////////////////////////////////////////864. 获取所有钥匙的最短路径//////////////////////////
+
+//https://leetcode.cn/problems/shortest-path-to-get-all-keys/solutions/1960449/by-lcbin-mk6o/
+//根据题意，我们需要从起点出发，往上下左右四个方向走，获取所有钥匙，最后返回获取所有钥匙所需要的移动的最少次数。
+//若无法获取所有钥匙，返回 −1。
+//·首先，我们遍历二维网格，找到起点位置(si, sj)，并统计钥匙的个数 k。
+//·然后，我们可以使用广度优先搜索 BFS 来解决本题。由于钥匙的个数范围是[1, 6]，
+//    我们可以用一个二进制数来表示钥匙的状态，其中第 i 位为 1 表示第 i 把钥匙已经获取到了，为 0 表示第 i 把钥匙还没有获取到。
+//    比如，以下例子中，共有 4 个二进制位为 1，表示 'b', 'c', 'd', 'f' 4 把钥匙已经获取到了。
+//    1 0 1 1 1 0
+//    ^   ^ ^ ^
+//    f   d c b
+//    我们定义一个队列 q 来存储当前位置以及当前拥有的钥匙的状态，即(i, j, state)，其中(i, j) 表示当前位置，
+//    state 表示当前拥有的钥匙的状态，即 state 的第 i 位为 1 表示当前拥有第 i 把钥匙，否则表示当前没有第 i 把钥匙。
+//·另外，定义哈希表或数组 vis 记录当前位置以及当前拥有的钥匙的状态是否已经被访问过，如果访问过，则不需要再次访问。
+//    vis[i][j][state] 表示当前位置为(i, j)，当前拥有的钥匙的状态为 state 时，是否已经被访问过。
+//·我们从起点(si, sj) 出发，将其加入队列 q，并将 vis[si][sj][0] 置为 true，表示起点位置以及拥有的钥匙的状态为 0 时已经被访问过。
+//    在广度优先搜索的过程中，我们每次从队首取出一个位置(i, j, state)，并判断当前位置是否为终点，
+//    即当前位置是否拥有所有的钥匙，即 state 的二进制表示中的 1 的个数是否为 k。如果是，将当前步数作为答案返回。
+//    否则，我们从当前位置出发，往上下左右四个方向走，如果可以走到下一个位置(x, y)，则将(x, y, nxt) 加入队列 q，
+//    其中 nxt 表示下一个位置的钥匙的状态。
+//    这里(x, y) 首先需要满足在网格范围内，即 0<= x < m 且 0 <= y < n。其次，如果(x, y) 位置是墙壁，即 grid[x][y] == '#'，
+//    或者(x, y) 位置是锁，但我们没有对应的钥匙，即 grid[x][y] >= 'A' && grid[x][y] <= 'F' && (state >> (grid[x][y] - 'A') & 1) == 0)，
+//    则不能走到位置(x, y)。否则，我们可以走到位置(x, y)。
+//·搜索结束，没能找到所有的钥匙，返回 −1。
+//int main()
+//{
+//    vector<string> grid = { "@.a.#","###.#","b.A.B" };
+//    int m = grid.size(), n = grid[0].size();
+//    int k = 0;
+//    queue<pair<int, int>> q;
+//    int si, sj;
+//    for (int i = 0; i < m; ++i) {
+//        for (int j = 0; j < n; ++j) {
+//            char c = grid[i][j];
+//            // 累加钥匙数量
+//            if (islower(c))
+//                ++k;
+//            // 起点
+//            else if (c == '@')
+//            {
+//                si = i;
+//                sj = j;
+//            }
+//        }
+//    }
+//    q.push({ si * n + sj,0 });//位于起点，没有任何钥匙
+//    vector<vector<bool>> vis(m * n, vector<bool>(1 << k));
+//    vis[si * n + sj][0] = true;
+//    int ans = 0;
+//    int dir[4][2] = { {1,0},{-1,0},{0,1},{0,-1} };
+//    while (!q.empty()) 
+//    {
+//        int sz = q.size();
+//        while (sz--)
+//        {
+//            auto [pos,state] = q.front();
+//            q.pop();
+//            // 找到所有钥匙，返回当前步数
+//            if (state == (1 << k) - 1) 
+//                return ans;
+//            // 往四个方向搜索
+//            for (int h = 0; h < 4; ++h) 
+//            {
+//                int x = pos/n + dir[h][0], y = pos%n + dir[h][1];
+//                // 在边界范围内
+//                if (x >= 0 && x < m && y >= 0 && y < n) 
+//                {
+//                    char c = grid[x][y];
+//                    // 是墙，或者是锁，但此时没有对应的钥匙，无法通过
+//                    if (c == '#' || (isupper(c) && (state >> (c - 'A') & 1) == 0)) 
+//                        continue;
+//                    int nxt = state;
+//                    // 是钥匙，更新状态
+//                    if (islower(c)) 
+//                        nxt |= 1 << (c - 'a');
+//                    // 此状态未访问过，入队
+//                    if (!vis[x * n + y][nxt])
+//                    {
+//                        vis[x * n + y][nxt] = true;
+//                        q.push({ x * n + y, nxt });
+//                    }
+//                }
+//            }
+//        }
+//        // 步数加一
+//        ++ans;
+//    }
+//    return -1;
+//}
