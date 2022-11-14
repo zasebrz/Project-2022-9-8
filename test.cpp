@@ -23391,3 +23391,119 @@ T m_lcm(T a, T b)
 //    }
 //    return -1;
 //}
+
+/////////////////////////////////////////2472. 不重叠回文子字符串的最大数目//////////////////////////
+
+//https://leetcode.cn/problems/maximum-number-of-non-overlapping-palindrome-substrings/solutions/1965456/zhong-xin-kuo-zhan-dppythonjavacgo-by-en-1yt1/
+//从字符串 s 中选出一组满足下述条件且 不重叠（第一个回文串的尾字母必须在第二个回文串首字母前面） 的子字符串：
+//·每个子字符串的长度 至少 为 k 。
+//·每个子字符串是一个 回文串 。
+//返回最优方案中能选择的子字符串的 最大 数目。
+//输入：s = "abaccdbbd", k = 3
+//输出：2
+//解释：可以选择 s = "ABAccDBBD" 中大写的子字符串。"aba" 和 "dbbd" 都是回文，且长度至少为 k = 3 。
+//可以证明，无法选出两个以上的有效子字符串。
+//int main()
+//{
+//    string s = "abaccdbbd";
+//    int k = 3;
+//    int n = s.length();
+//    vector<int> f(n+1,0);//定义 f[i] 表示 s[0..i−1] 中的不重叠回文子字符串的最大数目。
+//    //特别地，定义 f[0] = 0，方便我们表示空字符串。
+//    //对于每一个字符s[i],如果不将 s[i] 当成一个新的回文串的中心，那么有 f[i + 1] = max(f[i+1],f[i])，
+//    //因为f[i+1]可能在遍历之前字符的时候就更新过了，所以需要取最大值。
+//    //如果将 s[i] 当成一个新的回文串的中心，那么利用中心拓展法去找到这个回文串，假设 s[lhs..i..r]是回文子串（i是中心），
+//    //且 rhs−lhs+1>=k，那么有状态转移方程 f[rhs + 1] = max(f[rhs + 1], f[lhs] + 1)，f[rhs + 1]可能在遍历之前字符的时候就更新过了，
+//    //所以需要取最大值；这里的 rhs 有可能大于 i ，会提前更新后面的值，所以在遍历到后面时，如果不将 s[i]当成新的回文串中心，需要先取最大值
+//    for (int i = 0; i < 2 * n - 1; ++i) 
+//    {//https://leetcode.cn/problems/palindromic-substrings/solutions/379987/hui-wen-zi-chuan-by-leetcode-solution/
+//        //一个字符中心的情况有 n 种，两个字符中心的情况有 n-1种（[0,1],[1,2],[2,3]...），所以总共 2*n-1种情况
+//        int lhs = i / 2, rhs = lhs + i % 2; // 中心扩展法
+//        f[lhs + 1] = max(f[lhs + 1], f[lhs]);//不将 s[i] 当成一个新的回文串的中心
+//        for (; lhs >= 0 && rhs < n && s[lhs] == s[rhs]; --lhs, ++rhs)
+//        {//将 s[i] 当成一个新的回文串的中心，开始拓展
+//            if (rhs - lhs + 1 >= k)
+//            {//新的回文串长度大于等于 k，那么就尝试一下看看能否得到新的最大值
+//                //此时s[lhs..rhs]是新的回文串，且长度满足条件，那么s[0..rhs]这个字符串中不重叠回文子字符串的最大数目有可能是
+//                //s[0..lhs-1]这个字符串中不重叠回文子字符串的最大数目 加上 1（也就是s[l..r]这个新的字符串）。
+//                f[rhs + 1] = max(f[rhs + 1], f[lhs] + 1);
+//                break;//已经找到了一个满足条件的新字符串，就不必要继续拓展，因为往左拓展会使得左边剩余的字符串变短，拥有的
+//                //不重叠回文子字符串的最大数目也会变少，不可能大于当前这个 f[rhs+1]，不往左拓展就不能往右拓展
+//            }
+//        }  
+//    }
+//    return f[n];
+//}
+
+/////////////////////////////////////////2467. 树上最大得分和路径//////////////////////////
+
+//https://leetcode.cn/problems/most-profitable-path-in-a-tree/solutions/1964916/liang-bian-dfs-by-endlesscheng-da7j/comments/1832585
+//class Solution {
+//public:
+//    unordered_map<int, int> b;
+//    int res;
+//    void dfs2(vector<vector<int>>& graph, int last, int alice, int time, int total, vector<int>& amount)
+//    {//last记录从哪个节点来的，不走回头路，Alice记录当前节点，time记录时间点，total记录路径总和
+//        if (b.find(alice)==b.end() || b[alice] > time)
+//        { //bob没有访问过当前节点 或者 bob 访问此节点的时间在 alice之后
+//            total += amount[alice]; 
+//        }
+//        else if (b[alice] == time)
+//        {//alice 和 Bob 相遇 平摊分数
+//            total += amount[alice] / 2;
+//        }
+//        //如果 bob 访问此节点的时间在 alice之前，则alice不计分
+//        //alice是叶子节点，更新一下从0到叶子节点的最大值
+//        if (graph[alice].size() == 1)
+//            res = max(res,total);
+//        for (int e : graph[alice])
+//        {
+//            if (e != last)
+//            {//不走回头路
+//                dfs2(graph, alice, e, time + 1, total, amount);
+//            } 
+//        }
+//    }
+//    bool dfs(vector<vector<int>>& graph, int bob, int last, int time)
+//    {//bob表示当前节点，last表示从哪个节点来的，time记录到达当前节点的时间点
+//        if (bob == 0)
+//        {
+//            b[bob] = time;//到达0点 记录时间
+//            return true;//表示这条路径能找到0，记录这条路径上节点的时间点
+//        }
+//        bool flag = false;
+//        for (int e : graph[bob])
+//        {
+//            if (e != last && dfs(graph, e, bob, time + 1))
+//            {//如果这条路径上找到了0，不用继续找了
+//                flag = true;
+//                break;
+//            }
+//        }
+//        //已经找到0了，记录时间
+//        if (flag)
+//            b[bob] = time;
+//        return flag;
+//    }
+//    int mostProfitablePath(vector<vector<int>>& edges, int bob, vector<int>& amount) {
+//        int n = amount.size();
+//        vector<vector<int>> graph(n);
+//        for (auto e : edges)
+//        {
+//            graph[e[0]].push_back(e[1]);
+//            graph[e[1]].push_back(e[0]);
+//        }
+//        dfs(graph, bob, -1, 0);//先记录bob到0这条路径上所有节点的时间点
+//        graph[0].push_back(-1);//防止把 0 误认为是叶子节点
+//        dfs2(graph, -1, 0, 0, 0, amount);
+//        return res;
+//    }
+//};
+//int main()
+//{
+//    vector<vector<int>> edges = { {0, 1},{1, 2},{1, 3},{3, 4} };
+//    int bob = 3;
+//    vector<int> amount = { -2, 4, 2, -4, 6 };
+//    Solution so;
+//    so.mostProfitablePath(edges, bob, amount);
+//}
