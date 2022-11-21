@@ -1471,34 +1471,6 @@ T m_lcm(T a, T b)
 //    cout << (dp[amount]>amount? -1:dp[amount]) << endl;
 //}
 
-//////////////////////////////////////////////list去重///////////////////////////////////////////////////////
-
-//bool demo(double first, double second)
-//{
-//    return (int(first) == int(second));
-//}
-//int main()
-//{
-//    list<double> mylist{ 1,1.2,1.2,3,4,4.5,4.6 };
-//    //删除相邻重复的元素，仅保留一份
-//    mylist.unique();//{1, 1.2, 3, 4, 4.5, 4.6}
-//
-//    for (auto it = mylist.begin(); it != mylist.end(); ++it)
-//        cout << *it << ' ';
-//    cout << endl;
-//    //demo 为二元谓词函数，是我们自定义的去重规则
-//    mylist.unique(demo);
-//    //利用匿名函数去重
-//    /*mylist.unique([](const double a, const double b) {
-//        return (int(a) == int(b));
-//        }
-//    );*/
-//
-//    for (auto it = mylist.begin(); it != mylist.end(); ++it)
-//        std::cout << *it << ' ';
-//    return 0;
-//}
-
 //////////////////////////////////////////////柱状图中的最大矩形///////////////////////////////////////////////////////
 
 //https://leetcode-cn.com/problems/largest-rectangle-in-histogram/solution/bao-li-jie-fa-zhan-by-liweiwei1419/
@@ -23761,4 +23733,148 @@ T m_lcm(T a, T b)
 //            g[i][j] = (g[i - 1][j] + dp[i][j]) % MOD;
 //    }
 //    return dp[n][k];
+//}
+
+/////////////////////////////////////////799. 香槟塔//////////////////////////
+
+//https://leetcode.cn/problems/champagne-tower/solutions/1981121/by-ac_oier-c8jn/
+//int main()
+//{
+//    int poured = 4, query_row = 2, query_glass = 1;
+//    vector<vector<double>> dp(102, vector<double>(102));//定义 f[i][j] 为第 i 行第 j 列杯子所经过的水的流量（而不是最终剩余的水量）。
+//    dp[0][0] = poured;//起始我们有 f[0][0]=poured，最终答案为 min⁡(f[n][m],1)。
+//   // 不失一般性考虑 f[i][j] 能够更新哪些状态：显然当 f[i][j] 不足 1 的时候，不会有水从杯子里溢出，即 f[i][j] 
+//   // 将不能更新其他状态；当 f[i][j]大于 1 时，将会有 f[i][j]−1 的水会等量留到下一行的杯子里，所流向的杯子分别是
+//   //「第 i + 1 行第 j 列的杯子」和「第 i + 1 行第 j + 1 列的杯子」，增加流量均为 (f[i][j]−1)/2，
+//   // 即有 f[i + 1][j] += (f[i][j]−1) / 2 和 f[i + 1][j + 1] += (f[i][j]−1) / 2
+//    for (int i = 0; i <= query_row; ++i)
+//    {
+//        for (int j = 0; j <= i; ++j)
+//        {
+//            if (dp[i][j] <= 1)
+//                continue;
+//            dp[i + 1][j] += (dp[i][j] - 1) / 2;
+//            dp[i + 1][j + 1] += (dp[i][j] - 1) / 2;
+//        }
+//    }
+//    return dp[query_row][query_glass] >= 1.0 ? 1.0 : dp[query_row][query_glass];
+//}
+
+/////////////////////////////////////////808. 分汤//////////////////////////
+
+//https://leetcode.cn/problems/soup-servings/solutions/1981704/fen-tang-by-leetcode-solution-0yxs/
+//四种分配方式都是 25 的倍数，因此我们可以将 n 进行除以 25 并向上取整的缩放操作，并将四类操作等价成：
+//提供 4ml 的 汤A 和 0ml 的 汤B 。
+//提供 3ml 的 汤A 和 1ml 的 汤B 。
+//提供 2ml 的 汤A 和 2ml 的 汤B 。
+//提供 1ml 的 汤A 和 3ml 的 汤B 。
+//定义 f[i][j] 为 汤A 剩余 i 毫升，汤B 剩余 j 毫升时的最终概率
+//（概率 = 汤A先分配完的概率 + 汤A和汤B同时分配完的概率×0.5）
+//最终答案为 f[n][n] 为最终答案，考虑任意项存在为 0 情况时的边界情况：
+//若 i = 0 且 j = 0，结果为 0 + 1/2 = 1/2​，即有 f[0][0] = 0.5
+//若 i = 0 且 j > 0，结果为 1 + 0 = 1，即有 f[0][X] = 1，其中 X > 1
+//若 i > 0 且 j = 0，结果为 0 + 0 = 0，即有 f[X][0] = 0，其中 X > 1
+//其余一般情况为 i 和 j 均不为 0，由于四类操作均为等概率，结合题意和状态定义可知：
+//f[i][j] = 1/4×(f[i−4][j] + f[i−3][j−1] + f[i−2][j−2] + f[i−1][j−3])
+//即 汤A 剩余 i 毫升，汤B 剩余 j 毫升时的最终概率等于 按照每种方案分配后的最终概率乘以每种方案的概率（1/4）
+//由于 n = 1e9，即使进行了除 25 的缩放操作，过多的状态数仍会导致 TLE。
+//此时需要利用「返回值在正确答案 10^−5 的范围内将被认为是正确的」来做优化
+//int main()
+//{
+//    int n = 51;
+//    n = ceil((double)n / 25);//向上取整，因为只要剩下一点都需要一次分配，不能四舍五入
+//    if (n >= 179) 
+//    {//n没有缩小前，n=4475,p≈0.999990211307，n = 4476, p≈0.999990468596，所以可以直接返回
+//        return 1.0;
+//    }
+//    vector<vector<double>> dp(n + 1, vector<double>(n + 1));
+//    dp[0][0] = 0.5;
+//    for (int i = 1; i <= n; i++) 
+//    {
+//        dp[0][i] = 1.0;
+//    }
+//    for (int i = 1; i <= n; i++) {
+//        for (int j = 1; j <= n; j++) {
+//            dp[i][j] = (dp[max(0, i - 4)][j] + dp[max(0, i - 3)][max(0, j - 1)] +
+//                dp[max(0, i - 2)][max(0, j - 2)] + dp[max(0, i - 1)][max(0, j - 3)]) / 4.0;//递推
+//        }
+//    }
+//    return dp[n][n];
+//}
+
+/////////////////////////////////////////1719. 重构一棵树的方案数//////////////////////////
+
+//https://leetcode.cn/problems/number-of-ways-to-reconstruct-a-tree/solutions/1269173/gong-shui-san-xie-gou-zao-yan-zheng-he-f-q6fc/
+//int main()
+//{
+//    vector<vector<int>> pairs = { {1, 2},{2, 3},{1, 3} };
+//    int N = 510;
+//    vector<int> cnts(N), fa(N);//cnts统计每个节点的度，fa记录每个节点的父节点
+//    vector <vector<bool>> g(N, vector<bool>(N));//哪些节点之间时联通的
+//    unordered_set<int> set;//使用 Set 统计点集。
+//    int m = pairs.size();
+//    for (auto& pair : pairs) 
+//    {
+//        int a = pair[0], b = pair[1];
+//        cnts[a]++, cnts[b]++;
+//        g[a][b] = g[b][a] = true;
+//        set.insert(a), set.insert(b);
+//    }
+//    vector<int> list(set.begin(), set.end());
+//    //对于一棵合法树而言：每个子树的根节点在 pairs 中的出现数量满足大于等于
+//    //其子节点在 pairs 中出现的数量（当某个根节点只有一个子节点时可取等号），也就是度越大。
+//    //将节点按度降序排序，度越大肯定越靠近于根节点
+//    sort(list.begin(), list.end(), [&](const int& a, const int& b) {
+//        return cnts[a] > cnts[b];
+//        });
+//    int n = list.size(), root = list[0];//总共有 n 个节点，先假设一个根节点为list[0]，因为它的度最大
+//    //节点数n ，边数m，最少要有n-1才是一颗树（也就是所有节点都是联通的），不然则是森林（存在两个连通域)
+//    if (m < n - 1)
+//        return 0;
+//    //fa用来表示节点的父亲
+//    fa[root] = -1;
+//    //对于每个非根节点 a 而言，按道理我们可以将其添加到任意一个「度数不小于 cnt[i]」且「与其存在父子关系的」b 中，
+//    //但这样构造方式，只能确保能够得到「合法性」的结果，会为对于后续的「非唯一性」验证带来巨大困难。
+//    //因此这里尝试构造的关键点在于：我们为 a 找 b 的时候，应当找符合条件的、度数与 a 相近的点。
+//    //由于我们已经提前根据「度数」进行降序，这个找最优点的操作可从 a 所在位置开始进行往回找，
+//    //找到 第一个 满足「与 a 存在父子关系」的点 b 作为具体方案中 a 的根节点。
+//    //这样的构造逻辑为后续的「非唯一性」验证带来的好处是：如果存在多个点能够相互交换位置的话
+//    //其在具体方案中必然为直接的父子关系，即我们能够通过判断 cnts[i] 是否相等，
+//    //来得知在具体方案中点 i 和 fa[i] 能够交换，并且如果能够交换，具体方案的合法性不会发生改变。
+//    for (int i = 1; i < n; i++) 
+//    {
+//        int a = list[i];//当前遍历到的结点 a
+//        bool ok = false;
+//        //从构造节点开始往前找最近的可以成为该节点父亲的节点
+//        for (int j = i - 1; j >= 0 && !ok; j--) 
+//        {//只需要找到 1 个父节点 b，b的度数要大于a
+//            int b = list[j];
+//            if (g[a][b]) 
+//            {//b和a存在父子关系（祖父节点和孙子节点也存在父子关系）
+//                fa[a] = b;//暂且把a的父节点设为b，后面再验证
+//                ok = true;
+//            }
+//        }
+//        //如果找不到说明无法没有任何节点能够充当 a 的父节点，也就是 a是个根节点，但是我们已经有了根节点 root，所以是森林
+//        if (!ok) 
+//            return 0;//返回 0，无法构成一棵树
+//    }
+//    int c = 0, ans = 1;//到这里说明每个节点都找到了对应的父节点，这棵树的方案至少有1种
+//    for (int i : set) 
+//    {//对于每个节点
+//        int j = i;
+//        while (fa[j] != -1) 
+//        {//从节点 i 往上追溯，如果它的父辈节点们和节点i不连接，则一定不是一颗合法的树，而是森林，返回0
+//            if (!g[i][fa[j]]) 
+//                return 0;
+//            //当节点i和它的某个父辈节点fa[j]度相等时，说明这两者可以互换，因为上面只假设了有关系，但是没有规定谁一定是祖先
+//            //可以互换的话，那么组成这个树的方案就不只 1 种
+//            if (ans != 2 && cnts[i] == cnts[fa[j]]) 
+//                ans = 2;
+//            //统计关系数，至少用上所有关系才能构成一棵树，为啥？
+//            c++;
+//            j = fa[j];//往上追溯
+//        }
+//    }
+//    return c < m ? 0 : ans;//没有用到所有关系，不能构成一棵树
 //}
