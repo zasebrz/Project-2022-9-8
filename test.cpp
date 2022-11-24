@@ -22102,6 +22102,29 @@ T m_lcm(T a, T b)
 //    return ans;
 //}
 
+/////////////////////////////////////////795. 区间子数组个数///////////////////////////
+
+//https://leetcode.cn/problems/number-of-subarrays-with-bounded-maximum/solutions/1988198/tu-jie-yi-ci-bian-li-jian-ji-xie-fa-pyth-n75l/
+//一个整数数组 nums 和两个整数：left 及 right 。
+//找出 nums 中连续、非空且其中最大元素在范围[left, right] 内的子数组，并返回满足条件的子数组的个数。
+//int main()
+//{
+//    vector<int> nums = { 16,69,88,85,79,87,37,33,39,34 };
+//    int left = 55, right = 57;
+//    int n = nums.size(), ans = 0, i0 = -1, i1 = -1;
+//    for (int i = 0; i < n; ++i) 
+//    {//枚举区间右端点 i，根据之前找到的合法的左端点范围，去计算总共合法区间的个数
+//        if (nums[i] > right) 
+//            i0 = i;//合法区间左端点的最小值，不应该包括i0，因为nums[i0]大于right
+//        if (nums[i] >= left) 
+//            i1 = i;//合法区间左端点的最大值，应该包括i1，因为nums[i1]在[left:right]中，满足条件
+//        ans += i1 - i0;//左端点范围是（i0，i1]，右端点是 i，合法区间个数是 i1-i0
+//                       //不用担心i0会大于i1，因为当 nums[i]大于right 时，一定会大于left，此时 i0 和 i1都会更新为 i
+//                       //此时既不用担心这个不合法的值计入合法区间（因为 i1-i0=0），也不用担心后续的 i1-i0会小于0
+//    }
+//    return ans;
+//}
+
 /////////////////////////////////////////2430. 对字母串可执行的最大删除数///////////////////////////
 
 //https://leetcode.cn/problems/maximum-deletions-on-a-string/solutions/1864083/lcp-wen-ti-shen-qi-hou-zhui-shu-zu-rmq-b-xhqc/
@@ -22129,7 +22152,8 @@ T m_lcm(T a, T b)
 //            if (lcp[i][i + j] >= j) //lcp[i][i + j] 表示 s[i:] 和 s[i + j:] 的最长相同前缀的长度，如果大于等于 j
 //                                    //说明 s[i:i+j] == s[i+j:i+j*2]
 //                f[i] = max(f[i], f[i + j]);//加 1 的操作放在后面
-//        ++f[i];//由于f初始化为 0，所以不存在两个子串相等的时候，f[i]就变成了 1，当存在的时候，也在这里加 1
+//        ++f[i];//由于f初始化为 0，所以不存在两个子串相等的时候，f[i]就变成了 1，表示我们删除了整个字符串，
+//               //当存在的时候，也在这里加 1，表示我们只删除其中一个前缀字串
 //    }
 //    return f[0];//删除所有字符需要的最大操作数
 //}
@@ -23878,3 +23902,34 @@ T m_lcm(T a, T b)
 //    }
 //    return c < m ? 0 : ans;//没有用到所有关系，不能构成一棵树
 //}
+
+/////////////////////////////////////////878. 第 N 个神奇数字//////////////////////////
+
+//https://leetcode.cn/problems/nth-magical-number/solutions/1984641/er-fen-da-an-rong-chi-yuan-li-by-endless-9j34/
+//假设 x 是第 n 个神奇数字，则 x 越大，n 就越大，具有单调性
+//所以可以 二分x，然后计算小于等于x的神奇数字有多少个（假设为f(x)），如果f(x)=n，而小于等于f(x-1)=n-1
+//那么就说明x是第 n 个神奇数字，注意仅仅 f(x)=n 并不能说明 x 是第 n 个神奇数字，因为可能f(x-1)=n，f(x-1)=n
+//int main()
+//{
+//    int n = 4, a = 2, b = 3;
+//    long long l = min(a, b);//二分的下界是二者中的最小值，他是第一个神奇数字
+//    long long r = (long long)n * min(a, b);//当 x =min(a,b)*n时，至少有 n 个神奇数字了，所以它是上界
+//    long long ans;
+//    int c = lcm(a, b);//最小公倍数
+//    while (l <= r) 
+//    {
+//        long long mid = (l + r) / 2;
+//        long long cnt = mid / a + mid / b - mid / c;//计算f(x)，这里的mid就是我们枚举的 x
+//        if (cnt >= n)
+//        {//f(x)>=n，则x有可能是答案，记录下来，继续二分，注意当cnt==n时，不能直接返回，我们不能保证f(x-1)=n-1
+//            ans = mid;
+//            r = mid - 1;
+//        }
+//        else
+//        {//f(x)<n，则x不可能是答案
+//            l = mid + 1;
+//        }
+//    }
+//    return ans%MOD;
+//}
+
