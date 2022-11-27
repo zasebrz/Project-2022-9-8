@@ -11028,6 +11028,77 @@ T m_lcm(T a, T b)
 //    return 0;
 //}
 
+//////////////////////////////////////////882. 细分图中的可到达节点////////////////////////////////////////
+
+//https://leetcode.cn/problems/reachable-nodes-in-subdivided-graph/solutions/1991509/tu-jie-zhuan-huan-cheng-dan-yuan-zui-dua-6l8o/
+//要 细分 边[ui, vi] ，需要将其替换为(cnti + 1) 条新边，和 cnti 个新节点。新节点为 x1, x2, ..., xcnti ，
+//新边为[ui, x1], [x1, x2], [x2, x3], ..., [xcnti + 1, xcnti], [xcnti, vi] 。
+//现在得到一个 新的细分图 ，请你计算从节点 0 出发，可以到达多少个节点？如果节点间距离是 maxMoves 或更少，则视为 可以到达 。
+//给你原始图和 maxMoves ，返回 新的细分图中从节点 0 出发 可到达的节点数 。
+// Dijkstra 算法模板
+// 返回从 start 到每个点的最短路
+//vector<int> dijkstra(vector<vector<pair<int, int>>>& g, int start) {
+//    vector<int> dist(g.size(), INT_MAX);
+//    dist[start] = 0;
+//    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<>> pq;//<start到当前点的距离，当前点>
+//    pq.emplace(0, start);
+//    while (!pq.empty()) 
+//    {
+//        auto [dis, x] = pq.top();
+//        pq.pop();
+//        if (dis > dist[x]) 
+//            continue;//这里是剪枝，注意dis是直接从队列中取出来的距离，而dist[x]会随着每个循环进行更新，假如我们在之前的某次
+//                     //遍历时在队列中加入了一个比较大的距离，然后在后面的循环中找到了一条更短的路径到达此节点，那么循环到
+//                     //这个较大距离时，由于我们已经记录了一个小距离（dist[x]），所以不再需要进行下面的循环，可以省略
+//                     //上边的说法不好理解，可以把上图中节点 0 到节点 2 之间边的权值改为 20，动手模拟一下：
+//                     //第一圈 while 循环结束，队列中元素为{ [1,5] ,[2,20] }
+//                     //第二圈 while 循环取出了[1, 5] 开始遍历节点 1 的邻接点，发现到节点 2 的距离 5 + 8 = 13 小于 20，
+//                     // 则更新dist[2]为 13 ，并且把[2, 13] 加入队列。这一圈结束后，队列中元素为{ [3, 7] ,[2,13],[2, 20] }
+//                     //第三圈 while 循环取出[3, 7]，结束后队列中元素为{ [2,13] ,[2, 20] }
+//                     //第四圈 while 循环取出[2, 13]，结束后队列中元素为{ [2, 20] }
+//                     //第五圈 while 循环取出[2, 20]，发现最短距离 dist[2]=13 小于之前记录的最短距离 20（dis），说明节点 2 已经更新过，那么跳过
+//                     //最后队列为空，计算结束
+//        for (auto [y, wt] : g[x]) 
+//        {//遍历 x 的邻居节点
+//            int new_d = dist[x] + wt;//到达 x 的最短距离是 dist[x]，以它为中转节点到达 y 的距离时new_d
+//            if (new_d < dist[y]) 
+//            {//找到了到达 y 更短的路径
+//                dist[y] = new_d;//更新距离
+//                pq.emplace(new_d, y);//加入队列，作为后续的中转节点
+//            }
+//        }
+//    }
+//    return dist;
+//}
+//int main()
+//{
+//    vector<vector<int>> edges = { {0, 1, 5},{0, 2, 9},{1, 2, 8},{1,3,2}};
+//    int maxMoves = 10, n = 4;
+//    vector<vector<pair<int, int>>> g(n);
+//    for (auto& e : edges) 
+//    {
+//        int u = e[0], v = e[1], cnt = e[2];
+//        g[u].emplace_back(v, cnt + 1);// 建图,u，v是原来的节点，新增了cnt个节点后，u到v的距离（边数）变成了cnt+1
+//        g[v].emplace_back(u, cnt + 1); 
+//    }
+//
+//    auto dist = dijkstra(g, 0); // 从 0 出发的最短路
+//
+//    int ans = 0;
+//    for (int d : dist)
+//        if (d <= maxMoves) // 这个点可以在 maxMoves 步内到达
+//            ++ans;
+//    for (auto& e : edges) 
+//    {//对于每条边
+//        int u = e[0], v = e[1], cnt = e[2];
+//        int a = max(maxMoves - dist[u], 0);//到达 u 之后还能走 a 步，如果maxMoves内无法到达 u，那么 a=0
+//        int b = max(maxMoves - dist[v], 0);//到达 v 之后还能走 b 步，如果maxMoves内无法到达 v，那么 b=0
+//        ans += min(a + b, cnt); // a 和 b分别是从这条边两个端点能走的步数，cnt是这条边总的节点数，由于 a 和 b 可能
+//                                //会重合，所以需要求最小值
+//    }
+//    return ans;
+//}
+
 //////////////////////////////////////////从1号节点到n号节点的次短路径距离（BFS）////////////////////////////////////////
 
 //https://leetcode-cn.com/problems/second-minimum-time-to-reach-destination/solution/gong-shui-san-xie-yi-ti-shuang-jie-dui-y-88np/1349047
@@ -23932,4 +24003,3 @@ T m_lcm(T a, T b)
 //    }
 //    return ans%MOD;
 //}
-
