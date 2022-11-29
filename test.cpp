@@ -24157,33 +24157,38 @@ T m_lcm(T a, T b)
 //    cout << ans % MOD << endl;
 //}
 
+/////////////////////////////////////////813. 最大平均值和的分组//////////////////////////
 
-
-
-double prefix[101] = { 0 };
-double avg(int a, int b) {
-    return (prefix[b + 1] - prefix[a]) / (b - a + 1);
-}
-int main()
-{
-    vector<int> nums = { 9,1,2,3,9 };
-    int k = 3;
-    int n = nums.size();
-    for (int i = 0; i < n; i++) 
-    {//计算前缀和
-        prefix[i + 1] = prefix[i] + nums[i];
-    }
-    double dp[101][101] = { 0 };
-    for (int i = 0; i < n; i++) 
-        dp[0][i] = avg(0, i);
-    for (int i = 0; i < n; i++) {
-        for (int j = 0; j < k; j++) {
-            if (dp[j][i] == 0) 
-                continue;
-            for (int k = i + 1; k < n; k++) {
-                dp[j + 1][k] = max(dp[j + 1][k], dp[j][i] + avg(i + 1, k));
-            }
-        }
-    }
-    return dp[k - 1][n - 1];
-}
+//https://leetcode.cn/problems/largest-sum-of-averages/solutions/1995139/by-ac_oier-yfnt/
+//int main()
+//{
+//    vector<int> nums = { 9,1,2,3,9 };
+//    int k = 3;
+//    int n = nums.size();
+//    double sum[110]{};
+//    for (int i = 1; i <= n; i++)//计算前缀和
+//        sum[i] = sum[i - 1] + nums[i - 1];
+//    //f[i][j] 为考虑将前 i 个元素划分成 j 份的最大平均和，答案为 f[n][k]
+//    vector<vector<double>> f(110, vector<double>(110, 0.0));
+//    for (int i = 1; i <= n; i++) 
+//    {//前0个元素即为没有元素，不用考虑分组，都是0
+//        for (int j = 1; j <= min(i, k); j++)
+//        {//最少分成 1 份，最多分成 min(i,k) 份，因为最多只有 i 个元素，不可能分成更多组，另外只需要将 i 个元素分成 k 组，所以不需要更大
+//            if (j == 1)
+//            {//只分成 1 份的时候
+//                f[i][1] = sum[i] / i;//直接利用前缀和计算平均值
+//            }
+//            else
+//            {//分成更多份的时候，枚举最后一个子数组的起点 x，其中 2<=x<=i 
+//                //最后一个子数组起点是 x，终点是 i，那么前面的元素 nums[0:x-1]分成 j-1 份时的最大得分既是f[x - 1][j - 1]
+//                //再加上最后一个子数组的平均值 (sum[i] - sum[x - 1]) / (i - k + 1))，就是 将nums[0:i]分成 j 份时的最大得分
+//                //由于我们不知道起点 x 的具体位置，所以需要遍历，取最大值
+//                for (int x = 2; x <= i; x++)
+//                {
+//                    f[i][j] = max(f[i][j], f[x - 1][j - 1] + (sum[i] - sum[x - 1]) / (i - k + 1));
+//                }
+//            }
+//        }
+//    }
+//    return f[n][k];
+//}
