@@ -24769,4 +24769,72 @@ T m_lcm(T a, T b)
 //    return maxSide * maxSide;
 //}
 
+/////////////////////////////////////////2573. 找出对应 LCP 矩阵的字符串//////////////////////////
 
+//https://leetcode.cn/problems/find-the-string-with-lcp/solutions/2120175/tan-xin-gou-zao-yan-zheng-o1e-wai-kong-j-82ik/
+//int main()
+//{
+//    vector<vector<int>> lcp{ {4, 0, 2, 0},{0, 3, 0, 1},{2, 0, 2, 0},{0, 1, 0, 1} };
+//    int i = 0, n = lcp.size();
+//    string s(n, 0);
+//    for (char c = 'a'; c <= 'z'; ++c) 
+//    {//每个候选字符，尽可能放入小字符，这样字典序更小
+//        while (i < n && s[i]) 
+//            ++i;//找到一个没有放字符的位置
+//        if (i == n) 
+//            break; // 构造完毕
+//        for (int j = i; j < n; ++j)//当前这个位置没有放字符，而前面的位置都已经放了，且前面放的字符都比现在要放的这个字符小
+//                                   //那么吧当前字符放在这里能得到最小的字典序（s[i]=c）
+//            if (lcp[i][j]) //放完以后，检查lcp，如果lcp[i][j]！=0，说明word[i,...,n-1] 和 word[j,...,n-1]存在公共前缀，那么一定有
+//                           //s[i]=s[j]，因此s[j]=c
+//                s[j] = c;
+//    }
+//    while (i < n) 
+//        if (s[i++] == 0)
+//        {//i前面肯定都放过了
+//            cout << "" << endl;// 没有构造完
+//            return 0;
+//        }
+//    // 直接在原数组上验证
+//    for (int i = n - 1; i >= 0; --i)
+//        for (int j = n - 1; j >= 0; --j) 
+//        {//从后往前DP
+//            int actualLCP = s[i] != s[j] ? 0 : i == n - 1 || j == n - 1 ? 1 : lcp[i + 1][j + 1] + 1;
+//            if (lcp[i][j] != actualLCP)
+//            {//不相等，说明构造错误
+//                cout << "" << endl;// 没有构造完
+//                return 0;
+//            }
+//        }
+//    cout << s << endl;
+//}
+
+/////////////////////////////////////////1664. 生成平衡数组的方案数//////////////////////////
+
+//https://leetcode.cn/problems/ways-to-make-a-fair-array/solutions/2078340/sheng-cheng-ping-heng-shu-zu-de-fang-an-0mkaj/comments/1900709
+//int main()
+//{
+//    vector<int> nums{ 1,1,1 };
+//    long long ori_even = 0, ori_odd = 0, left_even = 0, left_odd = 0;
+//    int n = nums.size(), ans = 0;
+//    for (int i = 0; i < n; ++i) 
+//    {//先计算奇偶总和
+//        if (i & 1) 
+//            ori_odd += nums[i];
+//        else 
+//            ori_even += nums[i];
+//    }
+//    for (int i = 0; i < n; ++i) 
+//    {
+//        //当前遍历点后的奇偶和是交换的
+//        //新的奇数总和 = （偶数总和 - 左边偶数总和 - 当前数为偶数位）= 原本的右边偶数总和 + 左边奇数总和
+//        //新的偶数总和 = （奇数总和 - 左边奇数总和 - 当前数为奇数位）= 原本的右边奇数总和 + 左边偶数总和
+//        //新奇数和 = 新偶数和，答案加一
+//        long long new_odd = ori_even - left_even - (i & 1 ? 0 : nums[i]) + left_odd;
+//        long long new_even = ori_odd - left_odd - (i & 1 ? nums[i] : 0) + left_even;
+//        if (new_even == new_odd) 
+//            ++ans;
+//        i & 1 ? left_odd += nums[i] : left_even += nums[i];//左边奇偶数总和
+//    }
+//    return ans;
+//}
