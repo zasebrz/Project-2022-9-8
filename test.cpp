@@ -20217,35 +20217,87 @@ T m_lcm(T a, T b)
 //    return fun(0, 0, true, false);
 //}
 
-/////////////////////////////////////////跳跃游戏//////////////////////////////////////////
+/////////////////////////////////////////45. 跳跃游戏 II//////////////////////////////////////////
 
-//https://leetcode.cn/problems/jump-game-ii/
+//https://leetcode.cn/problems/jump-game-ii/solutions/36035/45-by-ikaruga/comments/1558637
 //int main()
 //{
-//    vector<int> a = { 2,2,3,0,4 };
-//    int N = a.size();
-//    int curDistance = 0;    // 当前覆盖最远距离下标
-//    int ans = 0;            // 记录⾛的最⼤步数
-//    int nextDistance = 0;   // 下⼀步覆盖最远距离下标，下一步不一定要等到当前最远距离的时候才去跳
-//    for (int i = 0; i < N; i++) {
-//        nextDistance = max(a[i] + i, nextDistance);  // 更新下⼀步覆盖最远距离下标
-//        if (i > curDistance)
-//        {//到达了当前覆盖最远距离无法覆盖的地方，说明无论如何不能到达这里，
-//            //如果可以的话，nextDistance会覆盖这里，则返回-1，表示无法到达
-//            return -1;
+//    vector<int> nums = { 2,2,3,0,4 };
+//    int N = nums.size();
+//    // 记录当前能跳跃到的位置的边界下标
+//    int border = 0;
+//    // 记录在边界范围内，下一步能跳跃的最远位置，作为下一步的候选
+//    int maxPosition = 0;
+//    // 记录所用步数
+//    int steps = 0;
+//    for (int i = 0; i < N - 1; i++) 
+//    {//注意题目要求到达N-1就可以了，那么i只需要到 N-2就行了，因为题目说了一定能到达N-1，当i=N-2时
+//        // 更新一下最远距离，这个距离一定能包含N-1，也就是最多再跳一次一定能到
+//        // 继续往下遍历，统计边界范围内，哪一格能跳得更远，每走一步就更新一次能跳跃的最远位置
+//        // 其实就是在假设在每个点起跳一次，然后统计下一步的最远位置，得到最优
+//        maxPosition = max(maxPosition, nums[i] + i);
+//        // 如果到达了边界，那么一定要跳了，下一跳的边界下标就是之前统计的最优情况maxPosition，并且步数加1
+//        if (i == border) 
+//        {
+//            border = maxPosition;
+//            steps++;
 //        }
-//        if (i == curDistance)
-//        {// 遇到当前覆盖最远距离下标
-//            if (curDistance != N - 1)
-//            {// 如果当前覆盖最远距离下标不是终点
-//                ans++;// 需要⾛下⼀步
-//                if (nextDistance >= N - 1)
-//                    break; // 下⼀步的覆盖范围已经可以达到终点，结束循环，上面ans已经递增了
-//                curDistance = nextDistance;// 否则更新当前覆盖最远距离下标
-//
-//            }
-//            else
-//                break;// 当前覆盖最远距离下标是集合终点，不⽤做ans++操作了，直接结束
+//    }
+//    return steps;
+//}
+
+
+//在 x 轴上有一个一维的花园。花园长度为 n，从点 0 开始，到点 n 结束。
+//花园里总共有 n + 1 个水龙头，分别位于[0, 1, ..., n] 。
+//给你一个整数 n 和一个长度为 n + 1 的整数数组 ranges ，其中 ranges[i] （下标从 0 开始）表示：
+//如果打开点 i 处的水龙头，可以灌溉的区域为[i - ranges[i], i + ranges[i]] 。
+//请你返回可以灌溉整个花园的 最少水龙头数目 。如果花园始终存在无法灌溉到的地方，请你返回 - 1 。
+//输入：n = 5, ranges = [3, 4, 1, 1, 0, 0]
+//输出：1
+//解释：
+//点 0 处的水龙头可以灌溉区间[-3, 3]
+//点 1 处的水龙头可以灌溉区间[-3, 5]
+//点 2 处的水龙头可以灌溉区间[1, 3]
+//点 3 处的水龙头可以灌溉区间[2, 4]
+//点 4 处的水龙头可以灌溉区间[4, 4]
+//点 5 处的水龙头可以灌溉区间[5, 5]
+//只需要打开点 1 处的水龙头即可灌溉整个花园[0, 5] 。
+//https://leetcode.cn/problems/minimum-number-of-taps-to-open-to-water-a-garden/solutions/2123855/yi-zhang-tu-miao-dong-pythonjavacgo-by-e-wqry/comments/1928925
+//int main()
+//{
+//    int n = 5;
+//    vector<int> ranges = { 3, 4, 1, 1, 0, 0 };
+//    //right_most[i]表示从i点出发往右走最远能到达哪个点
+//    vector<int> right_most(n+1,0);
+//    //i <= ranges[i]时，表示当前的i可以从起点0走过来(因为i-ranges[i]>=0)，所以要更新right_most[0]，而不是right_most[i - r], 因为i - r < 0
+//    //i > ranges[i]是，表示对于 i - ranges[i] 点来说，最远可以到 i + ranges[i] 这个位置
+//    for (int i = 0; i <= n; ++i) {
+//        int r = ranges[i];
+//        //解释一下这里为什么是必然，因为i是不断增加的, 
+//        //如果有i1 < i2， 更新左边同一个点，则有 i1 - r1 == i2 - r2, 那么 r1 < r2 成立
+//        //那么 i1 + r1 < i2 + r2也一定成立。
+//        //举个例子，i1 = 3, r1 = 2; i2 = 4, r2 = 3;
+//        //第一个i1=3 时，更新right_most[1] = 3 + 2, 当遍历到后一个i2 = 4时，也会更新right_most[1] = 4 + 3.
+//        //如果不放心，可以写成right_most[i - r] = max(right_most[i - r], i + r)
+//        if (i > r) 
+//            right_most[i - r] = i + r;    //对于i-r来说，i+r必然是它目前的最大值
+//        else 
+//            right_most[0] = max(right_most[0], i + r);
+//    }
+//    int ans = 0;
+//    int cur_right = 0;  //已建造的桥的右端点
+//    int next_right = 0; //下一座桥的右端点的最大值
+//    for (int i = 0; i < n; ++i) { 
+//        //注意这里没有遍历到n，因为题目说只要覆盖[0:n]就可以了，那么当i=n-1时，更新next_right
+//        //然后进行判断n-1是不是当前的边界，是的话在判断n-1是不是下一步的边界，是的话则不可能到达n，返回-1
+//        //不是的话，下一步一定能覆盖n，再跳一步即可。
+//        //如果不是当前的边界，那么当前一定能覆盖n，直接走就行了
+//        next_right = max(next_right, right_most[i]);
+//        if (i == cur_right) { //到达已建造的桥的右端点
+//            if (i == next_right) 
+//                return -1; //下一座桥最远点就是前面能走到的位置，那么就不能往前走了
+//            cur_right = next_right; //造一座桥
+//            ++ans;
 //        }
 //    }
 //    return ans;
@@ -24837,4 +24889,61 @@ T m_lcm(T a, T b)
 //        i & 1 ? left_odd += nums[i] : left_even += nums[i];//左边奇偶数总和
 //    }
 //    return ans;
+//}
+
+//typedef pair<int, int> pii;
+//vector<vector<int>> matrixRankTransform(vector<vector<int>>& matrix) {
+//    int m = matrix.size(), n = matrix[0].size();
+//    vector<vector<int>> res(m, vector<int>(n, 0));
+//    auto f = [&](const pii& a, const pii& b) -> bool
+//    {
+//        return matrix[a.first][a.second] > matrix[b.first][b.second];
+//    };
+//    priority_queue<pii, vector<pii>, decltype(f)> pq(f);
+//    for (int i = 0; i < m; ++i)
+//    {
+//        for (int j = 0; j < n; ++j)
+//        {
+//            pq.push({ i,j });
+//        }
+//    }
+//    vector<pii> row, col;
+//    for (int i = 0; i < m; ++i)
+//    {
+//        row.push_back({ INT_MIN,-1 });
+//    }
+//    for (int j = 0; j < n; ++j)
+//    {
+//        col.push_back({ INT_MIN,-1 });
+//    }
+//    while (!pq.empty())
+//    {
+//        auto t = pq.top();
+//        pq.pop();
+//        int x = t.first, y = t.second;
+//        int m = matrix[x][y];
+//        if (row[x].second != -1 || col[y].second != -1)
+//        {
+//            if (matrix[x][y] == max(row[x].first, col[y].first))
+//            {
+//                res[x][y] = max(row[x].second, col[y].second);
+//            }
+//            else
+//            {
+//                res[x][y] = max(row[x].second, col[y].second) + 1;
+//            }
+//        }
+//        else
+//        {
+//            res[x][y] = 1;
+//        }
+//        row[x] = make_pair(max(matrix[x][y], row[x].first), max(res[x][y], row[x].second));
+//        col[y] = make_pair(max(matrix[x][y], col[y].first), max(res[x][y], col[y].second));
+//    }
+//    return res;
+//}
+//int main()
+//{
+//    vector<vector<int>> matrix = { {-23,20,-49,-30,-39,-28,-5,-14},{-19,4,-33,2,-47,28,43,-6},{-47,36,-49,6,17,-8,-21,-30},{-27,44,27,10,21,-8,3,14},{-19,12,-25,34,-27,-48,-37,14},{-47,40,23,46,-39,48,-41,18},{-27,-4,7,-10,9,36,43,2},{37,44,43,-38,29,-44,19,38 }};
+//    matrixRankTransform(matrix);
 //}
