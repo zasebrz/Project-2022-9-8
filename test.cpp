@@ -20262,7 +20262,7 @@ public:
 //    return ans;
 //}
 
-/////////////////////////////////////////2376. 统计特殊整数//////////////////////////////////////////
+/////////////////////////////////////////2376. 小于n且不含相同数位的整数个数（数位DP）//////////////////////////////////////////
 
 //https://leetcode.cn/problems/count-special-integers/solution/shu-wei-dp-mo-ban-by-endlesscheng-xtgx/
 //如果一个正整数每一个数位都是 互不相同 的，我们称它是 特殊整数 。
@@ -20379,7 +20379,11 @@ public:
 //        // 比如 n=415，当前已经填了“4”，“1”，现在要填第三位，此时的 is_limit 是 TRUE，这一位只能填[0:5]
 //        // 之前某一次填了“1”，“4”，这一位填了[0:9]，这样的话虽然 i 和 mask 都相同，但是不能直接返回 dp[i][mask]
 //        // 因为一个是受限制，一个没有限制
-//        // 这里有没有 is_num 不影响，因为 is_num 不会和之前某一次填的mask相同
+//        // 这里有没有 is_num 不影响，因为is_limit是true的话说明之前已经填了数字且达到上限，is_num肯定是true，所有遍历中只会到达此状态一次
+//        // 不会再到达这个状态，因此当前肯定是第一次访问，需要去计算
+//        // is_limit是false的话说明之前可能填了数但没到上限，is_num是true，那么就看是第几次到达此状态，也就是dp[i][mask]的值；
+//        // 也可能没有填数，is_num是false，此时肯定处于“递”的过程中，dp[i][mask]肯定还没计算出来，值为-1，需要“递”到最深层才会计算和记忆化
+//        // 综上所述，is_limit是false的时候，不管is_num的值是多少，通过dp[i][mask]都能判断出来是否直接返回
 //        if (!is_limit && is_num && dp[i][mask] >= 0) 
 //            return dp[i][mask];
 //        //res表示访问到当前这一位（第 i 位），前面（不包括 i）用过的数字包含在 mask 的二进制中时符合条件的方案数
@@ -20420,7 +20424,10 @@ public:
 //        //所以当is_limit是TRUE的时候不需要记忆化，也就不需要记录dp
 //        //·如果 is_num 是FALSE，说明前面填的数全是0，当前这一位才是真正意义上的首位，那么由于前面的数是确定的
 //        //所以只可能有一次机会访问到该状态，所以不需要记忆，比如“006”这个数，它表示 6，第 3 位的 6 才是
-//        //真正意义上的首位，他前面两个 0 只是我们用来凑够位数的
+//        //真正意义上的首位，他前面两个 0 只是我们用来凑够位数的，其实is_num对记忆化没什么作用，因为能运行到这里的都是“归”的过程中
+//        //is_limit是false的话说明之前可能填了数但没到上限，is_num是true，运行到这里的话肯定是第一次访问该状态，否则dp[i][mask]是有值的，
+//        // 在前面判断的时候就直接返回了；也可能没有填数，is_num是false，此时mask是0，所有状态中有且只有一次需要访问此状态，记忆化没用
+//        // 只会增加一些内存而已
 //        //·其实就是说，当前面填的数都是确定的时候，我们不需要对当前这个状态（i，mask）做记录，因为只可能访问
 //        //  一次，当然记录也没啥问题，只不过多占一些内存。
 //        if (!is_limit && is_num) 
@@ -20428,6 +20435,194 @@ public:
 //        return res;//返回，计算上一位的方案数。
 //    };
 //    return fun(0, 0, true, false);
+//}
+
+///////////////////////////////////////////1012. 小于n且至少有 1 位重复的数位的整数个数（数位DP）/////////////////////////////////
+
+//转换成求无重复数字的个数。答案等于 n 减去无重复数字的个数。
+//和上面题完全相同，数位DP
+//int main()
+//{
+//    int n = 20;
+//    string s = to_string(n);
+//    int m = s.size();
+//    vector<vector<int>> dp(m, vector<int>(1 << 10, -1));
+//    function<int(int, int, bool, bool)> func = [&](int i, int mask, bool is_limit, bool is_num)->int
+//    {
+//        if (i == m)
+//            return is_num;
+//        int ans = 0;
+//        if (!is_limit && dp[i][mask] != -1)
+//            return dp[i][mask];
+//        if (!is_num)
+//        {
+//            ans += func(i + 1, mask, false, false);
+//        }
+//        int up = is_limit ? s[i] - '0' : 9;
+//
+//        for (int x = 1 - is_num; x <= up; ++x)
+//        {
+//            if ((mask & (1 << x)) == 0)
+//            {
+//                ans += func(i + 1, mask | (1 << x), is_limit && x == up, true);
+//            }
+//        }
+//        if (!is_limit)
+//            dp[i][mask] = ans;
+//        return ans;
+//    };
+//    return n - func(0, 0, true, false);
+//}
+
+///////////////////////////////////////////600. 小于n且二进制中不含连续1的非负整数（数位DP）/////////////////////////////////
+
+//给定一个正整数 n ，请你统计在 [0, n] 范围的非负整数中，有多少个整数的二进制表示中不存在 连续的 1 。
+//https://leetcode.cn/problems/non-negative-integers-without-consecutive-ones/solutions/1750941/by-endlesscheng-1egu/
+//int __lg(int x)
+//{
+//    int ans = -1;
+//    for (int i = 0; i < 32; ++i)
+//    {
+//        if (x >> i & 1)
+//            ans = i;
+//    }
+//    return ans;
+//}
+//int main()
+//{
+//    int n = 5;
+//    int m = __lg(n);//计算二进制最高位1的位置，比如5的二进制101的最高位1的位置是2（右边第一位是0）
+//    vector<vector<int>> dp(m + 1, vector<int>(2, -1));//dp[i][j]表示枚举到i位置时，前一位（左边一位）是j，后面位置随便放能得到的合法方案数
+//                                                      //二进制前一位只能是0或1，不管i位置前一位的前面（就是i+2及之前的位置）如何变化，都
+//                                                      //不会对后面的合法方案数产生影响，所以只需要记录 i + 1 位置
+//    function<int(int, bool, bool)> f = [&](int i, bool pre1, bool is_limit) -> int {//pre1表示前一位是否是1
+//        if (i < 0) //枚举完成，肯定是一个合法方案，不合法的方案都在“递”的过程中排除了，并且全0也是合法的，因此直接返回1
+//            return 1;
+//        if (!is_limit && dp[i][pre1] >= 0) //之前访问过该状态，直接返回
+//            return dp[i][pre1];
+//        int up = is_limit ? n >> i & 1 : 1;//之前受限制，现在也必定受限制，可以填的数最大是 n 的二进制在这一位置的值（不是0就是1）
+//                                           //之前不受限制，现在也必定不受限制，可以填的数最大是1
+//        int res = f(i - 1, false, is_limit && up == 0); // 填 0，判断下是否达到上限
+//        if (!pre1 && up == 1) //前一位没有填 1，并且上限是1，那么才可以填1
+//            res += f(i - 1, true, is_limit); // 填 1，限制仍然和之前一样
+//        if (!is_limit) //不受限制的情况下才去记忆化，受限制的情况下不需要记忆化，因为只访问一次该状态
+//            dp[i][pre1] = res;
+//        return res;
+//    };
+//    return f(m, false, true); // i 从 m 往小枚举，方便位运算，从小往大也可以
+//}
+
+/////////////////////////////////////////902. 最大为 N 的数字组合（数位DP）//////////////////////////
+
+//https://leetcode.cn/problems/numbers-at-most-n-given-digit-set/solutions/1900101/shu-wei-dp-tong-yong-mo-ban-xiang-xi-zhu-e5dg/
+//int main()
+//{
+//    int n = 100;
+//    vector<int> digits = { 1,3,5,7 };
+//    string s = to_string(n);
+//    int m = s.length();
+//    vector<int> dp(m,-1);//数位DP，
+//    //dp[i]记录的是遍历到下标 i 的位置 不受到约束下 的从这一位（包含）到最后一位 填数字会有多少种合法方案数
+//    sort(digits.begin(), digits.end());//从小到大排序，方便剪枝
+//    function<int(int, bool,bool)> fun = [&](int i, bool is_limit, bool is_num)->int
+//    {//is_num记录前面是否真正放了数字，还是说是用 0 占位的
+//        if (i == m)
+//        {//如果所有位都是占位，那么到这里is_num是false，肯定不能算一个数，返回 0
+//            //如果前面真正填了数字，那么返回 1，找到了一个数
+//            return is_num;
+//        }
+//        if (!is_limit && is_num && dp[i] != -1)
+//        {//在不受到约束，且前面已经放了数字的情况下，如果之前已经在这一下标填过数，已经计算出
+//            //从这一位（包含）到最后一位 填数字会有多少种合法方案数，直接返回这个方案数 dp[i]
+//            return dp[i];
+//        }
+//        int res=0;
+//        if (!is_num)//一般来说，数位DP都是从最后一位往前填，并且做记忆化，
+//        {//前面是占位的话，这一位也可以是占位，然后进入下一坐标，直到最后一位开始真正填数，保证了个位数也能正确填进去
+//            //因为个位数可以理解为前面都是占位，那么下一层is_limit和is_num肯定都是false
+//            res = fun(i + 1, false, false); 
+//        }
+//        int up = is_limit ? s[i] - '0' : 9;//上界
+//        for (int j = 0;j < digits.size() && digits[j]<=up;++j)
+//        {//只能从digits里面选，并且还要小于等于上界，由于我们提前对digits排序了，所以如果当前这个 digits[j] 超过上界了
+//            //那么后面的数一定也超过上界了，直接结束循环
+//            int d = digits[j];
+//            res += fun(i + 1, is_limit && d == up, true);//已经填了真正的数字，所以下一层的is_num是true
+//        }
+//        if (!is_limit && is_num)
+//        {//记忆化，前提是不受到约束，且前面已经放了数字的情况下
+//            dp[i] = res;
+//        }
+//        return res;
+//    };
+//    cout<<fun(0, true, false);
+//}
+
+//int getNum(const string& s, const string& e,const vector<int> & next) 
+//{//在数位DP的过程中匹配字符串（KMP）
+//    int len = s.size(), len2 = e.size();
+//    vector<vector<int>> dp(len,vector<int>(len2,-1));//dp[i][j]表示下标 i 位置填某个字符（枚举），目前已匹配了evil[0:j]的情况下，
+//                                                     //后续（从 i 到最右边）填字符最终满足条件的方案总数
+//                                                     //为了防止多次出现evil字符串而被重复排除的情况，使用了KMP算法对evil进行匹配
+//    function<int(int, int, bool)> f = [&](int i, int pos, bool is_limit)->int {
+//        if (pos+1 == len2) //注意KMP统一减 1 之后，使用的时候需要 加上 1 还原到下标，pos+1表示evil中下一个要匹配的字符下标
+//            return 0;//如果evil所有字符都匹配完了，下一个匹配的位置是 end，那么说明当前枚举的这个字符串里面含有字串 evil，不符合条件，返回 0
+//        if (i == len) //上面没返回的话，如果已经填了len个字符，说明已经枚举出了一个符合条件的字符串，返回1
+//            return 1;
+//        if (!is_limit && dp[i][pos+1] >= 0) //在没有受限的情况下，如果之前访问过此状态，那么直接返回
+//                                            //为什么只记录 i 和 pos就可以了？
+//            return dp[i][pos + 1];          //因为在没有受限的情况下，确定已经填的字符个数 i 和 匹配的字符个数 pos，后面能填的字符方案
+//                                            //就跟着确定下来了，把后续的所有字符串想成一个答案空间，第一次遍历的时候我们从里面挑出来一些
+//                                            //不符合条件的“害虫后半段”，第二次遍历的时候，答案空间是相同的（不受限），害虫是相同的，
+//                                            //“害虫前半段”也是相同的（已经匹配的字符个数pos），那么这一次挑出来的“害虫后半段”肯定也是
+//                                            //相同的，因此这一次计算的答案肯定和上一次一样，都是 答案空间-“害虫后半段”
+//                                            //而在受限的情况下，答案空间是不一样的，因此不能直接记忆化
+//        long long res = 0;
+//        char up = is_limit ? s[i] : 'z';//上界
+//        for (char d = 'a'; d <= up; ++d) 
+//        {
+//            int nx = pos;//KMP算法，nx+1 是 下一个要匹配的位置
+//            while (nx >=0 && d != e[nx + 1])//不匹配的话一直往前查找，直到nx=-1或者匹配
+//                nx = next[nx];
+//            if(d == e[nx+1])//这里要分开讨论是因为上面退出循环时有两种可能，nx=-1或者d==e[nx+1]，通俗来说就是：
+//                            //最长相同前后缀为 0，那么模式串（evil）就需要从头去匹配，而next数组里 nx=-1表示接下来要从头开始匹配
+//                            //所以不能 +1 进入下一层；而 d==e[nx+1]表示当前填的字符和evil中的某个字符相同，接下来要匹配evil的下一个字符
+//                            //所以将 nx+1进入下一层（nx+1 表示接下来要匹配的字符下标）
+//                            //而https://leetcode.cn/problems/find-all-good-strings/solutions/1854130/ling-shen-mo-ban-jie-jue-by-s9lssloubq-43kd/
+//                            //中不需要分开讨论是因为他的next数组没有 -1 操作，而是右移操作，这样的话，即使这一层需要从头匹配，也只需要将 nx+1
+//                            //就可以了，因为右移操作里面 nx=0表示从头匹配，退出循环是 nx=-1，加一以后正好等于0，下一层从头匹配
+//                res += f(i + 1, nx + 1, is_limit && d == up);
+//            else
+//                res += f(i + 1, nx, is_limit && d == up);
+//            res %= MOD;
+//        }
+//        if (!is_limit) //记忆化
+//            dp[i][pos+1] = res;
+//        return res;
+//    };
+//    return f(0, -1, true);//注意evil的匹配初始位置是 -1 ，因为减 1 操作， pos+1 才表示真正的下一个需要匹配的位置
+//}
+//int main()
+//{
+//    int n = 2;
+//    string s1 = "aa", s2 = "da", evil = "b";
+//    vector<int> next(evil.size());
+//    int j = -1;//前缀指针
+//    next[0] = j;//第一个字符无法匹配
+//    for (int i = 1; i < evil.size(); i++) //后缀指针
+//    {
+//        while (j >=0 && evil[i] != evil[j+1]) 
+//        {//无法匹配
+//            j = next[j];
+//        }
+//        if (evil[i] == evil[j + 1])//只有匹配的才能递增前缀指针，否则前缀指针保持为 -1 
+//            j++;
+//        next[i] = j;//记录每一个位置上 相同前后缀的长度，再进行减 1 操作
+//    }
+//    int a = getNum(s2, evil, next);//容斥原理，先计算大范围
+//    int b = getNum(s1, evil, next);//再计算小范围
+//    int res = a - b;//相减
+//    return (res < 0 ? MOD + res : res) + (s1.find(evil) == -1);//如果s1是符合答案的，上面容斥原理的时候会被剪掉，所以需要额外判断下
 //}
 
 /////////////////////////////////////////45. 跳跃游戏 II//////////////////////////////////////////
@@ -20459,6 +20654,7 @@ public:
 //    return steps;
 //}
 
+/////////////////////////////////////////1326. 灌溉花园的最少水龙头数目//////////////////////////
 
 //在 x 轴上有一个一维的花园。花园长度为 n，从点 0 开始，到点 n 结束。
 //花园里总共有 n + 1 个水龙头，分别位于[0, 1, ..., n] 。
@@ -22782,51 +22978,6 @@ public:
 //    cout<<dp[(m-1) * n+n-1][0];//到达最后一行最后一列，并且除k余0（整除k）的方案数
 //}
 
-/////////////////////////////////////////902. 最大为 N 的数字组合（数位DP）//////////////////////////
-
-//https://leetcode.cn/problems/numbers-at-most-n-given-digit-set/solutions/1900101/shu-wei-dp-tong-yong-mo-ban-xiang-xi-zhu-e5dg/
-//int main()
-//{
-//    int n = 100;
-//    vector<int> digits = { 1,3,5,7 };
-//    string s = to_string(n);
-//    int m = s.length();
-//    vector<int> dp(m,-1);//数位DP，
-//    //dp[i]记录的是遍历到下标 i 的位置 不受到约束下 的从这一位（包含）到最后一位 填数字会有多少种合法方案数
-//    sort(digits.begin(), digits.end());//从小到大排序，方便剪枝
-//    function<int(int, bool,bool)> fun = [&](int i, bool is_limit, bool is_num)->int
-//    {//is_num记录前面是否真正放了数字，还是说是用 0 占位的
-//        if (i == m)
-//        {//如果所有位都是占位，那么到这里is_num是false，肯定不能算一个数，返回 0
-//            //如果前面真正填了数字，那么返回 1，找到了一个数
-//            return is_num;
-//        }
-//        if (!is_limit && is_num && dp[i] != -1)
-//        {//在不受到约束，且前面已经放了数字的情况下，如果之前已经在这一下标填过数，已经计算出
-//            //从这一位（包含）到最后一位 填数字会有多少种合法方案数，直接返回这个方案数 dp[i]
-//            return dp[i];
-//        }
-//        int res=0;
-//        if (!is_num)//一般来说，数位DP都是从最后一位往前填，并且做记忆化，
-//        {//前面是占位的话，这一位也可以是占位，然后进入下一坐标，直到最后一位开始真正填数，保证了个位数也能正确填进去
-//            //因为个位数可以理解为前面都是占位，那么下一层is_limit和is_num肯定都是false
-//            res = fun(i + 1, false, false); 
-//        }
-//        int up = is_limit ? s[i] - '0' : 9;//上界
-//        for (int j = 0;j < digits.size() && digits[j]<=up;++j)
-//        {//只能从digits里面选，并且还要小于等于上界，由于我们提前对digits排序了，所以如果当前这个 digits[j] 超过上界了
-//            //那么后面的数一定也超过上界了，直接结束循环
-//            int d = digits[j];
-//            res += fun(i + 1, is_limit && d == up, true);//已经填了真正的数字，所以下一层的is_num是true
-//        }
-//        if (!is_limit && is_num)
-//        {//记忆化，前提是不受到约束，且前面已经放了数字的情况下
-//            dp[i] = res;
-//        }
-//        return res;
-//    };
-//    cout<<fun(0, true, false);
-//}
 
 /////////////////////////////////////////反转前面的字符串并加到末尾，计算某个区间内 1 的个数//////////////////////////
 
@@ -26020,3 +26171,193 @@ public:
 //    cout<< (check(a, b) || check(b,a));//两个字符串需要交换一下再次判断
 //    return 0;
 //}
+
+/////////////////////////////////////////2603. 收集树中金币//////////////////////////
+
+//https://leetcode.cn/problems/collect-coins-in-a-tree/solutions/2191371/tuo-bu-pai-xu-ji-lu-ru-dui-shi-jian-pyth-6uli/
+//int main()
+//{
+//    vector<int> coins{ 0,0,0,1,1,0,0,1 };
+//    vector<vector<int>> edges{ {0,1},{0,2},{1,3},{1,4},{2,5},{5,6},{5,7 }};
+//    int n = coins.size();
+//    vector<vector<int>> g(n);
+//    vector<int> degree(n, 0);//记录度数
+//    for (auto i : edges)
+//    {//建图
+//        g[i[0]].push_back(i[1]);
+//        g[i[1]].push_back(i[0]);
+//        ++degree[i[0]];
+//        ++degree[i[1]];
+//    }
+//    queue<int> q;
+//    for (int i = 0; i < n; ++i)//先排除掉无关的叶子节点，这些节点访不访问都没影响，题目要求最短路径，就需要先去掉这些无关节点
+//    {
+//        if (degree[i] == 1 && coins[i] == 0)
+//            q.push(i);
+//    }
+//    while (!q.empty())
+//    {
+//        auto t = q.front();
+//        q.pop();
+//        for (auto n : g[t])
+//        {
+//            if (--degree[n] == 1 && coins[n] == 0)
+//                q.push(n);//直接去掉不包含金币的节点，访问其中任何一个点都毫无意义。不会带来任何增益
+//        }
+//    }
+//    for (int i = 0; i < n; ++i)//只需要考虑有金币的叶子，因为不在叶子上的金币顺路就能收集到。
+//    {
+//        if (degree[i] == 1 && coins[i] == 1)//所以从有金币的叶子节点开始遍历，一层一层往里面遍历
+//            q.push(i);
+//    }
+//    /*从有金币的的叶子出发，再次跑拓扑排序。在拓扑排序的同时，标记每个点入队的时间 time。
+//    注意是入队的时间，不是访问到这个节点的时间。
+//    叶子入队的时间为 0；
+//    去掉这些叶子后，又产生了新的叶子，这些叶子入队的时间为 1；
+//    去掉这些叶子后，又产生了新的叶子，这些叶子入队的时间为 2；*/
+//    vector<int> time(n, 0);
+//    while (!q.empty())
+//    {
+//        auto t = q.front();
+//        q.pop();
+//        for (auto n : g[t])
+//        {
+//            if (--degree[n] == 1)
+//            {
+//                q.push(n);
+//                time[n] = time[t] + 1;
+//            }
+//
+//        }
+//    }
+//    //对于每个节点，我们已经找到了从最边缘的金币叶子节点到达此节点的最短距离，那么如果想要得到金币叶子，就至少要走到距离金币叶子节点为 2 的结点处
+//    //也就是time[x] <=2 才能得到这个金币叶子，为了总路径最短，选择time[x] = 2的节点作为必须要访问的节点
+//    /*那么只要走到 time[x] = 2 的节点 x，就能收集到在叶子上的金币。
+//    遍历所有边 x−y，如果满足 time[x]>=2 且 time[y]>=2（x节点距离金币叶子的节点大于等于 2，y节点距离另一个金币叶子的节点大于等于 2），
+//    那么这条边需要恰好经过 2 次（因为需要回到出发点）才能拿到这两个叶子节点，答案加 2；
+//    如果不满足，则无需经过。因为这说明x或y距离金币叶子不到 2，显然没有必要走到这里去收集叶子，完全可以再往里走，得到更短的路径*/
+//    int ans = 0;
+//    for (auto i : edges)
+//        if (time[i[0]] >= 2 && time[i[1]] >= 2)
+//        {
+//            ans += 2;
+//        }
+//    //变形题：如果再给一个q数组，表示我们可以收集距离当前节点距离为 q[i] 以内的所有金币，该怎么做？
+//    //同样先去掉无用的叶子节点，然后记录一个每个节点是第几轮删除（入队）的（金币叶子节点是第0轮），
+//    //这样的话，对于一条边的两个节点x和y，min(time[x]和time[y]）就是他们俩距离金币叶子的最小距离，
+//    //再用一个cnt数组，遍历所有边，cnt[min(time[x],time[y])]+=1，也就是两个端点的最小值代表这条边是否要计算进 ans[i]中，
+//    //time越大代表着距离金币叶子越远，当收集距离固定时，越有可能走这条路径。
+//    //然后统计cnt数组的后缀和，用O(1)的时间返回答案,return cnt[q[i]]，后缀和可以算出大于等于当前距离的所有边个数
+//    //vector<int> cnt(n, 0);
+//    //for (auto i : edges)
+//    //{
+//    //    cnt[min(time[i[0]], time[i[1]])] += 1;
+//    //}
+//    //for (int i = i - 2; i >= 0; i--)
+//    //    cnt[i] += cnt[i + 1];
+//    return ans;
+//    
+//}
+
+/////////////////////////////////////////1638. 统计只差一个字符的子串数目//////////////////////////
+
+//https://leetcode.cn/problems/count-substrings-that-differ-by-one-character/solutions/2192600/tu-jie-fei-bao-li-onm-suan-fa-pythonjava-k5og/
+//输入：s = "aba", t = "baba"
+//输出：6
+//解释：以下为只相差 1 个字符的 s 和 t 串的子字符串对：
+//("Aba", "Baba")
+//("abA", "Baba")
+//("aBa", "bAba")
+//("aBa", "babA")
+//("Aba", "baBa")
+//("abA", "baBa")
+//大写部分分别表示 s 和 t 串选出来的子字符串。
+//int main()
+//{
+//    string s = "aba", t = "baba";
+//    int ans = 0, n = s.length(), m = t.length();
+//    //用三个参数来表示一堆长度相同字串：s字串的结束下标 i，t子串的结束下标 j，s字串的开始下标 k
+//    //比如 i=2，j=3，k=0，表示s[0:2]="aba"和t[1:3]="aba"
+//    //暴力法的话就是枚举上面三个参数，计算合法数
+//    //外层循环枚举 s、t 字符串中被选取的子串的结束下标之差值，即 d = i - j
+//    //由于 i ∈ [0, n) , j ∈ [0, m)，故 d ∈ [1 - m, n)
+//    for (int d = 1 - m; d < n; ++d) { 
+//        // d=i-j, j=i-d
+//        //此处首先根据枚举的差值 d 确定 i，当 d 为 负值时， i 在下标区间要求下，取 0；
+//        //否则，i 应为 d
+//        int i = max(d, 0);
+//
+//        //枚举 i, 维护 k0（上上一个不同字符的下标） 和 k1（上一个不同字符的下标）， 累加 k0 - k1 到答案中，起点在(k0,k1]的s子串是满足条件的
+//        //由于一开始 k0 和 k1 不存在， 应初始化成 i - 1
+//        //为什么 k0 和 k1 初始化为 i - 1？ 一、初始化后，未遇到不同字符前，累加的是 0（符合条件的子串为0）；
+//        //二、遇到不同字符后，更新 k0 和 k1，累加的 k1 - k0，对应于 [可以作为满足条件的子串的起点的个数]。
+//        //这种累加法，等同于 以不同字符作为中心点，计算满足条件的子串的 起点个数*终点个数。
+//        //其实就是，固定字符串s，然后把t不断右移，将其与s重叠，计算这个重叠子串里面满足条件的子串个数，
+//        //由于这个重复子串枚举不会重复，因此最终算出来的答案也不会重复
+//        //i表示重叠部分结束字符在s中的下标，i-d 表示重叠部分结束字符在t中的下标，d用来控制重叠部分从短到长再到短，
+//        // s:      a b a                                       s:      a b a
+//        // t:b a b a（重叠子串为a和a，合法数为0），            t:  b a b a（重叠子串为ab和ba，合法数为 2，注意重叠子串的字串仍然可能是合法的）
+//        // s:      a b a                                       s:      a b a
+//        // t:    b a b a（重叠子串为aba和aba，合法数为0），    t:      b a b a（重叠子串为aba和bab，合法数为 3）
+//        // s:      a b a                                       s:      a b a
+//        // t:        b a b a（重叠子串为ba和ba，合法数为0），  t:          b a b a（重叠子串为a和b，合法数为 1）
+//        //下面这个循环就是再计算重叠子串里面符合条件的字串数量了， i < n && i - d < m 可以保证计算的时候不会超过重叠字符的范围
+//        for (int k0 = i - 1, k1 = k0; i < n && i - d < m; ++i) 
+//        { 
+//            if (s[i] != t[i - d])   //检查重叠子串中终点处的字符，不相同时更新 k0 和 k1 
+//                k0 = k1, k1 = i;
+//            ans += k1 - k0;     //每个重叠子串中的合法数都要累加，因为重叠子串不会重复，合法数也不会重复
+//        }
+//    }
+//    return ans;
+//}
+
+//给你一个字符串列表 words 和一个目标字符串 target 。words 中所有字符串都 长度相同  。
+//你的目标是使用给定的 words 字符串列表按照下述规则构造 target ：
+//从左到右依次构造 target 的每一个字符。
+//为了得到 target 第 i 个字符（下标从 0 开始），当 target[i] = words[j][k] 时，你可以使用 words 列表中第 j 个字符串的第 k 个字符。
+//一旦你使用了 words 中第 j 个字符串的第 k 个字符，你不能再使用 words 字符串列表中任意单词的第 x 个字符（x <= k）。也就是说，所有单词下标小于等于 k 的字符都不能再被使用。
+//请你重复此过程直到得到目标字符串 target 。
+//请注意， 在构造目标字符串的过程中，你可以按照上述规定使用 words 列表中 同一个字符串 的 多个字符 。
+//请你返回使用 words 构造 target 的方案数。由于答案可能会很大，请对 109 + 7 取余 后返回。
+//（译者注：此题目求的是有多少个不同的 k 序列，详情请见示例。）
+//https://leetcode.cn/problems/number-of-ways-to-form-a-target-string-given-a-dictionary/solutions/468538/dong-tai-gui-hua-omn-jie-fa-by-arsenal-591/
+//由于 words 中所有单词的长度均等于 N，因此能够维护一个计数数组 cnt，其中 cnt[i][ch] 表示在所有单词的第 i 个字符中，字符 ch 出现的次数。
+//记 words[i..] 为{ x[i..]∣x∈words }。意思是：将 words 的每个单词从第 i 个字符起截取，得到的「新字典」。
+//随后记 dp[i][j] 为：以 words[i..] 为字典，构造字符串 target[j..] 的方案数。
+//现在，考虑如何构造字符串 target[j..] 的首个字符，有以下两种情况：
+//不使用字典中位置为 i 的字符。此时，问题归结于使用 words[i + 1..] 为字典构造字符串的情形，故相应的方案数为 dp[i + 1][j]。
+//使用字典中位置为 i 的字符。此时，整个字典中，共有 cnt[i][target[j]] 个单词可供选择。
+//  在选择其中任意一个单词之后，根据题意，我们不能再选择任何一个单词的第 i 个字符或其之前的字符。
+//  因此，此后为了得到后面的字符串 target[j + 1..]，会有 dp[i + 1][j + 1]种方案。
+//根据加法原理与乘法原理，总的方案数目为：dp[i][j] = dp[i + 1][j] + dp[i + 1][j + 1]⋅cnt[i][target[j]] 
+//我们从最后开始构造target，那么无论从words的哪个位置开始取字符，有且只有一种方法得到空串，这就是初始化
+//int main()
+//{
+//    vector<string> words{ "abba","baab" };
+//    string target = "bab";
+//    int m = target.length(), n = words[0].length();
+//    vector<vector<long>> dp(n + 1, vector<long>(m + 1, 0));
+//    vector<vector<long>> cnt(n, vector<long>(26, 0));
+//    for (int j = 0; j <= n; j++)//无论从什么位置开始取字符，都只有一种方法可以得到target[m:m-1]（空串），那就是什么都不取
+//        dp[j][m] = 1;
+//    int mod = 1e9 + 7;
+//    for (int i = 0; i < n; i++)//计算每个位置上的字符种类个数
+//    {
+//        for (int j = 0; j < words.size(); j++)
+//        {
+//            cnt[i][words[j][i] - 'a']++;
+//        }
+//    }
+//    for (int i = n - 1; i >= 0; i--)//从words[i:n-1]中选取字符
+//    {
+//        for (int j = m - 1; j >= 0; j--)//现在选取的是target的第 j 个字符，
+//        {//不选当前位置上字符，dp[i + 1][j]，选，总共有cnt[i][target[j] - 'a']中可能的选法，然后从从words[i+1:n-1]中选取字符构建target[j+1:n-1]
+//            dp[i][j] = (dp[i + 1][j] + (cnt[i][target[j] - 'a'] * dp[i + 1][j + 1]) % mod) % mod;
+//        }
+//    }
+//    return dp[0][0];
+//}
+
+
+
