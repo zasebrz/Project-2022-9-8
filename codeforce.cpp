@@ -34,17 +34,31 @@ using namespace std;
 
 //void solve()
 //{
-//    long long n, x, p;
-//    cin >> n >> x >> p;
-//    for (long long i = 1; i <= min(p, 2 * n); ++i)
-//    {
-//        if ((x + i * (i + 1) / 2) % n == 0)
-//        {
-//            cout << "Yes" << endl;
-//            return;
+//    int n; cin >> n;
+//    vector<int> a(n);
+//    map<int, int> leftOcc, rightOcc;
+//    for (int i = 0; i < n; ++i) {
+//        cin >> a[i];
+//        rightOcc[a[i]] = i;
+//        if (!leftOcc.count(a[i])) leftOcc[a[i]] = i;
+//    }
+//    int mex = calcMex(a);
+//    if (leftOcc.count(mex + 1)) {
+//        int L = leftOcc[mex + 1], R = rightOcc[mex + 1];
+//        for (int i = L; i <= R; ++i) {
+//            a[i] = mex;
+//        }
+//        int mx = calcMex(a);
+//        assert(mx <= mex + 1);
+//        return mx == mex + 1;
+//    }
+//    for (int i = 0; i < n; ++i) {
+//        assert(a[i] != mex);
+//        if (a[i] > mex || (leftOcc[a[i]] != rightOcc[a[i]])) {
+//            return true;
 //        }
 //    }
-//    cout << "No" << endl;
+//    return false;
 //}
 //int main()
 //{
@@ -52,6 +66,6 @@ using namespace std;
 //    cin >> t;
 //    while (t--)
 //    {
-//        solve();
+//        cout << (solve() ? "Yes" : "No") << '\n';
 //    }
 //}

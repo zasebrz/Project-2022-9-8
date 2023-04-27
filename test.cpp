@@ -15552,6 +15552,160 @@ public:
 //    }
 //}
 
+////////////////////////////////////////////300. 最长递增子序列///////////////////////////////////////
+
+//输入：nums = [10, 9, 2, 5, 3, 7, 101, 18]
+//输出：4
+//解释：最长递增子序列是[2, 3, 7, 101]，因此长度为 4 。
+//https://leetcode.cn/problems/longest-increasing-subsequence/solutions/2147040/jiao-ni-yi-bu-bu-si-kao-dpfu-o1-kong-jia-4zma/?orderBy=hot
+//int main()
+//{
+//    vector<int> nums{ 10,9,2,5,3,7,101,18 };
+//    vector<int> g;//记录临时的递增子序列
+//    for (int x : nums) 
+//    {//对于每一个数
+//        auto it = lower_bound(g.begin(), g.end(), x);//在已记录的容器内查找大于等于它的数
+//        if (it == g.end()) //如果没找到，说明这个数 x 比容器内的数都要大，那么我们直接把他加进容器，得到一个更长的递增子序列
+//            g.push_back(x); // >=x 的 g[j] 不存在
+//        else//否则的话，我们找到了容器内的某个数 it，它大于等于 x，那么我们将这个数替换成 x，就可以得到一个理论上更小的递增子序列（更具潜力）
+//            //但是这样的话，顺序就有可能出现错误，那么如何保证顺序呢？
+//            //注意到这里的替换并不会影响长度，即使说我们这一次的替换后导致 g 的顺序是错误的，只要替换位置后面的数没有被完全替换
+//            //那么就代表着这个更具潜力的序列无法达到更长的长度（有潜力不代表一定成功）我们只需要把所有的替换都undo一次，就能得到原来的子序列
+//            //顺序一定是对的，并且还是递增的，虽然这一步不会体现在代码里，这是一个贪心的思路
+//            *it = x;
+//    }
+//    return g.size();//返回的时候顺序一定是对的
+//}
+
+////////////////////////////////////////////1187. 使数组严格递增（记忆化搜索，DP）///////////////////////////////////////
+
+//给你两个整数数组 arr1 和 arr2，返回使 arr1 严格递增所需要的最小「操作」数（可能为 0）。
+//每一步「操作」中，你可以分别从 arr1 和 arr2 中各选出一个索引，分别为 i 和 j，0 <= i < arr1.length 和 0 <= j < arr2.length，然后进行赋值运算 arr1[i] = arr2[j]。
+//如果无法让 arr1 严格递增，请返回 - 1。
+//输入：arr1 = [1, 5, 3, 6, 7], arr2 = [4, 3, 1]
+//输出：2
+//解释：用 3 来替换 5，然后用 4 来替换 3，得到 arr1 = [1, 3, 4, 6, 7]。
+//https://leetcode.cn/problems/make-array-strictly-increasing/solutions/2236095/zui-chang-di-zeng-zi-xu-lie-de-bian-xing-jhgg/?orderBy=hot
+//为方便描述，下文将 arr1简记为 a，arr2简记为 b。
+//问题等价于从 a 中找到一个最长严格递增子序列 lis，把不在 lis 中的元素替换成 b 中的元素后，a 是严格递增的，求不在 lis中的元素个数的最小值。
+//对于最长递增子序列问题（或者一般的动态规划问题），通常都可以用「选或不选」和「枚举选哪个」来启发思考。
+//方法一：「选或不选」
+//例如 a = [0, 4, 2, 2], b = [1, 2, 3, 4]，假如 a[3] = 2 替换成了 b[3] = 4，那么对于 a[2] = 2 来说:
+//·选择不替换，问题变成「把[0, 4] 替换成严格递增数组，且数组的最后一个数小于 2，所需要的最小操作数」。
+//·选择替换，那么应该替换得越大越好，但必须小于 4（因为 a[3] 替换成了 4），那么替换成 3 最佳，问题变成「把[0, 4] 替换成严格递增数组，
+//    且最后一个数小于 3，所需要的最小操作数」。
+//这样一通分析后，就找到了子问题：把从 a[0] 到 a[i] 的这段前缀替换成严格递增数组，且数组的最后一个数小于 pre，所需要的最小操作数。
+//记为 dfs(i, pre)。pre表示 a[0] 到 a[i] 的这段前缀 的右边的数，由于我们是先从右边开始遍历的，所以把它叫做pre
+//分类讨论：
+//·如果 a[i] < pre，那么可以不替换 a[i]，此时 dfs(i, pre) = dfs(i−1, a[i])。
+//·如果 b 中有比 pre 小的数，那么选其中最大的 b[k]，去替换 a[i]，此时 dfs(i, pre) = dfs(i−1, b[k]) + 1。
+//·其余情况，dfs(i, pre) = ∞，表示无法做到。
+//  所有情况取最小值，即为 dfs(i, pre) 的答案。
+//递归边界：dfs(−1, pre) = 0。数组为空，无需任何操作，直接返回0。
+//递归入口：dfs(n−1, ∞)。为简化代码逻辑，假设 a[n−1] 右侧还有一个无穷大的数。如果 dfs(n−1, ∞) = ∞，则返回 −1，否则返回 dfs(n−1, ∞)。
+//和最长递增子序列一样，存在重叠子问题，代码实现时可以用记忆化搜索优化。考虑到 pre 的范围比较大，可以用哈希表来记忆化。
+//注：如果把数组元素都映射到一个比较小的范围，就可以避免使用哈希表了。这一技巧叫「离散化」。
+//在 b 中找小于 pre 的最大的数，可以对 b 排序，然后二分查找。为了方便使用库函数二分，转换成二分查找大于等于pre的最小的数的前一个数。
+//时间复杂度：O(n(n + m)log⁡m)，其中 n 为 a 的长度，m 为 b 的长度。动态规划的时间复杂度 = 状态个数 × 单个状态的计算时间。
+//这里状态个数为 O(n(n + m))，单个状态的计算时间为 O(log⁡m)，因此时间复杂度为 O(n(n + m)log⁡m)。
+//空间复杂度：O(n(n + m))。即状态个数。
+//方法二：「枚举选哪个」
+//为了避免使用哈希表（或者离散化），我们来尝试另外一种思路，它只需要 O(n) 个状态。
+//在方法二中，我们把重点放在 lis 上，关注哪些 a[i] 没有被替换，那么答案就是 n−length(lis)。
+//1) 记忆化搜索
+//仿照最长递增子序列的状态定义，用 dfs(i) 表示以 a[i] 结尾的 lis 的长度，这里 a[i] 没有被替换。
+//枚举 a[i] 左侧最近的没有被替换的元素 a[j]，那么必须满足从 a[j + 1] 到 a[i−1] 的这段子数组，能被替换成 b 中的元素，
+//且替换后从 a[j] 到 a[i] 是严格递增的。为了保证替换的元素互不相同，需要对 b 去重。
+//设 b[k] 为大于等于a[i] 的最小元素。
+//注：即使 b[k] 不存在也没关系，下面不会用到这个数。
+//a[i−1] 最大可以替换成 b 中小于 a[i] 的最大元素，即 b[k−1]，然后 a[i−2] 最大可以替换成 b[k−2]，……，
+//a[j + 1] 最大可以替换成 b[k−(i−j−1)]。
+//注：从 a[j + 1] 到 a[i−1] 一共有 i−j−1 个数。
+//所以，只有满足 b[k−(i−j−1)] > a[j]（也就是有这么多的数可供替换，注意之前去重的操作），才能完成替换操作。
+//此时更新 dfs(i) = max⁡(dfs(i), dfs(j) + 1)。
+//注：要求 k−(i−j−1)>=0，也就是 j >= i−k−1。
+//特别地（当 j = i−1 时），只要满足 a[i−1] < a[i]，就可以更新 dfs(i) = max⁡(dfs(i), dfs(i−1) + 1)。
+//特别地（当 j = −1 时），如果 k >= i，那么可以把 a[0] 到 a[i−1] 全部替换掉。把这种情况作为 dfs(i) 的初始值，即 1。
+//如果 k < i 则 dfs(i) 初始化为 −∞
+//递归边界：dfs(0) = 1（dfs(i) 表示以 a[i] 结尾的 lis 的长度），表示 a[0] 没有被替换。注意能递归到 i = 0，说明替换是可行的。
+//递归入口：dfs(n)。为简化代码逻辑，假设 a[n] = ∞，这样 a[n] 无需被替换。如果 dfs(n) = −∞，则返回 −1，否则返回 n + 1−dfs(n)。
+//和最长递增子序列一样，存在重叠子问题，代码实现时可以用记忆化搜索优化。
+//int main()
+//{
+//    vector<int> arr1 = { 1, 5, 3, 6, 7 }, arr2 = { 4,3,1 };
+//    //*****************************************方法一，选或不选*************************************
+//    //int n = arr1.size(), m = arr2.size();
+//    //sort(arr2.begin(), arr2.end());
+//    //vector<unordered_map<int, int>> dp(n);//n个哈希表，哈希表里记录的是<last,操作数>
+//    //function<int(int, int)> dfs = [&](int i, int last)->int
+//    //{
+//    //    if (i < 0)
+//    //        return 0;//递归到底，没有子数组，返回0
+//    //    if (dp[i].find(last) != dp[i].end())//递归到当前这个数i，后一个数已经填了last，那么前缀变成严格递增的操作数是固定的，直接返回
+//    //        return dp[i][last];
+//    //    int res = INT_MAX/2;//初始值，不能是INT_MAX，因为返回到上一层后需要加一，会越界
+//    //    if (arr1[i] < last)//不做替换
+//    //        res = dfs(i - 1, arr1[i]);
+//    //    auto it = lower_bound(arr2.begin(), arr2.end(), last);//找到大于等于last的第一个数
+//    //    if (it == arr2.begin())//也就是说 b 里面没有比last更小的数了，那么不可能替换了，记忆化后直接返回
+//    //        return dp[i][last] = res;
+//    //    res = min(res, dfs(i - 1, *(--it)) + 1);//否则的话，--it就是比last更小的数，递归到下一层去，操作数+1，求最小值
+//    //    return dp[i][last] = res;//记忆化后返回
+//    //};
+//    //int ans=dfs(n-1,INT_MAX);
+//    //return ans == INT_MAX / 2 ? -1 : ans;
+//    //*****************************************方法二，选哪个*************************************
+//    arr1.push_back(INT_MAX); // 简化代码逻辑
+//    sort(arr2.begin(), arr2.end());
+//    arr2.erase(unique(arr2.begin(), arr2.end()), arr2.end()); // 原地去重，unique以覆盖的方式去重，返回去重后尾元素的后一个位置，然后把后面的元素全都erase掉
+//    int n = arr1.size();
+//    vector<int> memo(n,0);// 0 表示还没有计算过
+//    function<int(int)> dfs = [&](int i) -> int {
+//        int& res = memo[i]; // 注意这里是引用，下面会直接修改 memo[i]
+//        if (res) //位置确定的话，以 arr1[i] 结尾的 lis 的长度（且这个lis中的元素都无替换）就是确定的，因为lis是唯一的
+//            return res; // 之前计算过了
+//        int k = lower_bound(arr2.begin(), arr2.end(), arr1[i]) - arr2.begin();//大于等于arr1[i]的第一个数
+//        res = k < i ? INT_MIN : 0; // k左边的数全都是小于arr1[i]的，总共有 k 个，如果k>=i，说明我们可以把 i 左边[0:i-1]总共i个数全都替换掉
+//                                   // 那么以 a[i] 结尾的 lis 的长度（且lis中的元素都无替换）就是 1，也就是arr1[i]本身，视为它的初始值，由于加一
+//                                   //放在了后面，所有这里初始化为0，而当 k<i 时，说明我们无法把所有元素都替换掉，总会存在某个 j 是无法替换的
+//                                   //但是 a[j] 无替换的情况下，不一定能满足 [j+1:i-1]这中间所有的元素替换后满足严格递增，所以初始化为最小值
+//                                   //后续的for循环中在进行判断求出最大值
+//        if (i && arr1[i - 1] < arr1[i]) // 无替换，i等于0说明这个替换方案是可行的，不需要在往前递归了，直接返回 1 （因为i=0时，上面的res
+//                                        // 初始化为 0，下面的for循环不执行，直接返回 ++res，就是 1，表示 第1个元素不需要替换（严格递增
+//                                        // 性在上一层循环中已经判断过了），这是最短的符合条件的 lis
+//            res = max(res, dfs(i - 1));//注意res表示以 a[i] 结尾的 lis 的长度（且lis中的元素都无替换）,由于res已经初始化了，所有要取最大值
+//        for (int j = i - 2; j >= i - k - 1 && j >= 0; --j)//选出前面一个数没有做替换的，i-1已经判断过了，有 k个数可供替换，从 i-1开始替换，
+//                                                          //替换结束位置为 j+1（因为j是没被替换的），那么要保证 i-1-(j+1)+1<=k，即j >= i - k - 1
+//                                                          //同时还要保证 j 是有效的下标
+//            if (arr2[k - (i - j - 1)] > arr1[j])//虽然有 k 个可供替换的数，但是不一定能满足所有的数替换后都能组成严格递增序列，由于arr2是
+//                                                //有序的，那么a[j + 1] 最大可以替换成 b[k−(i−j−1)]，只要b[k−(i−j−1)]大于arr1[j]，替换一定
+//                                                //成立，因此递归进下一层
+//                // a[j+1] 到 a[i-1] 替换成 b[k-(i-j-1)] 到 b[k-1]，a[j]没有被替换
+//                res = max(res, dfs(j));//这里求出最大值后，表示[0:i-1]这段序列中没有被替换的lis的长度，而arr1[i]可以加到这个lis后面，因此
+//                                       //以 a[i] 结尾的 lis 的长度（且lis中的元素都无替换）为res+1
+//        return ++res; // 把 +1 移到这里，表示 a[i] 不替换，lis至少为 1，如果无法找到这样的lis，那么res上面初始化为 INT_MIN，加1之后仍然很小
+//    };
+//    int ans = dfs(n - 1); // 注意 a 已经添加了一个元素，n表示加入元素之后的长度，就表示所有元素（包括哨兵）没有被替换，
+//                          // 且其他元素被替换后仍然满足严格递增性的lis长度
+//    //*****************************************翻译成DP*************************************
+//    //vector<int> dp(n, 0);
+//    //dp[0] = 1;//第一个元素无需替换
+//    //for (int i = 1; i < n; i++)
+//    //{
+//    //    int k = lower_bound(arr2.begin(), arr2.end(), arr1[i]) - arr2.begin();
+//    //    dp[i] = k < i ? INT_MIN : 1; // 小于 a[i] 的数全部替换
+//    //    if (arr1[i - 1] < arr1[i])
+//    //        dp[i] = max(dp[i], dp[i - 1] + 1);
+//    //    for (int j = i - 2; j >= max(0, i - k - 1); --j)
+//    //    {
+//    //        if (arr2[k - (i - j - 1)] > arr1[j])//如果j从i-1开始的话，这里就需要特殊判断一下了，就是如果j=i-1，无需替换，直接求值
+//    //            dp[i] = max(dp[i], dp[j] + 1);
+//    //    }
+//    //}
+//    //ans = dp[n - 1];
+//    return ans < 0 ? -1 : n - ans;//不能直接判断ans==INT_MIN，因为是加 1 之后返回的，不等于INT_MIN
+//}
+
 ////////////////////////////////////////////纪录最长递增子序列的长度（变体）///////////////////////////////////////
 
 //https://blog.csdn.net/xyjy11/article/details/118032689
@@ -27368,4 +27522,215 @@ public:
 //    cout << majorityChecker.query(2, 3, 2) << endl; // 返回 2
 //}
 
+/////////////////////////////////////////2642. 设计可以求最短路径的图类（Dijkstra、Floyd最短路径算法）//////////////////////////
 
+//https://leetcode.cn/problems/design-graph-with-shortest-path-calculator/solutions/2229013/dijkstra-suan-fa-mo-ban-pythonjavacgo-by-unmv/?orderBy=hot
+//由于数据量太小，这道题可以直接用Dijkstra最短路径算法，在使用堆优化的情况下，算法复杂度为O(qm*log n)，还有一种Floyd算法，属于动态规划
+//Floyd 本质是动态规划。由于这个动态规划的状态定义不是很好想出来，所以我就直接描述算法了：
+//定义 d[k][i][j] 表示从 i 到 j 的最短路长度，并且从 i 到 j 的路径上的中间节点（不含 i 和 j）的编号至多为 k（也就是中间节点编号的最大值）。
+//分类讨论：
+//如果 i 到 j 的路径上的节点编号没有 k，那么按照定义 d[k][i][j] = d[k−1][i][j]。（最大值至多为 k-1）
+//如果 i 到 j 的路径上的节点编号有 k，那么可以视作先从 i 到 k，再从 k 到 j。由于 i 到 k 和 k 到 j 的中间节点都没有 k，所以有 d[k][i][j] = d[k−1][i][k] + d[k−1][k][j]
+//取最小值，得
+//d[k][i][j] = min⁡(d[k−1][i][j], d[k−1][i][k] + d[k−1][k][j]) 
+//初始值 d[0][i][j] 为原图中 i 到 j 的边长，如果不存在则为 无穷大。最终 i 到 j 的最短路长度为 d[k−1][i][j]
+//
+//代码实现时，第一个维度可以优化掉，即
+//
+//d[i][j] = min⁡(d [[i][j], d[i][k] + d[k][j]) 
+//为什么这样做是对的？视频中讲了正确性。
+//对于 addEdge 操作，记 x = from, y = to 如果 新加入边的长度（edgeCode）大于 d[x][y]，则无法更新任何点对的最短路。否则枚举所有 d[i][j]，
+//尝试看看能否更新成更小，即 i−x−y−j 是否更短：
+//d[i][j] = min⁡(d[i][j], d[i][x] + edgeCode + d[y][j])
+//由于当 i = x 或 j = y 时，需要用到 d[i][i] 这样的值，所以初始化的时候，d[i][i] 要置为 0。
+//class Graph {
+//    vector<vector<int>> d;
+//public:
+//    Graph(int n, vector<vector<int>>& edges) {
+//        // 邻接矩阵（初始化为无穷大，表示 i 到 j 没有边）
+//        d = vector<vector<int>>(n, vector<int>(n, INT_MAX / 3));//有可能有三段长度相加，所以只能初始化到这个值
+//        for (int i = 0; i < n; ++i)
+//            d[i][i] = 0;
+//        for (auto& e : edges)
+//            d[e[0]][e[1]] = e[2]; // 添加一条边（输入保证没有重边和自环）
+//        for (int k = 0; k < n; ++k)
+//            for (int i = 0; i < n; ++i)
+//                for (int j = 0; j < n; ++j)
+//                    d[i][j] = min(d[i][j], d[i][k] + d[k][j]);//动态规划
+//    }
+//
+//    void addEdge(vector<int> e) {
+//        int x = e[0], y = e[1], w = e[2], n = d.size();
+//        if (w >= d[x][y]) // 新加入的这条边的长度 比原本起终点之间的长度 都要大，那么它就无法用来更新任何两点之间的距离（硬要更新的话为什么不选原本更短的那条路径呢）
+//            return;
+//        for (int i = 0; i < n; ++i)
+//            for (int j = 0; j < n; ++j)
+//                d[i][j] = min(d[i][j], d[i][x] + w + d[y][j]);//更新一下那些可能得到更短路径的起终点距离
+//    }
+//
+//    int shortestPath(int start, int end) {
+//        int ans = d[start][end];
+//        return ans < INT_MAX / 3 ? ans : -1;//无法到达，返回-1
+//    }
+//};
+
+/////////////////////////////////////////2646. 最小化旅行的价格总和（树形DP）//////////////////////////
+
+//https://leetcode.cn/problems/minimize-the-total-price-of-the-trips/solutions/2229503/lei-si-da-jia-jie-she-iii-pythonjavacgo-4k3wq/?orderBy=hot
+//int main()
+//{
+//    int n = 4;
+//    vector<vector<int>> edges = { {0, 1},{1, 2 }, {1, 3}};
+//    vector<int> price = { 2, 2, 10, 6 };
+//    vector<vector<int>> trips = { {0, 3},{2, 1 }, { 2, 3}};
+//    vector<vector<int>> g(n);
+//    for (auto& e : edges) {
+//        int x = e[0], y = e[1];
+//        g[x].push_back(y);
+//        g[y].push_back(x); // 建树
+//    }
+//
+//    vector<int> cnt(n, 0);
+//    for (auto& t : trips) 
+//    {//计算所有旅程中，每个点需要经过的次数，乘以他们本身的分数，就是未减半之前的总分数
+//        int end = t[1];
+//        function<bool(int, int)> dfs = [&](int x, int fa) -> bool {
+//            if (x == end) { // 到达终点（注意树只有唯一的一条简单路径）
+//                ++cnt[x]; // 统计从 start 到 end 的路径上的点经过了多少次
+//                return true; // 找到终点
+//            }
+//            for (int y : g[x])
+//                if (y != fa && dfs(y, x)) 
+//                {//后续找到终点之后才能统计次数
+//                    ++cnt[x]; // 统计从 start 到 end 的路径上的点经过了多少次
+//                    return true; // 找到终点
+//                }
+//            return false; // 未找到终点
+//        };
+//        dfs(t[0], -1);
+//    }
+//
+//    // 类似 337. 打家劫舍 III https://leetcode.cn/problems/house-robber-iii/ ，树形DP
+//    function<pair<int, int>(int, int)> dfs = [&](int x, int fa) -> pair<int, int> {
+//        int not_halve = price[x] * cnt[x]; // 当前节点不变
+//        int halve = not_halve / 2; // 当前节点值减半，则它的总贡献也会减半
+//        for (int y : g[x])
+//            if (y != fa) 
+//            {
+//                auto [nh, h] = dfs(y, x); // 计算 当前节点的邻居 不变/减半的最小价值总和
+//                not_halve += min(nh, h); // 当前节点 不变，那么 邻居节点 可以不变，也可以减半，取这两种情况的最小值
+//                halve += nh; // 当前节点 减半，那么 邻居节点 只能不变
+//            }
+//        return { not_halve, halve };//如果是边缘节点，那么之间返回减半和不减半的分数就行了
+//    };
+//    auto [nh, h] = dfs(0, -1);//随便选择一个节点进入
+//    return min(nh, h);//选择初始节点 减半或者不变 之中的最小值
+//}
+
+/////////////////////////////////////////1043. 分隔数组以得到最大和（递归、DP）//////////////////////////
+
+//https://leetcode.cn/problems/partition-array-for-maximum-sum/solutions/2234242/jiao-ni-yi-bu-bu-si-kao-dong-tai-gui-hua-rq5i/?orderBy=hot
+//给你一个整数数组 arr，请你将该数组分隔为长度 最多 为 k 的一些（连续）子数组。
+//分隔完成后，每个子数组的中的所有值都会变为该子数组中的最大值。
+//返回将数组分隔变换后能够得到的元素最大和。本题所用到的测试用例会确保答案是一个 32 位整数。
+//输入：arr = [1, 15, 7, 9, 2, 5, 10], k = 3
+//输出：84
+//解释：数组变为[15, 15, 15, 9, 10, 10, 10]
+//对于 arr = [1, 15, 7, 9, 2, 5, 10], k = 3，最后一段子数组可以是[10], [5, 10], [2, 5, 10]（长度不能超过 k = 3）。
+//根据题意，将子数组内的元素变成子数组的最大值，例如[2, 5, 10] 变成[10, 10, 10]，其元素和为 30。
+//去掉这段子数组，例如去掉[2, 5, 10]，剩余的要解决的问题是[1, 15, 7, 9] 在分隔变换后能够得到的元素最大和。
+//由于这是一个和原问题相似的子问题，所以可以用递归解决。
+//int main()
+//{
+//    vector<int> arr = { 1, 15, 7, 9, 2, 5, 10 };
+//    int k = 3;
+//    int n = arr.size();
+//    vector<int> dp(n, -1);//dp[i]表示arr[0:i]分割变换后能得到的最大和，用来记忆化，因为固定子数组边界后，得到的最大和是唯一的，不需要重复计算
+//    function<int(int)> dfs = [&](int i)->int
+//    {//dfs(i)用来求dp[i]
+//        if (i < 0)//子数组不存在，直接返回0
+//            return 0;
+//        if (dp[i] != -1)//之前已经计算过
+//            return dp[i];
+//        int res = 0;
+//        for (int j = max(i - k + 1, 0); j <= i; j++)
+//        {//枚举左边界 j，不能越过 0
+//            int tmp = 0;//记录arr[j:i]这个子数组之间的最大值
+//            for (int m = j; m <= i; m++)
+//                tmp = max(tmp, arr[m]);
+//            res = max(res, dfs(j - 1) + tmp * (i - j + 1));//把arr[j:i]这个子数组全部变成 tmp，然后下一层递归计算 arr[0:j-1]的最大和，取最大值
+//        }
+//        // cout<<res<<endl;
+//        return dp[i] = res;//记忆化
+//    };
+//    vector<int> dp1(n + 1, 0);//翻译成动态规划，dp1[i]表示从头到第 i 个元素能得到的最大和，因为没法表示i<0的 情况，所以需要额外开辟空间
+//    for (int i = 1; i <= n; i++)
+//    {//dp1[i]是从小到大计算的，所以i需要递增遍历
+//        int tmp = 0;
+//        for (int j = i; j >= max(i - k + 1, 1); j--)//在枚举左边界的同时，记录arr[j-1:i-1]的最大值tmp
+//        {
+//            tmp = max(tmp, arr[j - 1]);
+//            dp1[i] = max(dp1[i], dp1[j - 1] + tmp * (i - j + 1));
+//        }
+//    }
+//    return dp1[n];
+//    // return dfs(n-1);
+//}
+
+
+//int main()
+//{
+//    string s = "xabxcd";
+//    int n = s.size();
+//    int i = 0;
+//    for (int j = 1, k = 0; j + k < n;) {
+//        if (s[i + k] == s[j + k]) {
+//            ++k;
+//        }
+//        else if (s[i + k] < s[j + k]) {
+//            i += k + 1;
+//            k = 0;
+//            if (i >= j) {
+//                j = i + 1;
+//            }
+//        }
+//        else {
+//            j += k + 1;
+//            k = 0;
+//        }
+//    }
+//}
+
+/////////////////////////////////////////1031. 两个非重叠子数组的最大和（前缀和）//////////////////////////
+
+//https://leetcode.cn/problems/maximum-sum-of-two-non-overlapping-subarrays/solutions/2245647/tu-jie-mei-you-si-lu-yi-zhang-tu-miao-do-3lli/?orderBy=hot
+//为方便计算，常用左闭右开区间[left, right) 来表示从 nums[left] 到 nums[right−1] 的子数组，
+//此时子数组的和为 s[right]−s[left]，子数组的长度为 right−left
+//尝试a数组在前b数组在后的思路，设 b 的下标范围为左闭右开区间[i−secondLen, i)，其元素和为 s[i]−s[i−secondLen]
+//由于左边要留空间给 a，所以 i 要从 firstLen + secondLen 开始枚举（结合上图理解）。
+//由于每次枚举一个新的 i，都会在 b 的左边产生一个新的子数组[i−secondLen−firstLen, i−secondLen)，所以用它的元素和 
+//s[i−secondLen]−s[i−secondLen−firstLen]去更新 maxSumA\textit{ maxSumA }maxSumA。
+//把这个算法封装成一个函数 f(firstLen, secondLen)，表示左 a 右 b 的计算。那么 f(secondLen, firstLen) 就是左 b 右 a 的计算了。
+//「左 a 右 b」和「左 b 右 a」可以合并到同一个循环中。
+//对于有两个变量的题目，通常可以枚举其中一个变量，把它视作常量，从而转化成只有一个变量的问题。
+//对于本题来说，就是枚举 bbb，把问题转化成计算 a 的最大元素和。
+//其实这个技巧在 1. 两数之和 中就体现了：枚举第二个数，去左边找第一个数。（用哈希表优化找第一个数的过程。）
+//int main()
+//{
+//    vector<int> nums{ 2,1,5,6,0,9,5,0,3,8 };
+//    int firstLen = 4, secondLen = 3 ;
+//    int res = 0;
+//    int n = nums.size();
+//    vector<int> presum(n + 1, 0);
+//    for (int i = 0; i < n; i++)
+//        presum[i + 1] = presum[i] + nums[i];
+//    int max_a = 0, max_b = 0;
+//    for (int i = firstLen + secondLen; i <= n; i++)
+//    {//i表示右边子数组的右边界，是取不到的，因此可以到 n
+//        max_a = max(max_a, presum[i - secondLen] - presum[i - secondLen - firstLen]);//i每往右移动一位，就会产生新的子数组和，
+//        max_b = max(max_b, presum[i - firstLen] - presum[i - secondLen - firstLen]);//单独去更新a在左边和b在左边的情况
+//        //上面两个值记录的是左边 a数组和左边 b数组的最大值，然后加上右边 b数组和右边 a数组的和，就是两个不重叠数组的总和，再去更新最大值
+//        res = max(res, max(max_a + presum[i] - presum[i - secondLen], max_b + presum[i] - presum[i - firstLen]));
+//    }
+//    return res;
+//}
