@@ -27819,3 +27819,90 @@ public:
 //    for (auto i : ans)
 //        cout << i << ' ';
 //}
+
+
+
+class DinnerPlates {
+public:
+    vector<stack<int>> v;
+    int c;
+    priority_queue<int, vector<int>, greater<int>> p;
+    DinnerPlates(int capacity) {
+        c = capacity;
+    }
+
+    void push(int val) {
+        if (!p.empty() && p.top() >= v.size())
+            while (!p.empty())
+                p.pop();
+        if (p.empty())
+        {
+            stack<int> tmp;
+            tmp.push(val);
+            v.emplace_back(tmp);
+            if (c > 1)
+                p.push(v.size() - 1);
+        }
+        else
+        {
+            auto& st = v[p.top()];
+            st.push(val);
+            if (st.size() == c)
+                p.pop();
+        }
+    }
+
+    int pop() {
+        return popAtStack(v.size() - 1);
+    }
+
+    int popAtStack(int index) {
+        if (index < 0 || index >= v.size() || v[index].empty())
+            return -1;
+        auto& st = v[index];
+        if (st.size() == c)
+        {
+            p.push(index);
+        }
+        int ans = st.top();
+        st.pop();
+        while (v.size() && v.back().empty())
+            v.pop_back();
+        return ans;
+    }
+};
+int main()
+{
+    DinnerPlates D(1);  // 初始化，栈最大容量 capacity = 2
+    D.push(1);
+    D.push(2);
+    D.push(3);
+    D.push(4);
+    D.push(5);         // 栈的现状为：    2  4
+                       //                 1  3  5
+                       //                 ﹈ ﹈ ﹈
+    D.popAtStack(0);   // 返回 2。栈的现状为：      4
+                       //                        1  3  5
+                       //                        ﹈ ﹈ ﹈
+    D.push(20);        // 栈的现状为：  20  4
+                       //                1  3  5
+                       //               ﹈ ﹈ ﹈
+    D.push(21);        // 栈的现状为：  20  4 21
+                       //                1  3  5
+                       //               ﹈ ﹈ ﹈
+    D.popAtStack(0);   // 返回 20。栈的现状为：       4 21
+                       //                          1  3  5
+                       //                         ﹈ ﹈ ﹈
+    D.popAtStack(2);   // 返回 21。栈的现状为：       4
+                       //                          1  3  5
+                       //                          ﹈ ﹈ ﹈
+    D.pop();           // 返回 5。栈的现状为：        4
+                       //                          1  3
+                       //                          ﹈ ﹈
+    D.pop();           // 返回 4。栈的现状为：    1  3 
+                       //                         ﹈ ﹈
+    D.pop();           // 返回 3。栈的现状为：    1 
+                       //                         ﹈
+    D.pop();           // 返回 1。现在没有栈。
+    D.pop();           // 返回 -1。仍然没有栈。
+}
