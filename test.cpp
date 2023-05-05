@@ -6462,6 +6462,43 @@ T m_lcm(T a, T b)
 //    cout << max(num1, num2) << endl;
 //}
 
+/////////////////////////////////////// //526. 优美排列的个数（状态压缩DP）//////////////////////////
+
+//https://leetcode.cn/problems/beautiful-arrangement/solutions/937821/you-mei-de-pai-lie-by-leetcode-solution-vea2/
+//https://leetcode.cn/problems/beautiful-arrangement/solutions/938214/gong-shui-san-xie-xiang-jie-liang-chong-vgsia/
+//void main()
+//{
+//    // 用 mask 的二进制表示选取状态，n 个数字用 n 位表示，从右往左第 i+1 位为 1 代表数字 i+1 已被选取（i=0~n-1），
+//    // mask 中 1 的个数 num 代表前num位已放置（注意是前m位，也就是0,1,2,...num-1的位置已经被放置，下一个要放的就是num的位置）
+//    // 例如：二进制 100110 共三个1，代表排列的前三位已放置数字，三个1分别在二进制第 1、2、5位置上(从右侧开始，从0开始计数）, 
+//    // 所以 2、3、6三个数字被选取，综合起来就是表示：2 3 6 这三个数字被放到了排列的前三位，三个数字完美排列方式未知，
+//    // 通过枚举 mask 进行计算
+//    int n = 10;
+//    vector<int> f(1 << n);// 用来存储中间结果，f[6] = f[000110] = 数字2、3在前两位时的完美排列数量,总共有2^n-1中可能，所以左移n位
+//    f[0] = 1;
+//    // 通过 mask 进行枚举，最终目的是为了得到二进制 mask = (11..11)n 时，总的完美排列数 
+//    for (int mask = 1; mask < (1 << n); mask++) {
+//        int num = __builtin_popcount(mask);
+//        // ·遍历 mask 的每一位，仍以 mask = 100110 为例，此 mask 代表 2 3 6三个数字在排列的前三位
+//        // ·求三个数字 2 3 6 的完美排列方式，则先确定2 3 6哪些数字能放到第三位，然后累加另外两个数字的完美排列数量来获得
+//        // ·2 3 6，第三位可以为 6，则 f[100110] += f[000110] (2、3在前两位时的完美排列数量)
+//        // ·2 3 6，第三位可以为 3，则 f[100110] += f[100010] (2、6在前两位时的完美排列数量)
+//        for (int i = 0; i < n; i++) {
+//            // mask & (1<<i) 用来判断 mask 第 i 位是否为 1，如果为 1，说明第 i+1 个数字被选取
+//            // ((num % (i + 1)) == 0 || (i + 1) % num == 0) 判断被选取的数字 i+1 能否放到位置 num 上，
+//            // 即：先从被选取的数字中找到能放到位置num上的数字，然后将剩余num-1个数字的完美排列方式累加到f[mask]中
+//            // num表示下一个要放数的位置（索引），i+1表示可以放在num上的数，比如上面那个例子，num就是第三位，i+1就是2,3,6
+//            if ((mask & (1 << i)) != 0 && ((num % (i + 1)) == 0 || (i + 1) % num == 0)) {
+//                // mask ^ (1 << i) 将 mask 第 i 位设置为 0
+//                //^表示异或，相同为0，比如计算f[100110]的时候i=2满足if，那么f[100110] += f[100010]，右边第3位变成了0
+//                //i=5的时候也满足if，那么f[100110] += f[000110]，右边第6位变成了0
+//                f[mask] += f[mask ^ (1 << i)];
+//            }
+//        }
+//    }
+//    cout<<f[(1 << n) - 1]<<endl;
+//}
+
 ///////////////////////////////////////////所有小于n的数字中出现1的个数（数位DP）////////////////////////////////////////////////////
 
 //https://leetcode-cn.com/problems/1nzheng-shu-zhong-1chu-xian-de-ci-shu-lcof/solution/mian-shi-ti-43-1n-zheng-shu-zhong-1-chu-xian-de-2/
@@ -6507,44 +6544,6 @@ T m_lcm(T a, T b)
 //        digit *= 10;//位因子每轮 × 10
 //    }
 //    cout<<res<<endl;
-//}
-
-/////////////////////////526. 优美排列的个数（状态压缩DP）//////////////////////////
-
-
-//https://leetcode.cn/problems/beautiful-arrangement/solutions/937821/you-mei-de-pai-lie-by-leetcode-solution-vea2/
-//https://leetcode.cn/problems/beautiful-arrangement/solutions/938214/gong-shui-san-xie-xiang-jie-liang-chong-vgsia/
-//void main()
-//{
-//    // 用 mask 的二进制表示选取状态，n 个数字用 n 位表示，从右往左第 i+1 位为 1 代表数字 i+1 已被选取（i=0~n-1），
-//    // mask 中 1 的个数 num 代表前num位已放置（注意是前m位，也就是0,1,2,...num-1的位置已经被放置，下一个要放的就是num的位置）
-//    // 例如：二进制 100110 共三个1，代表排列的前三位已放置数字，三个1分别在二进制第 1、2、5位置上(从右侧开始，从0开始计数）, 
-//    // 所以 2、3、6三个数字被选取，综合起来就是表示：2 3 6 这三个数字被放到了排列的前三位，三个数字完美排列方式未知，
-//    // 通过枚举 mask 进行计算
-//    int n = 10;
-//    vector<int> f(1 << n);// 用来存储中间结果，f[6] = f[000110] = 数字2、3在前两位时的完美排列数量,总共有2^n-1中可能，所以左移n位
-//    f[0] = 1;
-//    // 通过 mask 进行枚举，最终目的是为了得到二进制 mask = (11..11)n 时，总的完美排列数 
-//    for (int mask = 1; mask < (1 << n); mask++) {
-//        int num = __builtin_popcount(mask);
-//        // ·遍历 mask 的每一位，仍以 mask = 100110 为例，此 mask 代表 2 3 6三个数字在排列的前三位
-//        // ·求三个数字 2 3 6 的完美排列方式，则先确定2 3 6哪些数字能放到第三位，然后累加另外两个数字的完美排列数量来获得
-//        // ·2 3 6，第三位可以为 6，则 f[100110] += f[000110] (2、3在前两位时的完美排列数量)
-//        // ·2 3 6，第三位可以为 3，则 f[100110] += f[100010] (2、6在前两位时的完美排列数量)
-//        for (int i = 0; i < n; i++) {
-//            // mask & (1<<i) 用来判断 mask 第 i 位是否为 1，如果为 1，说明第 i+1 个数字被选取
-//            // ((num % (i + 1)) == 0 || (i + 1) % num == 0) 判断被选取的数字 i+1 能否放到位置 num 上，
-//            // 即：先从被选取的数字中找到能放到位置num上的数字，然后将剩余num-1个数字的完美排列方式累加到f[mask]中
-//            // num表示下一个要放数的位置（索引），i+1表示可以放在num上的数，比如上面那个例子，num就是第三位，i+1就是2,3,6
-//            if ((mask & (1 << i)) != 0 && ((num % (i + 1)) == 0 || (i + 1) % num == 0)) {
-//                // mask ^ (1 << i) 将 mask 第 i 位设置为 0
-//                //^表示异或，相同为0，比如计算f[100110]的时候i=2满足if，那么f[100110] += f[100010]，右边第3位变成了0
-//                //i=5的时候也满足if，那么f[100110] += f[000110]，右边第6位变成了0
-//                f[mask] += f[mask ^ (1 << i)];
-//            }
-//        }
-//    }
-//    cout<<f[(1 << n) - 1]<<endl;
 //}
 
 ///////////////////////////////////////////环球旅行规划合理的飞行路线总数（回溯和map的灵活运用）//////////////////////////////////
@@ -20154,6 +20153,49 @@ public:
 //    cout << makeLargestSpecial("11011000");
 //}
 
+/////////////////////////////////////////约瑟夫环出列顺序//////////////////////////////////////////
+
+//https://blog.csdn.net/shizi599/article/details/101238187?spm=1001.2101.3001.6650.8&utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-8.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-8.pc_relevant_default&utm_relevant_index=12
+//struct node
+//{
+//    int num;
+//    struct node* next;
+//    node(int val, node* p) :num(val), next(p) {};
+//};
+//int main()
+//{
+//    int N = 6, M = 3;//总共N个人，
+//    node* head = new node(1, nullptr);
+//    node* cyclic = head;
+//    for (int i = 2; i <= N; i++)
+//    {//创建链表
+//        node* body = new node(i, nullptr);
+//        cyclic->next = body;
+//        cyclic = cyclic->next;
+//    }
+//    cyclic->next = head;//收尾相连
+//    node* tail = head;
+//    while (tail->next != head) {//找到尾结点
+//        tail = tail->next;
+//    }
+//    node* p = head;//p代表离队的那个人
+//    while (p->next != p) //每删除一个节点，就要把链表重新组合成环，最后只剩下一个节点，退出循环
+//    {
+//        for (int i = 1; i < M; i++)
+//        {//找到从当前头部开始的第 M 个人，注意 i=M-1仍然进行一次循环，这样p就指向第 M 个人
+//            tail = p;//先记录上一个人
+//            p = p->next;//再往前进
+//        }
+//        tail->next = p->next;//tail是第 M-1 个人，p是 第 M 个人，出列，剩下的人继续组成环
+//        cout << p->num << ' ';
+//        delete p;
+//        p = tail->next;//上一轮的 第 M+1 个人成为这一轮的第 1 个人
+//    }
+//    cout << p->num;//最后一个人，出列
+//    delete p;
+//    return 0;
+//}
+
 /////////////////////////////////////////899. 转移字符能得到的字典序最小的字符串//////////////////////
 
 //https://leetcode.cn/problems/orderly-queue/solution/nao-jin-ji-zhuan-wan-by-heren1229-gg97/
@@ -20276,102 +20318,11 @@ public:
 //    return 0;
 //}
 
-/////////////////////////////////////////约瑟夫环出列顺序//////////////////////////////////////////
 
-//https://blog.csdn.net/shizi599/article/details/101238187?spm=1001.2101.3001.6650.8&utm_medium=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-8.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2~default~BlogCommendFromBaidu~Rate-8.pc_relevant_default&utm_relevant_index=12
-//struct node
-//{
-//    int num;
-//    struct node* next;
-//    node(int val, node* p) :num(val), next(p) {};
-//};
-//int main()
-//{
-//    int N = 6, M = 3;//总共N个人，
-//    node* head = new node(1, nullptr);
-//    node* cyclic = head;
-//    for (int i = 2; i <= N; i++)
-//    {//创建链表
-//        node* body = new node(i, nullptr);
-//        cyclic->next = body;
-//        cyclic = cyclic->next;
-//    }
-//    cyclic->next = head;//收尾相连
-//    node* tail = head;
-//    while (tail->next != head) {//找到尾结点
-//        tail = tail->next;
-//    }
-//    node* p = head;//p代表离队的那个人
-//    while (p->next != p) //每删除一个节点，就要把链表重新组合成环，最后只剩下一个节点，退出循环
-//    {
-//        for (int i = 1; i < M; i++)
-//        {//找到从当前头部开始的第 M 个人，注意 i=M-1仍然进行一次循环，这样p就指向第 M 个人
-//            tail = p;//先记录上一个人
-//            p = p->next;//再往前进
-//        }
-//        tail->next = p->next;//tail是第 M-1 个人，p是 第 M 个人，出列，剩下的人继续组成环
-//        cout << p->num << ' ';
-//        delete p;
-//        p = tail->next;//上一轮的 第 M+1 个人成为这一轮的第 1 个人
-//    }
-//    cout << p->num;//最后一个人，出列
-//    delete p;
-//    return 0;
-//}
-
-/////////////////////////////////////////768. 最多能完成排序的块 II//////////////////////////////////////////
-
-//https://leetcode.cn/problems/max-chunks-to-make-sorted-ii/solution/zui-duo-neng-wan-cheng-pai-xu-de-kuai-ii-w5c6/
-//arr是一个可能包含重复元素的整数数组，我们将这个数组分割成几个“块”，并将这些块分别进行排序。
-//之后再连接起来，使得连接的结果和按升序排序后的原数组相同。
-//我们最多能将数组分成多少块？
-// 比如arr = [4,3,2,1,0]，最多分成 1 块
-// 将数组分成2块或者更多块，都无法得到所需的结果。
-// 例如，分成[4, 3], [2, 1, 0] 的结果是[3, 4, 0, 1, 2]，这不是有序的数组。
-//int main()
-//{
-//    vector<int> arr = { 2,1,1,4,3,4 };
-//    stack<int> st;//构建单调递增栈
-//    for (auto i : arr)
-//    {
-//        //对于已经分好块的数组，若在其末尾添加一个数字，如何求得新数组的分块方式？
-//        //·新添加的数字可能会改变原数组的分块方式。如果新添加的数字大于或等于原数组最后一个块的最大值，
-//        //则这个新添加的数字可以自己形成一个块，因为我们要求最多分为多少块。
-//        //·如果新添加的数字小于原数组最后一个块的最大值，则它必须融入最后一个块。
-//        //如果它大于或等于原数组倒数第二个块（如果有）的最大值，那么这个过程可以停止，
-//        //新数组的分块方式已经求得。否则，它将继续融合原数组倒数第二个块，直到遇到一个块，
-//        //使得该块的最大值小于或等于这个新添加的数，或者这个数字已经融合了所有块。
-//        //上述分析过程中，我们只用到了块的最大值来进行比较，比较过程又是从右到左，符合栈的思想，
-//        //因此可以用类似单调栈的数据结构来存储块的最大值。
-//        if (!st.empty())
-//        {//对于一个非空栈，
-//            if (i >= st.top())
-//            {//比较当前值 i 和栈顶最后一个块的最大值，如果大于或等于，则当前值可以自己形成一个块
-//                //他又变成新的最后一个块的最大值（到目前为止）
-//                st.push(i);
-//            }
-//            else
-//            {//否则，往前查找，原有的最后一个块的最大值不应该变动，其他块的最大值可能会受到影响
-//                //比如在[1,2,3,0]中，从左向右遍历，[1,2,3]均为最大值，但是一遇到0之后不仅0需要并入3所在分块，
-//                //就连1和2都要并入3所在分块，所以这里我们还需要有一步弹出操作，表示之前的块不能单独存在了
-//                //需要合并到后面更大的块中
-//                int max_ = st.top();
-//                while (!st.empty() && i < st.top())
-//                {
-//                    st.pop();
-//                }
-//                st.push(max_);//新的块的最大值
-//            }
-//        }
-//        else
-//        {
-//            st.push(i);
-//        }
-//    }
-//    return st.size();//st记录的是每一块的最大值，所以有多少个最大值就有多少个块
-//}
 
 /////////////////////////////////////////1422. 分割字符串的最大得分//////////////////////////////////////////
+
+/////////////////////////////////////////1422. 分割字符串的最大得分（换位DP）//////////////////////////////////////////
 
 //https://leetcode.cn/problems/maximum-score-after-splitting-a-string/solution/fen-ge-zi-fu-chuan-de-zui-da-de-fen-by-l-7u5p/
 //给你一个由若干 0 和 1 组成的字符串 s ，请你计算并返回将该字符串分割成
@@ -20712,6 +20663,16 @@ public:
 //    cout<<fun(0, true, false);
 //}
 
+/////////////////////////////////////////1397. 找到所有好字符串（数位DP+KMP）//////////////////////////
+
+//https://leetcode.cn/problems/find-all-good-strings/solutions/1854130/ling-shen-mo-ban-jie-jue-by-s9lssloubq-43kd/
+//给你两个长度为 n 的字符串 s1 和 s2 ，以及一个字符串 evil 。请你返回 好字符串 的数目。
+//好字符串 的定义为：它的长度为 n ，字典序大于等于 s1 ，字典序小于等于 s2 ，且不包含 evil 为子字符串。
+//由于答案可能很大，请你返回答案对 10 ^ 9 + 7 取余的结果。
+//输入：n = 2, s1 = "aa", s2 = "da", evil = "b"
+//输出：51
+//解释：总共有 25 个以 'a' 开头的好字符串："aa"，"ac"，"ad"，...，"az"。还有 25 个以 'c' 开头的好字符串："ca"，"cc"，"cd"，...，"cz"。
+//最后，还有一个以 'd' 开头的好字符串："da"。
 //int getNum(const string& s, const string& e,const vector<int> & next) 
 //{//在数位DP的过程中匹配字符串（KMP）
 //    int len = s.size(), len2 = e.size();
@@ -20742,7 +20703,7 @@ public:
 //                            //最长相同前后缀为 0，那么模式串（evil）就需要从头去匹配，而next数组里 nx=-1表示接下来要从头开始匹配
 //                            //所以不能 +1 进入下一层；而 d==e[nx+1]表示当前填的字符和evil中的某个字符相同，接下来要匹配evil的下一个字符
 //                            //所以将 nx+1进入下一层（nx+1 表示接下来要匹配的字符下标）
-//                            //而https://leetcode.cn/problems/find-all-good-strings/solutions/1854130/ling-shen-mo-ban-jie-jue-by-s9lssloubq-43kd/
+//                            //而 https://leetcode.cn/problems/find-all-good-strings/solutions/1854130/ling-shen-mo-ban-jie-jue-by-s9lssloubq-43kd/
 //                            //中不需要分开讨论是因为他的next数组没有 -1 操作，而是右移操作，这样的话，即使这一层需要从头匹配，也只需要将 nx+1
 //                            //就可以了，因为右移操作里面 nx=0表示从头匹配，退出循环是 nx=-1，加一以后正好等于0，下一层从头匹配
 //                res += f(i + 1, nx + 1, is_limit && d == up);
@@ -20864,6 +20825,58 @@ public:
 //        }
 //    }
 //    return ans;
+//}
+
+/////////////////////////////////////////768. 最多能完成排序的块 II//////////////////////////////////////////
+
+//https://leetcode.cn/problems/max-chunks-to-make-sorted-ii/solution/zui-duo-neng-wan-cheng-pai-xu-de-kuai-ii-w5c6/
+//arr是一个可能包含重复元素的整数数组，我们将这个数组分割成几个“块”，并将这些块分别进行排序。
+//之后再连接起来，使得连接的结果和按升序排序后的原数组相同。
+//我们最多能将数组分成多少块？
+// 比如arr = [4,3,2,1,0]，最多分成 1 块
+// 将数组分成2块或者更多块，都无法得到所需的结果。
+// 例如，分成[4, 3], [2, 1, 0] 的结果是[3, 4, 0, 1, 2]，这不是有序的数组。
+//int main()
+//{
+//    vector<int> arr = { 2,1,1,4,3,4 };
+//    stack<int> st;//构建单调递增栈
+//    for (auto i : arr)
+//    {
+//        //对于已经分好块的数组，若在其末尾添加一个数字，如何求得新数组的分块方式？
+//        //·新添加的数字可能会改变原数组的分块方式。如果新添加的数字大于或等于原数组最后一个块的最大值，
+//        //则这个新添加的数字可以自己形成一个块，因为我们要求最多分为多少块。
+//        //·如果新添加的数字小于原数组最后一个块的最大值，则它必须融入最后一个块。
+//        //如果它大于或等于原数组倒数第二个块（如果有）的最大值，那么这个过程可以停止，
+//        //新数组的分块方式已经求得。否则，它将继续融合原数组倒数第二个块，直到遇到一个块，
+//        //使得该块的最大值小于或等于这个新添加的数，或者这个数字已经融合了所有块。
+//        //上述分析过程中，我们只用到了块的最大值来进行比较，比较过程又是从右到左，符合栈的思想，
+//        //因此可以用类似单调栈的数据结构来存储块的最大值。
+//        if (!st.empty())
+//        {//对于一个非空栈，
+//            if (i >= st.top())
+//            {//比较当前值 i 和栈顶最后一个块的最大值，如果大于或等于，则当前值可以自己形成一个块
+//                //他又变成新的最后一个块的最大值（到目前为止）
+//                st.push(i);
+//            }
+//            else
+//            {//否则，往前查找，原有的最后一个块的最大值不应该变动，其他块的最大值可能会受到影响
+//                //比如在[1,2,3,0]中，从左向右遍历，[1,2,3]均为最大值，但是一遇到0之后不仅0需要并入3所在分块，
+//                //就连1和2都要并入3所在分块，所以这里我们还需要有一步弹出操作，表示之前的块不能单独存在了
+//                //需要合并到后面更大的块中
+//                int max_ = st.top();
+//                while (!st.empty() && i < st.top())
+//                {
+//                    st.pop();
+//                }
+//                st.push(max_);//新的块的最大值
+//            }
+//        }
+//        else
+//        {
+//            st.push(i);
+//        }
+//    }
+//    return st.size();//st记录的是每一块的最大值，所以有多少个最大值就有多少个块
 //}
 
 /////////////////////////////////////////2380. 二进制字符串重新安排顺序需要的时间///////////////////////////
@@ -21940,24 +21953,72 @@ public:
 //据此我们可以提出如下改进后的算法：
 //从左到右正向遍历 nums，对于 x = nums[i]，从 i - 1开始倒着遍历 nums[j]：
 //相当于固定右端点，依次更新左端点的值
-//·如果 nums[j]∣x != nums[j]，说明 nums[j] 可以变大（集合元素增多），更新 nums[j] = nums[j]∣x；
-//  注意此时的 nums[j]是原本数组 nums从 j 到 i 所有数中能使 nums[j]变大的数的 或值
-//·如果 nums[j]∣x = nums[j]，从集合的角度看，此时 x 不仅是 nums[j] 的子集，同时也是 nums[k](k < j) 的子集
-//（因为 nums[j] 是 nums[k] 的子集，不可能再使nums[k]变大了，循环保证了每个集合都是其左侧相邻集合的子集，
-//  每一个数都会融入到它左边的集合里面去，不可能超过左边集合），
-//  那么后续的循环都无法让元素变大，退出循环；
+//·如果 nums[j]∣x != nums[j]，说明 将x加入到 nums[j] 的集合中可以使nums[j]的集合变大（集合元素增多），于是更新 nums[j] = nums[j]∣x；
+//  注意此时的 nums[j]是原本数组 nums[j:i]这个区间内所有数的 二进制或值
+//·如果 nums[j]∣x = nums[j]，从集合的角度看，此时 x 不仅是 nums[j] 的子集，把它加入 nums[j]的集合中无法使nums[j]的集合变大
+//  那么 x 同样无法使 nums[k](k < j) 的子集变得更大
+//（因为 nums[j] 是 nums[k] 的子集，那么把 x 加入 nums[k]的集合中不可能使nums[k]变大，因为它连nums[j]都不能变大，
+//  循环保证了每个集合都是其左侧相邻集合的子集，每一个数都会融入到它左边的集合里面去，不可能超过左边集合），
+//  那么将 x 加入 j 之前的集合中都无法使之变大，退出循环；
 //在循环中，如果 nums[j] 可以变大，则更新 ans[j] = i−j + 1。
 //int main()
 //{
 //    vector<int> nums = { 1, 0, 2, 1, 3 };
+//    //int n = nums.size();
+//    //vector<int> ans(n,1);//原本长度是 1
+//    //for (int i = 0; i < n; ++i) {//i是设想的终止位置
+//    //    for (int j = i - 1; j >= 0 && (nums[j] | nums[i]) != nums[j]; --j) 
+//    //    {//j是设想的起始位置，我们就是在固定终止位置的情况下，看看这个终止位置能使那些起始位置的集合变大，我们就去更新那些起始位置
+//    //        nums[j] |= nums[i];//集合增大
+//    //        ans[j] = i - j + 1;//长度变大，nums[j]的集合更大了，那么就需要更新nums[j]的集合长度
+//    //    }
+//    //}
+//    //*********************************************更通用的模板**************************************************
+//    //方法二：更加通用的模板
+//    //该模板可以做到
+//    //求出所有子数组的按位或的结果，以及值等于该结果的子数组的个数。
+//    //求按位或结果等于任意给定数字的子数组的最短长度 / 最长长度。
+//    //末尾列出了一些题目，均可以用该模板秒杀。
+//    //思考：对于起始位置为 iii 的子数组的按位或，至多有多少种不同的结果？
+//    //根据或运算的性质，我们可以从 x = nums[i] 开始，不断往右扩展子数组，按位或的结果要么使 x 不变，要么让 x 的某些比特位的值由 0 变 1。
+//    //最坏情况下从 x = 0 出发，每次改变一个比特位，最终得到 2^29 - 1 < 10^9，因此至多有 30 种不同的结果。这意味着我们可以递推计算所有按位或的结果。
+//    //另一个结论是，相同的按位或对应的子数组右端点会形成一个连续的区间，从而保证下面去重逻辑的正确性（这一性质还可以用来统计按位或结果及其对应的子数组的个数）。
+//    //据此，我们可以倒着遍历 nums，在遍历的同时，用一个数组 ors 维护以 i 为左端点的子数组的按位或的结果，
+//    //及其对应的子数组右端点的最小值。继续遍历到 nums[i−1] 时，我们可以把 nums[i−1] 和 ors 中的每个值按位或，合并值相同的结果。
+//    //这样在遍历时，ors 中值最大的元素对应的子数组右端点的最小值，就是要求的最短子数组的右端点。
 //    int n = nums.size();
-//    vector<int> ans(n,1);//原本长度是 1
-//    for (int i = 0; i < n; ++i) {
-//        for (int j = i - 1; j >= 0 && (nums[j] | nums[i]) != nums[j]; --j) 
+//    vector<int> ans(n);
+//    vector<pair<int, int>> ors; // 按位或的值 + 对应子数组的右端点的最小值，最多会有30种结果
+//    for (int i = n - 1; i >= 0; --i) {
+//        ors.emplace_back(0, i);//以 i 为左端点的子数组的按位或的结果 及其 对应的子数组右端点的最小值
+//        //为什么ors里面存储的或值是从大到小排列的？
+//        //因为我们是倒序遍历的，每遍历到一个值就加到末尾去，而我们会把这个值加入之前的每个集合中，那么最先加入ors的这个集合
+//        //在每遇到一个nums[i]时就能得到更新，由于或值更新只会相等或者是变大，而相等的话会进行合并，因此它变大的次数是最多的
+//        //保证了这个集合会比后面加入的集合大，因此或值是递减的。
+//        ors[0].first |= nums[i];//把 nums[i]加到之前的每个集合中，这里先加到ors[0]里面，后面for循环再加到其他的里面
+//        int k = 0;//上面 ors[0]是已经更新过的或值，而后面的ors元素是未更新的（也就是集合中还没有nums[i]的），后面更新的时候如果有重复的话就可以用来去重
+//        for (int j = 1; j < ors.size(); ++j) 
 //        {
-//            nums[j] |= nums[i];//集合增大
-//            ans[j] = i - j + 1;//长度变大
+//            ors[j].first |= nums[i];//ors[j]是右邻元素计算出来的或值，以及对应的右端点最小值，然后将当前数 nums[i]和这些或值结合，即更新集合
+//            if (ors[k].first == ors[j].first)//ors[j].first是结合了当前值nums[i]的或值，这个值算出来可能和之前某个旧的或值是相同的
+//                                             //因此我们需要去重（或者说合并）
+//                                             // k 表示已经更新过集合的最后一个元素下标，参考 原地去重的技巧 https://leetcode.cn/problems/remove-duplicates-from-sorted-array/
+//                                             //其实这里是把 更新值和去重结合在一起了，一边更新一边去重，感觉分开写更好一点
+//                                             //就像这样写更清楚 https://leetcode.cn/problems/smallest-subarrays-with-maximum-bitwise-or/solutions/1830911/by-endlesscheng-zai1/comments/2008907
+//                                             //注意 k 一定是小于等于 j的，而上面说过，下标小的元素代表的集合更大，子数组右端点越大
+//                                             //因此当两个或值相同的时候，下标j 右端点一定是小于下标 k 右端点的，因此就去掉重复的或值
+//                                             //并将右端点设为较小的那一个，代表我们找到了一个更小的集合（子数组），能得到相同的或值
+//                                             //为什么只需要和已更新的最后一个元素 k 相比较？不可能得到更大的或值吗？
+//                                             //ors中右边元素一定是左边元素的子集，右边元素加入nums[i]后得到的或值一定不会超过左边元素
+//                                             //加入nums[i]的或值，假如此时的k表示左邻元素更新过的或值，那么右邻元素更新过的或值一定不可能
+//                                             //超过这个值，也就是更新之后的ors一定是递减的，不会出现乱序，这样就可以用原地去重的方法
+//                ors[k].second = ors[j].second; // 合并相同值，下标取最小的
+//            else 
+//                ors[++k] = ors[j];//否则，我们得到一个新的或值，递增 k，把ors[j]赋给此时的ors[k]
 //        }
+//        ors.resize(k + 1);
+//        // 本题只用到了 ors[0]，如果题目改成任意给定数字，可以在 ors 中查找
+//        ans[i] = ors[0].second - i + 1;
 //    }
 //    for (auto i : ans)
 //    {
@@ -27803,7 +27864,7 @@ public:
 //    {//闭区间右边界 i，左边界 i-k+1
 //        ++cnt[nums[i] + BIAS]; // 右边界进入窗口（保证窗口有恰好 k 个数）
 //        int left = x;//通过计数来找 第 x 小的数
-//        for (int j = 0; j < BIAS; ++j) { // 暴力枚举负数范围 [-50,-1]，为什么值遍历负数？因为在窗口内有正数也有负数，而我们只想找第 x 小的数
+//        for (int j = 0; j < BIAS; ++j) { // 暴力枚举负数范围 [-50,-1]，为什么只遍历负数？因为在窗口内有正数也有负数，而我们只想找第 x 小的数
 //                                         // 并且还要求这个数是负数，那么只需要找到一个负数num，保证 < num 的数有 < x  个，<=num 的数有 >= x 个
 //                                         // 这里用减法来求，x-left表示是<=num 的数有多少个，当left<=0时，就得到 x-left >=x，说明我们找到了num
 //                                         // 如果找遍所有负数，仍然没有找到满足条件的数，那么就说明当前窗口内第 x 小的数不是负数，直接赋值为0（初始化过了）
@@ -27820,89 +27881,99 @@ public:
 //        cout << i << ' ';
 //}
 
+/////////////////////////////////////////1172. 餐盘栈（最小堆）//////////////////////////
+
+//我们把无限数量 ∞ 的栈排成一行，按从左到右的次序从 0 开始编号。每个栈的的最大容量 capacity 都相同。
+//实现一个叫「餐盘」的类 DinnerPlates：
+//DinnerPlates(int capacity) - 给出栈的最大容量 capacity。
+//void push(int val) - 将给出的正整数 val 推入 从左往右第一个 没有满的栈。
+//int pop() - 返回 从右往左第一个 非空栈顶部的值，并将其从栈中删除；如果所有的栈都是空的，请返回 - 1。
+//int popAtStack(int index) - 返回编号 index 的栈顶部的值，并将其从栈中删除；如果编号 index 的栈是空的，请返回 - 1。
+//https://leetcode.cn/problems/dinner-plate-stacks/solutions/2248707/yu-qi-wei-hu-di-yi-ge-wei-man-zhan-bu-ru-sphs/?orderBy=hot
+//class DinnerPlates {
+//public:
+//    vector<stack<int>> v;
+//    int c;
+//    priority_queue<int, vector<int>, greater<int>> p;
+//    DinnerPlates(int capacity) {
+//        c = capacity;
+//    }
+//
+//    void push(int val) {
+//        if (!p.empty() && p.top() >= v.size())
+//            while (!p.empty())
+//                p.pop();
+//        if (p.empty())
+//        {
+//            stack<int> tmp;
+//            tmp.push(val);
+//            v.emplace_back(tmp);
+//            if (c > 1)
+//                p.push(v.size() - 1);
+//        }
+//        else
+//        {
+//            auto& st = v[p.top()];
+//            st.push(val);
+//            if (st.size() == c)
+//                p.pop();
+//        }
+//    }
+//
+//    int pop() {
+//        return popAtStack(v.size() - 1);
+//    }
+//
+//    int popAtStack(int index) {
+//        if (index < 0 || index >= v.size() || v[index].empty())
+//            return -1;
+//        auto& st = v[index];
+//        if (st.size() == c)
+//        {
+//            p.push(index);
+//        }
+//        int ans = st.top();
+//        st.pop();
+//        while (v.size() && v.back().empty())
+//            v.pop_back();
+//        return ans;
+//    }
+//};
+//int main()
+//{
+//    DinnerPlates D(1);  // 初始化，栈最大容量 capacity = 2
+//    D.push(1);
+//    D.push(2);
+//    D.push(3);
+//    D.push(4);
+//    D.push(5);         // 栈的现状为：    2  4
+//                       //                 1  3  5
+//                       //                 ﹈ ﹈ ﹈
+//    D.popAtStack(0);   // 返回 2。栈的现状为：      4
+//                       //                        1  3  5
+//                       //                        ﹈ ﹈ ﹈
+//    D.push(20);        // 栈的现状为：  20  4
+//                       //                1  3  5
+//                       //               ﹈ ﹈ ﹈
+//    D.push(21);        // 栈的现状为：  20  4 21
+//                       //                1  3  5
+//                       //               ﹈ ﹈ ﹈
+//    D.popAtStack(0);   // 返回 20。栈的现状为：       4 21
+//                       //                          1  3  5
+//                       //                         ﹈ ﹈ ﹈
+//    D.popAtStack(2);   // 返回 21。栈的现状为：       4
+//                       //                          1  3  5
+//                       //                          ﹈ ﹈ ﹈
+//    D.pop();           // 返回 5。栈的现状为：        4
+//                       //                          1  3
+//                       //                          ﹈ ﹈
+//    D.pop();           // 返回 4。栈的现状为：    1  3 
+//                       //                         ﹈ ﹈
+//    D.pop();           // 返回 3。栈的现状为：    1 
+//                       //                         ﹈
+//    D.pop();           // 返回 1。现在没有栈。
+//    D.pop();           // 返回 -1。仍然没有栈。
+//}
 
 
-class DinnerPlates {
-public:
-    vector<stack<int>> v;
-    int c;
-    priority_queue<int, vector<int>, greater<int>> p;
-    DinnerPlates(int capacity) {
-        c = capacity;
-    }
 
-    void push(int val) {
-        if (!p.empty() && p.top() >= v.size())
-            while (!p.empty())
-                p.pop();
-        if (p.empty())
-        {
-            stack<int> tmp;
-            tmp.push(val);
-            v.emplace_back(tmp);
-            if (c > 1)
-                p.push(v.size() - 1);
-        }
-        else
-        {
-            auto& st = v[p.top()];
-            st.push(val);
-            if (st.size() == c)
-                p.pop();
-        }
-    }
-
-    int pop() {
-        return popAtStack(v.size() - 1);
-    }
-
-    int popAtStack(int index) {
-        if (index < 0 || index >= v.size() || v[index].empty())
-            return -1;
-        auto& st = v[index];
-        if (st.size() == c)
-        {
-            p.push(index);
-        }
-        int ans = st.top();
-        st.pop();
-        while (v.size() && v.back().empty())
-            v.pop_back();
-        return ans;
-    }
-};
-int main()
-{
-    DinnerPlates D(1);  // 初始化，栈最大容量 capacity = 2
-    D.push(1);
-    D.push(2);
-    D.push(3);
-    D.push(4);
-    D.push(5);         // 栈的现状为：    2  4
-                       //                 1  3  5
-                       //                 ﹈ ﹈ ﹈
-    D.popAtStack(0);   // 返回 2。栈的现状为：      4
-                       //                        1  3  5
-                       //                        ﹈ ﹈ ﹈
-    D.push(20);        // 栈的现状为：  20  4
-                       //                1  3  5
-                       //               ﹈ ﹈ ﹈
-    D.push(21);        // 栈的现状为：  20  4 21
-                       //                1  3  5
-                       //               ﹈ ﹈ ﹈
-    D.popAtStack(0);   // 返回 20。栈的现状为：       4 21
-                       //                          1  3  5
-                       //                         ﹈ ﹈ ﹈
-    D.popAtStack(2);   // 返回 21。栈的现状为：       4
-                       //                          1  3  5
-                       //                          ﹈ ﹈ ﹈
-    D.pop();           // 返回 5。栈的现状为：        4
-                       //                          1  3
-                       //                          ﹈ ﹈
-    D.pop();           // 返回 4。栈的现状为：    1  3 
-                       //                         ﹈ ﹈
-    D.pop();           // 返回 3。栈的现状为：    1 
-                       //                         ﹈
-    D.pop();           // 返回 1。现在没有栈。
-    D.pop();           // 返回 -1。仍然没有栈。
-}
