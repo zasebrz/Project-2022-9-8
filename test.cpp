@@ -28368,3 +28368,77 @@ public:
 //    }
 //    return -1;
 //}
+
+/////////////////////////////////////////1015. 可被 K 整除的最小整数(取模数学）//////////////////////////
+
+//https://leetcode.cn/problems/smallest-integer-divisible-by-k/solutions/2263780/san-chong-suan-fa-you-hua-pythonjavacgo-tk4cj/
+//一般地，涉及到取模的题目，通常会用到如下等式：
+//(a + b)  mod  m = ((a  mod   m)+(b mod   m))  mod   m
+//(a⋅b) mod  m = ((a mod  m)⋅(b mod  m)) mod  m
+//证明：根据带余除法，任意整数 a 都可以表示为 a = km + r，这里 r 相当于 a  mod  m。那么设 a = k1m + r1, b = k2m + r2
+//第一个等式：
+//(a + b)  mod   m = ((k1 + k2)m + r1 + r2)  mod  m = (r1 + r2)  mod   m = ((a  mod   m)+(b  mod  m))  mod   m
+//第二个等式：
+//(a⋅b) mod   m = (k1k2m2 + (k1r2 + k2r1)m + r1r2)  mod   m = (r1r2) mod   m = ((a mod   m)⋅(b  mod   m)) mod  m
+//从小到大枚举 n，第一个能被 k 整除的 n 的长度即为答案
+//设上一个枚举的数是 n=km+x，那么这次枚举的数就是 10n+1,可以表示为10(km+x)+1，那么(10n+1) mod k = (10km+10x+1) mod k=(10x+1) mod k
+//也就是这一次的余数 r 和上一次的余数 x之间的关系就是 r=(10x+1) mod k
+//int main()
+//{
+//    int k = 7;
+//    unordered_set<int> seen;
+//    int x = 1 % k;//如果k=1，那么x=0，不用下面的循环，反之，x=1，进入循环
+//    while (x && !seen.count(x)) {//如果计算得到一个相同的数，由于计算规则不变，后面计算到的数也一定是一个循环，不可能得到0，返回-1
+//        seen.insert(x);
+//        x = (x * 10 + 1) % k;//只需要计算余数的变化
+//    }
+//    return x ? -1 : seen.size() + 1;//seen.size()是之前枚举的所有数，这些数都无法被k整除，而当前数由于能被 k 整除而没有加入 seen，所以要 +1
+//}
+
+/////////////////////////////////////////2106. 摘水果（双指针滑动窗口）//////////////////////////
+
+//在一个无限的 x 坐标轴上，有许多水果分布在其中某些位置。给你一个二维整数数组 fruits ，其中 fruits[i] = [positioni, amounti] 表示共有 amounti 个水果放置在 positioni 上。
+//fruits 已经按 positioni 升序排列 ，每个 positioni 互不相同 。
+//另给你两个整数 startPos 和 k 。最初，你位于 startPos 。从任何位置，你可以选择 向左或者向右 走。在 x 轴上每移动 一个单位 ，就记作 一步 。
+//你总共可以走 最多 k 步。你每达到一个位置，都会摘掉全部的水果，水果也将从该位置消失（不会再生）。
+//返回你可以摘到水果的 最大总数 。
+//输入：fruits = [[2, 8], [6, 3], [8, 6]], startPos = 5, k = 4
+//输出：9
+//解释：
+//最佳路线为：
+//- 向右移动到位置 6 ，摘到 3 个水果
+//- 向右移动到位置 8 ，摘到 6 个水果
+//移动 3 步，共摘到 3 + 6 = 9 个水果
+//https://leetcode.cn/problems/maximum-fruits-harvested-after-at-most-k-steps/solutions/2254860/hua-dong-chuang-kou-jian-ji-xie-fa-pytho-1c2d/
+//int main()
+//{
+//    vector<vector<int>> fruits{ {2,8},{6,3},{8,6} };
+//    int startPos = 5, k = 4;
+//    int left = lower_bound(fruits.begin(), fruits.end(), startPos - k, [](const auto& a, int b) {
+//        return a[0] < b;
+//        }) - fruits.begin(); // 向左最远能到 fruits[left][0]，这个left是指有水果的位置在fruits中的下标，这个位置在[startPos-k:startPos]内
+//    int right = left, s = 0, n = fruits.size();//right也是fruits中的下标，[left,right]就表示一个区间，这个区间内的水果我们都能摘到
+//                                               //注意这里的双指针是直接在fruits上滑动，而不是在坐标轴上滑动，这些就可以直接跳过大量的没有水果的位置
+//    for (; right < n && fruits[right][0] <= startPos; ++right)//第一个窗口初始化，为什么初始窗口的右边界必须小于等于startPos？
+//                                                              //因为此时的左边界是最左边能到达的有水果的位置，如果右边界同样是在startPos的
+//                                                              //左边的话，那么我们只需要一直往左边走就可以摘到这个窗口内的所有水果（走的步数小于等于k）
+//                                                              //但是如果右边界大于startPos的话，我们就不得不走一个来回
+//                                                              //（先向右再向左 或者 先向左再向右）那么就不一定能保证走的步数小于等于k了
+//                                                              //因此这里必须保证初始窗口的右边界小于等于startPos
+//        s += fruits[right][1]; // 从 fruits[left][0] 到 startPos 的水果数
+//    int ans = s;
+//    for (; right < n && fruits[right][0] <= startPos + k; ++right) 
+//    {//双指针的滑动窗口一般是枚举一个边界（一般是右边界），然后在这个循环里，右边界就相当于是固定的，只要移动左边界使窗口满足条件就行了
+//        s += fruits[right][1]; // 由于left和right都是下标，这个位置上一定是有水果的，因此把右边界包括进来
+//        //此时的startPos是包含在窗口内的（也有可能是在窗口的左边），那么我们必须要走一个来回（或者一直往右边走）
+//        //如果先向右再向左，那么移动距离为(右边界−startPos) + (右边界−左边界)=2*右边界-左边界-startPos
+//        //如果先向左再向右，那么移动距离为(startPos−左边界) + (右边界−左边界)=右边界+startPos-2*左边界
+//        //如果上面两个式子均大于 k，就说明 左边界 太远了，我们无法在给定的k步内走完整个窗口，需要增加 左边界。
+//        //而对于startPos在窗口左边的情况，我们只需要一直往右边走就可以了，只要保证 右边界<=startPos + k，那么这个窗口一定能走到
+//        //综合来看，往单方向走的步数一定是小于等于来回走的
+//        while (fruits[right][0] * 2 - fruits[left][0] - startPos > k && fruits[right][0] - fruits[left][0] * 2 + startPos > k)
+//            s -= fruits[left++][1]; // fruits[left][0] 无法到达，增加左边界
+//        ans = max(ans, s); // 更新答案最大值
+//    }
+//    return ans;
+//}
