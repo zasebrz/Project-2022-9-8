@@ -17387,7 +17387,7 @@ public:
 //                               // 整数 9 和 10 出现在区间 [7, 10] 中
 //}
 
-////////////////////////////////////////////每个子数组内最小值的总和///////////////////////////////////////
+////////////////////////////////////////////907. 子数组的最小值之和(管辖范围，贡献值，单调栈）///////////////////////////////////////
 
 //https://leetcode.cn/problems/sum-of-subarray-minimums/solution/xiao-bai-lang-dong-hua-xiang-jie-bao-zhe-489q/
 //给定一个整数数组 arr，找到 min(b) 的总和，其中 b 的范围为 arr 的每个（连续）子数组。
@@ -17434,9 +17434,10 @@ public:
 //    return 0;
 //}
 
-////////////////////////////////////////////巫师的能力值总和（单调栈）///////////////////////////////////////
+////////////////////////////////////////////2281. 巫师的能力值总和（管辖范围，贡献值，单调栈）///////////////////////////////////////
 
 //https://leetcode.cn/problems/sum-of-total-strength-of-wizards/solution/ji-suan-mei-ge-shu-zi-zuo-wei-zui-xiao-z-3jvr/
+//https://leetcode.cn/problems/sum-of-total-strength-of-wizards/solutions/1/dan-diao-zhan-qian-zhui-he-de-qian-zhui-d9nki/
 //给你一个整数数组 strength ，其中 strength[i] 表示第 i 位巫师的力量值。对于连续的一组巫师（也就是这些巫师的力量值是 strength 的 子数组），总力量 定义为以下两个值的 乘积 ：
 //·子数组中 最小 的能力值。
 //·子数组中所有巫师的个人力量值 之和 。
@@ -17448,6 +17449,11 @@ public:
 //    int n = strength.size();
 //    // 步骤1. 求左侧第一个 严格小于nums[i] 的坐标，和右侧第一个 小于等于nums[i] 的坐标，这是为了防止重复计算子数组
 //    stack<int> st;
+//    //left[i] 是左侧第一个 严格小于nums[i] 的坐标，那么 nums[i] 的管辖范围一定不包括它(left[i])，否则的话 nums[i]就不是最小值了
+//    //right[i] 是右侧第一个 小于等于nums[i] 的坐标，那么 nums[i]的管辖范围一定也不包括它(right[i])，否则的话这两个相同值的管辖区间就会重合
+//    //以示例 1 中的数组 [1,3,1,2] 为例，如果左右两侧都是找严格小于，那么第一个 1 和第二个 1 算出来的边界范围都是一样的（都是整个数组）
+//    //这就重复统计了，为了避免这种情况，可以把某一侧改为小于等于，比如把右侧改成小于等于，那么第一个 1 算出来的右边界不会触及或越过
+//    //第二个 1，这样就能避免重复统计同一个子数组。
 //    vector<int> left(n, -1), right(n, n);
 //    for (int i = 0; i < n; ++i) {
 //        while (!st.empty() && strength[st.top()] >= strength[i]) {
@@ -17459,7 +17465,7 @@ public:
 //        }
 //        st.push(i);
 //    }
-//    //现在我们已经求出了最小值的‘管辖范围’，下一步计算这些子数组前缀和并与最小值相乘，直接想法是在‘管辖范围’内枚举子数组，然后计算，但是这样时间复杂度是O（n2）
+//    //现在我们已经求出了最小值的‘管辖范围’，下一步计算这些子数组区间和并与最小值相乘，直接想法是在‘管辖范围’内枚举子数组，然后计算，但是这样时间复杂度是O（n2）
 //    //所以利用 前缀和 以及 前缀和的前缀和 来计算，参考 https://leetcode.cn/problems/sum-of-total-strength-of-wizards/solution/ji-suan-mei-ge-shu-zi-zuo-wei-zui-xiao-z-3jvr/ 的第二步
 //    // 步骤2. 准备前缀和 psum 和 前缀和的前缀和 ppsum
 //    vector<int> psum = strength;//注意这里的处理，直接赋值初始化，大小是相同的
@@ -17479,13 +17485,13 @@ public:
 //        return (ppsum[r] - ppsum[l] + MOD) % MOD;//注意ppsum[r]是取余后的值，所以ppsum[r] - ppsum[l]可能小于0，加上MOD就还原为原本的值，但是当ppsum[r] - ppsum[l]大于0时，加上MOD就可能溢出，所以最终还要取余
 //    };
 //    // 步骤3. 针对每个 min 值计算结果
-//    // 对于 a[i], 其管辖区间为 [left[i] + 1, right[i] - 1]
+//    // 对于 a[i], 其管辖区间为 [left[i] + 1, right[i] - 1]，因为left[i]和right[i]都不能包括
 //    // 问题归结, 将 l = left[i] + 1, r = right[i] - 1 代入上面的式子求解即可
 //    int res = 0;
 //    for (int i = 0; i < n; ++i) {
-//        int l = left[i] + 1, r = right[i] - 1;//这里的l和r都能取到
-//        int sleft = 1LL * f(l - 2, i - 1) * (r - i + 1) % MOD;//计算前缀和
-//        int sright = 1LL * f(i - 1, r) * (i - l + 1) % MOD;
+//        int l = left[i] + 1, r = right[i] - 1;//这里的l和r都能取到，在这个范围内寻找所有的子数组，要求是这些子数组必须包含下标 i，计算所有子数组的和
+//        int sleft = 1LL * f(l - 2, i - 1) * (r - i + 1) % MOD;//计算前缀和，由于前缀和数组 以及 前前缀和数组 下标都没有+1，因此这里直接取相同下标即可
+//        int sright = 1LL * f(i - 1, r) * (i - l + 1) % MOD;//否则应该参考 https://leetcode.cn/problems/sum-of-total-strength-of-wizards/solutions/1/dan-diao-zhan-qian-zhui-he-de-qian-zhui-d9nki/
 //        res = (res + 1LL * strength[i] * (((sright - sleft) + MOD) % MOD)) % MOD;//还是刚才那个问题sright和sleft是取余后的，所以要这样处理一下
 //    }
 //}
@@ -28441,4 +28447,405 @@ public:
 //        ans = max(ans, s); // 更新答案最大值
 //    }
 //    return ans;
+//}
+
+/////////////////////////////////////////1054. 距离相等的条形码（贪心）//////////////////////////
+
+//先用哈希表或数组 cnt 统计数组 barcodes 中各个数出现的次数，然后将 barcodes 中的数按照它们在 cnt
+//中出现的次数从大到小排序，如果出现次数相同，那么就按照数的大小从小到大排序（确保相同的数相邻）。
+//接下来，我们创建一个长度为 n 的答案数组 ans，然后遍历排好序的 barcodes，将元素依次填入答案数组的 0, 2, 4 ⋯ 等偶数下标位置，
+//然后将剩余元素依次填入答案数组的 1, 3, 5⋯等奇数下标位置即可。
+//因为题目保证一定有答案，因此奇数位置上的数不可能和偶数位置上的数相同
+//https://leetcode.cn/problems/distant-barcodes/solutions/2268959/python3javacgotypescript-yi-ti-yi-jie-ji-3or2/
+//int main()
+//{
+//    vector<int> barcodes{ 1,1,1,1,2,2,3,3 };
+//    int mx = *max_element(barcodes.begin(), barcodes.end());
+//    vector<int> cnt(mx+1,0);
+//    for (int x : barcodes) {
+//        ++cnt[x];
+//    }
+//    sort(barcodes.begin(), barcodes.end(), [&](int a, int b) {
+//        return cnt[a] > cnt[b] || (cnt[a] == cnt[b] && a < b);
+//        });
+//    int n = barcodes.size();
+//    vector<int> ans(n);
+//    for (int k = 0, j = 0; k < 2; ++k) 
+//    {//k用来控制奇偶位置，j表示当前遍历到的位置
+//        for (int i = k; i < n; i += 2) 
+//        {//i用来填数
+//            ans[i] = barcodes[j++];
+//        }
+//    }
+//    for (auto i : ans)
+//        cout << i << ' ';
+//}
+
+/////////////////////////////////////////1072. 按列翻转得到最大值等行数（贪心）//////////////////////////
+
+//从答案出发倒着思考。关注最后全为 0 或者全为 1 的行，倒数第二步是什么样的？
+//假如翻转最后一列，000 变成 001，111 变成 110，再将001全部反转得到110，从这个例子可以发现，对于相同的行，或者「互补」的行，
+//一定存在一种翻转方式，可以使这些行最终全为 0 或者全为 1。
+//从图论的角度来看的话，就是在这些相同或者互补的行之间连边，答案就是最大连通块的大小。
+//但实际上不需要建图，用哈希表统计这些行。为了统计互补的行，可以把 第一个数为 1 的行全部翻转。
+//例如示例 3，把最后一行翻转得到 001（变成互补的行），发现与第二行是一样的，所以答案等于 2。
+//https://leetcode.cn/problems/flip-columns-for-maximum-number-of-equal-rows/solutions/2270101/ni-xiang-si-wei-pythonjavacgo-by-endless-915k/
+//int main()
+//{
+//    vector<vector<int>> matrix{ {0,0,0},{1,1,0},{0,0,1} };
+//    int ans = 0, n = matrix[0].size();
+//    unordered_map<string, int> cnt;
+//    for (auto& row : matrix) 
+//    {
+//        string r(n, 0);//n个ASCII的0
+//        for (int j = 0; j < n; ++j)
+//            r[j] = row[j] ^ row[0]; // 翻转第一个数为 1 的行，如果row[0]是1，那么当row[j]是1的时候，r[j]就变成了0（ASCII码的0）
+//                                    // 当row[j]是0的时候，r[j]就变成了1（ASCII码的1），而row[1]是0的话，r[j]就不会发生变化
+//        ans = max(ans, ++cnt[r]);//先递增，再计算答案
+//    }
+//    return ans;
+//}
+
+/////////////////////////////////////////2680. 最大或值（贪心）//////////////////////////
+
+//首先能想到的一点是，选最高位1的数更优，因为它乘以2以后更大，如果有多个数都有最高位1，那么选择其中任何一个乘以2以后
+//它就变成了最大的数，拥有了最高位的1，又回到了前面的思路，但是我们不知道这些数哪个乘以2以后更大，因此枚举最高位1的那几个数即可
+//·要让答案最大，首先应当最大化答案的二进制的长度。
+//·把「乘 2」分配给多个数，不如只分配给一个数，这样更有可能得到更大的答案。
+//枚举把哪个 nums[i] 乘 k 次 2（左移 k 次）。
+//代码实现时，可以仿照 238. 除自身以外数组的乘积，预处理每个 nums[i] 左侧元素的或值 pre，以及右侧元素的或值 suf，
+//从而快速计算出把 nums[i] 乘 k 次 2 后的所有元素的或值。进一步地，只需要预处理右侧元素的或值，左侧的或值可以一边枚举一边计算。
+//https://leetcode.cn/problems/maximum-or/solutions/2268795/tan-xin-qian-hou-zhui-fen-jie-pythonjava-wrv1/
+//把2换成其他数，也是一样的思路
+//把乘法改成除法，把 OR 改成 AND，要怎么做？
+//int main()
+//{
+//    vector<int> nums{ 5,6,2 };
+//    int k = 1;
+//    int n = nums.size();
+//    vector<int> suf(n + 1, 0); //suf[i]表示nums[i]到nums[n-1]的所有元素或值
+//    for (int i = n - 1; i; i--)
+//        suf[i] = suf[i + 1] | nums[i];
+//    long long ans = 0;
+//    for (int i = 0, pre = 0; i < n; i++) 
+//    {//一边枚举，一边计算pre，pre不包括nums[i]
+//        ans = max(ans, pre | ((long long)nums[i] << k) | suf[i + 1]);
+//        pre |= nums[i];
+//    }
+//    return ans;
+//}
+
+/////////////////////////////////////////1335. 工作计划的最低难度（记忆化搜索，DP，单调栈）//////////////////////////
+
+//https://leetcode.cn/problems/minimum-difficulty-of-a-job-schedule/solutions/2271631/jiao-ni-yi-bu-bu-si-kao-dong-tai-gui-hua-68nx/
+//int main()
+//{
+//    vector<int> jobDifficulty = { 6, 5, 4, 3, 2, 1 };
+//    int d = 2;
+//    int n = jobDifficulty.size();
+//    if (n < d)//任务数小于天数，至少有一天是没有任务的，所以无法完成任务
+//        return -1;
+//    //**************************************记忆化搜索**********************************************
+//    vector<vector<int>> dp(d + 1, vector<int>(n + 1, -1));//dp[i][j]表示在i天时间内完成 第1项到第j项任务 这j项任务 最小的难度
+//    function<int(int, int)> dfs = [&](int day, int idx)->int
+//    {//dfs用来求 在 day天内 完成 第1项任务到第idx项 任务最小的难度
+//        if (day == 1)
+//        {//如果只剩下 1 天，那么需要在一天内完成剩下的所有任务，难度是当天任务的难度最大值
+//            return dp[day][idx] = *max_element(jobDifficulty.begin(), jobDifficulty.begin() + idx);//记忆化
+//        }
+//        if (dp[day][idx] != -1)
+//            return dp[day][idx];
+//        int mx = 0;//用来记录当天任务的难度最大值
+//        int ans = INT_MAX;
+//        for (int k = idx; k >= day; k--)
+//        {//现在开始枚举 第day天 内完成的所有任务，从第 k 项开始，到第 idx 项结束，然后前面的任务交给前面几天去完成
+//            //注意，由于必须保证每天都有任务，因此，前面的第 1:k-1 项任务（总共 k-1项）需要在 day-1 天内完成，则必须满足 k-1>=day-1，即k>=day
+//            mx = max(mx, jobDifficulty[k - 1]);
+//            ans = min(ans, mx + dfs(day - 1, k - 1));//mx是当天的难度，加上前面几天完成任务的难度最小值
+//        }
+//        return dp[day][idx] = ans;//记忆化
+//    };
+//    //**************************************动态规划（二维）**********************************************
+//    vector<vector<int>> dp1(d + 1, vector<int>(n + 1, INT_MAX));//dp1[i][j]表示在i天时间内完成 第1项到第j项任务 这j项任务 最小的难度
+//    int m = 0;//用来初始化
+//    for (int i = 1; i <= n; i++)
+//    {
+//        m = max(m, jobDifficulty[i - 1]);
+//        dp1[1][i] = m;//只有一天的时候，所有的任务都要在一天内完成
+//    }
+//    for (int i = 2; i <= d; i++)
+//    {//从第 2 天开始枚举
+//        for (int j = i; j <= n; j++)
+//        {// 我们要在 i 天内 完成 第1项到第j项任务（总共j项），那么必须满足 j>=i
+//            int mx = 0;
+//            for (int k = j; k >= i; k--)
+//            {//枚举当前这天的 任务起始序号 k
+//                mx = max(mx, jobDifficulty[k - 1]);
+//                dp1[i][j] = min(dp1[i][j], dp1[i - 1][k - 1] + mx);
+//            }
+//        }
+//    }
+//    //**************************************动态规划（一维）**********************************************
+//    vector<int> dp2(n + 1, INT_MAX);
+//    int m = 0;
+//    for (int i = 1; i <= n; i++)
+//    {
+//        m = max(m, jobDifficulty[i - 1]);
+//        dp2[i] = m;
+//    }
+//    for (int i = 2; i <= d; i++)
+//    {
+//        for (int j = n; j >= i; j--)
+//        {//由于一维dp会更新 i-1 轮的答案，因此需要倒序遍历，和01背包一样
+//            int mx = 0;
+//            dp2[j] = INT_MAX;//必须要重新初始化，不然就是 i-1 轮的答案
+//            for (int k = j; k >= i; k--)
+//            {
+//                mx = max(mx, jobDifficulty[k - 1]);
+//                dp2[j] = min(dp2[j], dp2[k - 1] + mx);
+//            }
+//        }
+//    }
+//    vector<vector<int>> f(d, vector<int>(n));
+//    f[0][0] = jobDifficulty[0];
+//    for (int i = 1; i < n; i++)
+//        f[0][i] = max(f[0][i - 1], jobDifficulty[i]);
+//    for (int i = 1; i < d; i++) {
+//        stack<pair<int, int>> st; // (下标 j，从 f[i-1][left[j]] 到 f[i-1][j-1] 的最小值，left[j]表示jobDifficulty[j] 左侧最近更大元素的下标
+//        for (int j = i; j < n; j++) 
+//        {//j表示当天完成任务的最后一个任务下标，那么当天和前一天的分界线下标（这个分界线任务是属于当天的）可以是 j，j-1，j-2...left[j]+1，
+//            //因为left[j]比j要更大
+//            //如果把left[j]这个任务也在当天完成的话，那么当天任务难度的最大值就一定不是 jobDifficulty[j]，而是左边那个更大值
+//            int mn = f[i - 1][j - 1]; // mn记录分界线不同时，左边部分能得到的最小难度，最开始的分界线是 j
+//                                      // 左边部分就是 [0:j-1]，需要在 i-1天内完成，最小难度就是 f[i-1][j-1]
+//                                      // 也就是说当天只有 下标j 这一项任务
+//            while (!st.empty() && jobDifficulty[st.top().first] <= jobDifficulty[j]) { // 计算左侧更大元素，向左一直计算到 left[j]
+//                mn = min(mn, st.top().second);//分界线继续向左，计算左边部分的最小难度，由于单调栈保证了当天的最大难度一定是 jobDifficulty[j]
+//                                              //因此不需要去比较这些分界线的难度，一直到left[j]这个更大难度，此时jobDifficulty[j]不是当天的最大难度了
+//                st.pop();//小于当前难度的话一直弹出，直到遇到更大难度，即为left[j]
+//            }
+//            f[i][j] = mn + jobDifficulty[j]; // 从 jobDifficulty[left[j]+1] 到 jobDifficulty[j] 的最大值是 jobDifficulty[j]
+//                                             // mn记录的是分界线左边的最小难度，那么就以这个分界线为基准，分界线及右边的任务是当天的任务
+//                                             // 最大难度是 jobDifficulty[j]，对应讨论中的情况二
+//                              // 此时，如果栈是非空的，说明存在一个left[j]，它的难度比jobDifficulty[j]大，那么我们考虑将 left[j]后面的任务
+//                              // （包括j）全都放到和 left[j] 同一天去解决，那么这一天的难度最大值就是 jobDifficulty[left[j]]，问题就变成了
+//                              // 在 i+1 天内完成 [0:left[j]]任务所需要的最小难度，即f[i][left[j]]，对应讨论中的情况一
+//            if (!st.empty()) // 
+//                f[i][j] = min(f[i][j], f[i][st.top().first]); // 答案和 f[i][left[j]] 是一样的
+//            st.emplace(j, mn); // 注意这里保存的不是 f[i][j]，因为f[i][j]综合考虑了情况一和情况二，而st是用来计算情况二的答案的，不能将情况一包含进去
+//        }
+//    }
+//    return f[d - 1][n - 1];
+//    //return dfs(d,n);
+//    //return dp1[d][n];
+//    //return dp2[n];
+//}
+
+/////////////////////////////////////////1330. 翻转子数组得到最大的数组值（数学）//////////////////////////
+
+//输入：nums = [2, 3, 1, 5, 4]
+//输出：10
+//解释：通过翻转子数组[3, 1, 5] ，数组变成[2, 5, 1, 3, 4] ，数组值为 10 。
+//https://leetcode.cn/problems/reverse-subarray-to-maximize-array-value/solutions/2266500/bu-hui-hua-jian-qing-kan-zhe-pythonjavac-c2s6/
+//如果不翻转，或者翻转的是一个长为 1 的子数组，那么 nums 不变，此时的「数组值」记作 base。
+//示例 1 的 base = ∣2−3∣ + ∣3−1∣ + ∣1−5∣ + ∣5−4∣ = 1 + 2 + 4 + 1 = 8。
+//为了计算出最大的「数组值」，考虑翻转后与翻转前的差值 d，那么答案为 base + d，所以 d 越大，答案也就越大。
+//假设从 nums[i] 到 nums[j] 的这段子数组翻转了，且 1<=i < j < n−1（其中 n 为 nums 的长度）。
+//设 a = nums[i−1], b = nums[i], x = nums[j], y = nums[j + 1]
+//对于 i = 0 或 j = n−1 的翻转，单独用 O(n) 的时间枚举。
+//翻转前，这 4 个数对数组值的贡献为∣a−b∣ + ∣x−y∣
+//翻转后，顺序变为 a, x,... b, y，贡献为∣a−x∣ + ∣b−y∣
+//得到d = ∣a−x∣ + ∣b−y∣−∣a−b∣−∣x−y∣(1)
+//这里不需要考虑 b 和 x 之间的那些数的贡献是否增加或减少，因为翻转子数组内部元素的相对顺序是没有变的，因此内部的差值不会变化，只有两个边界上
+//的差值会变化。问题转换成求 d 的最大值。
+//示例 1 中翻转的子数组对应的 a = 2, b = 3, x = 5, y = 4，代入上式得 d = 2，数组值为 base + d = 8 + 2 = 10
+//暴力枚举 i 和 j 的时间复杂度是 O(n^2) 的，如何优化？化简(1) 式是本题的核心。
+//·若干恒等式:
+//对于 ∣a−b∣：如果 a>=b，结果是 a−b；如果 a < b，结果是 b−a；总而言之，结果就是大的减去小的。
+//所以∣a−b∣ = max⁡(a, b)−min⁡(a, b)(2) 
+//·此外还有如下恒等式：a + b = max⁡(a, b) + min⁡(a, b)(3)
+//(3) + (2) 得 a + b + ∣a−b∣ = 2⋅max⁡(a, b)(4)
+//(3) - (2) 得 a + b - ∣a−b∣ = 2⋅min⁡(a, b)(5)
+//恒等式(4) 和(5) 是化简(1) 式的钥匙。
+//转动钥匙，让我们开始吧！
+//分类讨论
+//a, b, x, y 这 4 个数的大小关系一共有 4 != 24 种情况，例如 a<=b <= x <= y, b <= x <= a <= y等等。
+//按照这 4 个数中的哪两个数是最小的两个，可以分为 C(4, 2) = 6 类，每类 4 种情况。
+//利用对称性，只需讨论其中 3 类，便可以得到另外 3 类的结果。
+//·第 1 类：max⁡(a, b)<=min⁡(x, y)
+//  把 a, b, x, y 画在数轴上，相当于 a 和 b 都在 x 和 y 的左边（或重合）。
+//  那么
+//  d = ∣a−x∣ + ∣b−y∣−∣a−b∣−∣x−y∣ 
+//    = (x−a)+(y−b)−∣a−b∣−∣x−y∣ 
+//    = (x + y)−(a + b)−∣a−b∣−∣x−y∣ 
+//    = (x + y−∣x−y∣)−(a + b + ∣a−b∣) 
+//    = 2⋅min⁡(x, y)−2⋅max⁡(a, b)
+//  注意 max⁡(a, b) <= min⁡(x, y)，上式是 >=0 的。
+//  利用对称性，对于 max⁡(x, y) <= min⁡(a, b) 的 4 种情况，可以得到类似的结果，证明如下：
+//  d = ∣a−x∣ + ∣b−y∣−∣a−b∣−∣x−y∣
+//    = (a-x)+(b-y)−∣a−b∣−∣x−y∣
+//    = (a+b)-(x+y)−∣a−b∣−∣x−y∣
+//    = (a+b−∣a−b∣)-(x+y + ∣x−y∣)
+//    = 2⋅min⁡(a, b) - 2⋅max(x, y)>=0
+//  很好，已经讨论清楚 8 种情况了！
+//·第 2 类：max⁡(a, x)<=min⁡(b, y)
+//  把 a, b, x, y 画在数轴上，相当于 a 和 x 都在 b 和 y 的左边（或重合）。
+//  那么
+//  d = ∣a−x∣ + ∣b−y∣−∣a−b∣−∣x−y∣ 
+//    = ∣a−x∣ + ∣b−y∣−(b−a)−(y−x) 
+//    = ∣a−x∣ + ∣b−y∣ + (a + x)−(b + y) 
+//    = (a + x + ∣a−x∣)−(b + y−∣b−y∣) 
+//    = 2⋅max⁡(a, x)−2⋅min⁡(b, y)
+//  由于 max⁡(a, x)<=min⁡(b, y)，上式 <= 0
+//  利用对称性，对于 max⁡(b, y) <= min⁡(a, x) 的 4 种情况，可以得到类似的结果。
+//  d = 2⋅max⁡(b, y)−2⋅min⁡(a, x) <= 0
+//  所以这 8 种情况不会对 d 的最大值产生影响。（注意可以只翻转长为 1 的子数组，此时 d = 0。）
+//  很好，已经讨论清楚 16 种情况了！
+//·第 3 类：max⁡(a, y)<=min⁡(b, x)
+//  把 a, b, x, y画在数轴上，相当于 a 和 y 都在 b 和 x 的左边（或重合）。
+//  那么
+//  d = ∣a−x∣ + ∣b−y∣−∣a−b∣−∣x−y∣
+//    = (x−a)+(b−y)−(b−a)−(x−y) = 0 
+//  利用对称性，对于 max⁡(b, x) <= min⁡(a, y) 的 4 种情况，同样可以得到 d = 0。
+//  所以这 8 种情况也不会对 d 的最大值产生影响。
+//24 种情况讨论完毕。
+//由于只有第 1 类的情况会影响 d 的最大值，为了最大化 d，在遍历 nums 的所有相邻元素 a, b 的同时，维护 min⁡(a, b) 的最大值 mx
+//，以及 max⁡(a, b) 的最小值 mn。
+//遍历结束后，如果 mx > mn，那么对应的 a, b, x, y 存在，且大小关系必然属于第 1 类讨论的 8 种情况之一。则有
+//d = 2⋅(mx−mn),如果 mx = mn，由于 d 初始值为 0，不会产生影响。
+//特别地，对于翻转范围在数组边界的情况（i = 0或 j = n−1），单独枚举，并更新 d 的最大值。
+//int main()
+//{
+//    vector<int> nums{ 2,3,1,5,4 };
+//    int base = 0, d = 0, mx = INT_MIN, mn = INT_MAX, n = nums.size();
+//    for (int i = 1; i < n; i++) 
+//    {//枚举 b，同时计算base
+//        int a = nums[i - 1], b = nums[i];
+//        base += abs(a - b);//计算base
+//        //由于只有第一类情况会对d产生影响，此时的d=2⋅min⁡(x, y)−2⋅max⁡(a, b)，xy相邻，ab相邻，要想使d最大，我们就要使min(x,y)最大，使max(a,b)
+//        //最小，因此枚举所有相邻的两个值，用mx记录 min(x,y)的最大值，mn记录max(a,b）的最小值，最后在进行计算
+//        mx = max(mx, min(a, b));
+//        mn = min(mn, max(a, b));
+//        //考虑将[0:i-1]这个子数组全部翻转的情况，此时，a是子数组的最后一个值，b是子数组右边的第一个值，翻转前的贡献是 ∣a−b∣
+//        //翻转后，b 前面的数变成了 nums[0]，此时的贡献是 ∣nums[0]−b∣，因此 d 变化了 ∣nums[0]−b∣- ∣a−b∣
+//        //再考虑将[i:n-1]这个子数组全部翻转的情况，此时，a是子数组左边的第一个值，b是子数组的最先一个值，翻转前的贡献是 ∣a−b∣
+//        //翻转后，a 后面的数变成了 nums[0]，此时的贡献是 ∣nums[n-1]−a∣，因此 d 变化了 ∣nums[n-1]−a∣- ∣a−b∣
+//        //由于d初始化为0，因此小于0的变化我们是不会记录下来的
+//        d = max(d, max(abs(nums[0] - b) - abs(a - b), // i=0
+//            abs(nums[n - 1] - a) - abs(a - b))); // j=n-1
+//    }
+//    return base + max(d, 2 * (mx - mn));//mx小于等于mn的时候是不会对d有影响的，因为d初始化为0
+//}
+
+/////////////////////////////////////////1263. 推箱子（0-1BFS，贪心）//////////////////////////
+
+//输入：grid = [["#", "#", "#", "#", "#", "#"],
+//["#", "T", "#", "#", "#", "#"],
+//["#", ".", ".", "B", ".", "#"],
+//["#", ".", "#", "#", ".", "#"],
+//["#", ".", ".", ".", "S", "#"],
+//["#", "#", "#", "#", "#", "#"]]
+//输出：3
+//解释：我们只需要返回推箱子的次数。
+//https://leetcode.cn/problems/minimum-moves-to-move-a-box-to-their-target-location/solutions/2261099/python3javacgotypescript-yi-ti-yi-jie-sh-xgcz/
+//int main()
+//{
+//    vector<vector<char>> grid{ {'#', '#', '#', '#', '#', '#'},
+//                               {'#', 'T', '#', '#', '#', '#'},
+//                               {'#', '.', '.', 'B', '.', '#'},
+//                               {'#', '.', '#', '#', '.', '#'},
+//                               {'#', '.', '.', '.', 'S', '#'},
+//                               {'#', '#', '#', '#', '#', '#'}};
+//    using tiii = tuple<int, int, int>;//《玩家位置，箱子位置，推动次数》
+//    deque<tiii> q;//用deque的原因是后面需要在头部插入
+//    int m = grid.size(), n = grid[0].size();
+//    vector<vector<int>> vis(m * n, vector<int>(m * n, 0));//实际上的状态就是《玩家位置，箱子位置》，因此用了一个二维的数组标记
+//    int tx, ty, sx, sy, bx, by;
+//    for (int i = 0; i < m; i++)
+//    {
+//        for (int j = 0; j < n; j++)
+//        {
+//            if (grid[i][j] == 'S')
+//            {
+//                sx = i, sy = j;
+//            }
+//            else if (grid[i][j] == 'T')
+//                tx = i, ty = j;
+//            else if (grid[i][j] == 'B')
+//                bx = i, by = j;
+//        }
+//    }
+//    q.emplace_back(sx * n + sy, bx * n + by, 0);//起始状态，推动次数为 0
+//    vis[sx * n + sy][bx * n + by] = 1;
+//    int dir[4][2] = { {1,0},{-1,0},{0,1},{0,-1} };
+//    while (!q.empty())
+//    {
+//        auto [s, b, d] = q.front();
+//        q.pop_front();
+//        if (b / n == tx && b % n == ty)//箱子到达终点
+//            return d;
+//        for (int i = 0; i < 4; i++)
+//        {
+//            int nx = s / n + dir[i][0];//玩家的新位置
+//            int ny = s % n + dir[i][1];
+//            if (nx >= 0 && nx < m && ny >= 0 && ny < n && grid[nx][ny] != '#')
+//            {//新位置必须是合法的
+//                if (nx == b / n && ny == b % n)
+//                {//如果玩家的新位置是箱子此时的位置，就说明玩家推动了箱子一次，那么箱子就要移动一下
+//                    int nbx = b / n + dir[i][0];//箱子的新位置，移动方向和玩家的移动方向是一致的，都是 dir[i]
+//                    int nby = b % n + dir[i][1];
+//                    if (nbx >= 0 && nbx < m && nby >= 0 && nby < n && grid[nbx][nby] != '#' && vis[nx * n + ny][nbx * n + nby] == 0)
+//                    {//箱子的位置必须是合法的，另外，得到的新状态《玩家新位置，箱子新位置》必须是未访问的，如果已访问的话就没必要再次访问了
+//                        q.emplace_back(nx * n + ny, nbx * n + nby, d + 1);//推动次数加 1
+//                        vis[nx * n + ny][nbx * n + nby] = 1;//新状态已访问
+//                    }
+//                }
+//                else if (vis[nx * n + ny][b] == 0)
+//                {//否则，如果玩家没有推动箱子的话，那么只需要判断新状态《玩家新位置，箱子位置》未访问
+//                    q.emplace_front(nx * n + ny, b, d);//新状态加入 头部，因此此时的推动次数没有增加，队列从头到尾的推动次数是非递减的
+//                                                        //如果没推动箱子却仍然加入尾部，就会使得 推动次数小的状态 位于 推动次数大的状态的 后面
+//                                                        //假如 这两个状态都能到达最终位置，那么由于 推动次数大的状态在队列前面，那么最后答案
+//                                                        //就会变大，导致错误
+//                    vis[nx * n + ny][b] = 1;
+//                }
+//            }
+//        }
+//    }
+//    return -1;
+//}
+
+/////////////////////////////////////////1073. 负二进制数相加（模拟）//////////////////////////
+
+//https://leetcode.cn/problems/adding-two-negabinary-numbers/solutions/2274292/python3javacgotypescript-yi-ti-yi-jie-mo-mg0a/
+//int main()
+//{
+//    vector<int> arr1 = { 1, 0, 1, 0, 1 }, arr2 = { 1,0,1, 1, 1 };
+//    int i = arr1.size() - 1, j = arr2.size() - 1;
+//    vector<int> ans;
+//    for (int c = 0; i >= 0 || j >= 0 || c; --i, --j) {//只要存在数字或者存在进位，就继续循环
+//        int a = i < 0 ? 0 : arr1[i];
+//        int b = j < 0 ? 0 : arr2[j];
+//        int x = a + b + c;
+//        c = 0;//先把进位设为0，后面在修改
+//        if (x >= 2) 
+//        {//存在向前的进位，由于是 -2 基数的，因此会进位 -1，可以这么看，(-2)^n + (-2)^n = 2*(-2)^n = -(-2) *(-2)^n = -(-2)^(n+1)，所以进 -1
+//            x -= 2;//修改当前位的系数
+//            c -= 1;
+//        }
+//        else if (x == -1) 
+//        {// x=-1说明当前这一位上不够后面借位的，因此需要向前借位，也可以这么理解，这一位系数本应该是 -1 ，但是我们只能用 0 或 1 来表示，因此借助了前面的位
+//            //由于 -(-2)^(i) = (-2)^(i) + (-2)^(i+1)， 所以我们可以将 x（当前位，也就是(-2)^(i)的系数） 置为 1，并向高位进位 1，表示我们
+//            //产生了一个(-2)^(i+1)。
+//            x = 1;
+//            c += 1;
+//        }
+//        //x是当前位的系数，只有-1,0,1,2,3五种可能
+//        ans.push_back(x);
+//    }
+//    while (ans.size() > 1 && ans.back() == 0) {//去除前导0，如果全都是0的话需要保留1位
+//        ans.pop_back();
+//    }
+//    reverse(ans.begin(), ans.end());//再反转
+//    for (auto i : ans)
+//        cout << i << ' ';
 //}
