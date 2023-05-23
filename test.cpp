@@ -28849,3 +28849,116 @@ public:
 //    for (auto i : ans)
 //        cout << i << ' ';
 //}
+
+/////////////////////////////////////////1373. 二叉搜索子树的最大键值和（二叉搜索树）//////////////////////////
+
+//https://leetcode.cn/problems/maximum-sum-bst-in-binary-tree/solutions/2276783/hou-xu-bian-li-pythonjavacgo-by-endlessc-gll3/
+//int main()
+//{
+//    TreeNode* one = new TreeNode(3);
+//    TreeNode* two = new TreeNode(6);
+//    TreeNode* thr = new TreeNode(3);
+//    TreeNode* fou = new TreeNode(4, one, nullptr);
+//    TreeNode* fiv = new TreeNode(8, two, thr);
+//    TreeNode* root = new TreeNode(5, fou, fiv);
+//    int ans = 0;
+//    function<tuple<int, int, int>(TreeNode*)> dfs = [&](TreeNode* node)->tuple<int, int, int>//该子树的最小值，该子树的最大值，该子树的总和
+//    {
+//        if (node == nullptr)//不存在则最小值返回INT_MAX，最大值返回INT_MIN，以免让叶子节点判断错误，因为叶子节点的值要大于左空节点的最大值
+//            //小于右空节点的最小值
+//            return { INT_MAX, INT_MIN, 0 };
+//
+//        auto [l_min, l_max, l_sum] = dfs(node->left); // 递归左子树
+//        auto [r_min, r_max, r_sum] = dfs(node->right); // 递归右子树
+//        int x = node->val;
+//        if (x <= l_max || x >= r_min) // 不是二叉搜索树，返回一个最小值INT_MIN和最大值INT_MAX，那么上层的任何值都可以满足这个区间，
+//                                      //这就可以把当前这个子树砍掉，然后以上层节点为“叶子”节点去找二叉搜索树
+//            return { INT_MIN, INT_MAX, 0 };
+//        //否则它就是一个二叉搜索树
+//        int s = l_sum + r_sum + x; // 这棵子树的所有节点值之和
+//        ans = max(ans, s);//更新答案
+//        //到这里，我们能够保证，x>=l_max，x<=r_min，但是由于空节点返回的特殊情况，返回上层的最小值仍然需要求最小值才行
+//        //因为空节点返回的最小值是INT_MAX，为了不对上层产生影响，需要用x更新一下，而对于上层的情况则肯定可以保证 x>l_min
+//        return { min(l_min, x), max(r_max, x), s };
+//    };
+//    dfs(root);
+//    return ans;
+//}
+
+/////////////////////////////////////////1080. 根到叶路径上的不足节点（二叉树递归）//////////////////////////
+
+//https://leetcode.cn/problems/insufficient-nodes-in-root-to-leaf-paths/solutions/2278769/jian-ji-xie-fa-diao-yong-zi-shen-pythonj-64lf/
+//一、思考
+//对于一个叶子节点，要想删除它，需要满足什么条件？
+//对于一个非叶节点，如果它有一个儿子没被删除，那么它能被删除吗？如果它的儿子都被删除，意味着什么？
+//二、解惑
+//对于一个叶子节点 leaf，由于根到 leaf 的路径仅有一条，所以如果这条路径的元素和小于 limit，就删除 leaf。
+//对于一个非叶节点 node，如果 node 有一个儿子没被删除，那么 node 就不能被删除。这可以用反证法证明：假设可以把 node 删除，
+//那么经过 node 的所有路径和都小于 limit，也就意味着经过 node 的儿子的路径和也小于 limit（因为经过 node 的所有路径就是由经过node儿子节点的
+//路径组合而成的），说明 node 的儿子需要被删除，矛盾，所以 node 不能被删除。
+//如果 node 的儿子都被删除，说明经过 node 的所有儿子的路径和都小于 limit，这等价于经过 node 的所有路径和都小于 limit，所以 node 需要被删除。
+//因此，要删除非叶节点 node，当且仅当 node的所有儿子都被删除。
+//三、算法
+//一个直接的想法是，添加一个递归参数 sumPath，表示从根到当前节点的路径和。
+//但为了能直接调用 sufficientSubset，还可以从 limit 中减去当前节点值。
+//如果当前节点是叶子，且此时 limit > 0，说明从根到这个叶子的路径和小于 limit，那么删除这个叶子。
+//如果当前节点不是叶子，那么往下递归，更新它的左儿子为对左儿子调用 sufficientSubset 的结果，
+//更新它的右儿子为对右儿子调用 sufficientSubset 的结果。
+//如果左右儿子都为空，那么就删除当前节点，返回空；否则不删，返回当前节点。
+//int main()
+//{
+//    TreeNode* one = new TreeNode(-5);
+//    TreeNode* two = new TreeNode(4);
+//    TreeNode* thr = new TreeNode(2,one,nullptr);
+//    TreeNode* fou = new TreeNode(-3, two, nullptr);
+//    TreeNode* root = new TreeNode(1, thr, fou);
+//    int limit = -1;
+//    function<TreeNode* (TreeNode*, int)> sufficientSubset = [&](TreeNode* root, int limit)->TreeNode*
+//    {
+//        limit -= root->val;//节点保证不为空
+//        if (!root->left && !root->right)//叶子节点
+//            return limit > 0 ? nullptr : root;//大于0 说明这条路径上的总和小于limit，需要删除这个叶子节点，返回nullptr
+//        if (root->left)//不存在的时候不需要处理
+//            root->left = sufficientSubset(root->left, limit);
+//        if (root->right)
+//            root->right = sufficientSubset(root->right, limit);
+//        return (!root->left && !root->right) ? nullptr : root;//左右孩子都被删除的时候，此节点要被删除
+//    };
+//    sufficientSubset(root,limit);
+//}
+
+/////////////////////////////////////////LCP 33. 蓄水（贪心）//////////////////////////
+
+//给定 N 个无限容量且初始均空的水缸，每个水缸配有一个水桶用来打水，第 i 个水缸配备的水桶容量记作 bucket[i]。小扣有以下两种操作：
+//升级水桶：选择任意一个水桶，使其容量增加为 bucket[i] + 1
+//蓄水：将全部水桶接满水，倒入各自对应的水缸
+//每个水缸对应最低蓄水量记作 vat[i]，返回小扣至少需要多少次操作可以完成所有水缸蓄水要求。
+//注意：实际蓄水量 达到或超过 最低蓄水量，即完成蓄水要求。
+//https://leetcode.cn/problems/o8SXZn/solutions/713877/lcp-33-xu-shui-by-zerotrac2-fyj5/
+//int main()
+//{
+//    vector<int> bucket = { 1, 3 }, vat = { 6, 8 };
+//    int n = bucket.size();
+//    int maxk = *max_element(vat.begin(), vat.end());//尝试倒水最多的次数，这里只包含倒水的次数，不包含升级的次数
+//    //vat是最低蓄水量，如果以每次 1 的容量倒水，那么最多需要max_element次倒水次数才能满足所有水缸的最低蓄水量需求
+//    if (!maxk) 
+//    {//倒水次数最多为0，说明不需要倒水，也就不需要升级，直接返回0
+//        return 0;
+//    }
+//
+//    int ans = INT_MAX;//操作次数
+//    for (int k = 1; k <= maxk && k < ans; ++k)
+//    {//枚举倒水次数，就是所有水缸在倒水阶段中都只能倒 k 次水，为了达到最低蓄水量，就需要水桶升级到一定容量，才能在 k 次倒水后满足要求
+//        //k最少是 1 次，最多是maxk次，并且当k>=ans的时候，倒水次数已经大于等于已有的操作次数了，再加上升级次数，后续的操作次数不可能更小了
+//        //直接结束循环
+//        int cur = k;//操作次数=升级次数+倒水次数（k）
+//        for (int i = 0; i < n; ++i) 
+//        {//下面来算每个水桶各自的升级次数
+//            int least = vat[i] / k + (vat[i] % k != 0);//最低蓄水量为 vat[i]，只能倒 k 次水，那么水桶需要 ⌈ vat[i]/k ⌉（向上取整）
+//                                                        //就比如 最低蓄水量是 8 ，次数是 3，那么水桶容量至少为 3 才能满足条件
+//            cur += max(least - bucket[i], 0);//累加水桶的升级次数，如果水桶的容量初始值就大于最终要求，那么就不需要升级水桶，升级次数为0
+//        }
+//        ans = min(ans, cur);//操作次数的最小值
+//    }
+//    return ans;
+//}
