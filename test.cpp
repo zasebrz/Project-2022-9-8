@@ -28962,3 +28962,71 @@ public:
 //    }
 //    return ans;
 //}
+
+//输入：n = 5, edges = [[4, 1, -1], [2, 0, -1], [0, 3, -1], [4, 3, -1]],
+//输出： [[4, 1, 1], [2, 0, 1], [0, 3, 3], [4, 3, 1]]
+//解释：上图展示了一个满足题意的修改方案，从 0 到 1 的最短距离为 5 。
+//
+int main()
+{
+    int n = 5, source = 0, destination = 1, target = 5;
+    vector<vector<int>> edges = { {4,1,-1},{2,0,-1},{0,3,-1},{4,3,-1} };
+    vector<vector<pair<int, int>>> g(n);
+    for (int i = 0; i < edges.size(); i++) {
+        int x = edges[i][0], y = edges[i][1];//两个端点
+        g[x].emplace_back(y, i);
+        g[y].emplace_back(x, i); // 建图，额外记录边的编号
+    }
+    vector<vector<int>> dis(n, vector<int>(2,0x3f3f3f3f));//两次Dijkstra算法的距离数组
+    int delta;//用来控制是第一次Dijkstra还是第二次
+    vector<int> vis(n);
+    dis[source][0] = dis[source][1] = 0;//不管是第几次，原点的距离一定是0
+    auto dijkstra = [&](int k) { // 这里 k 表示第一次/第二次
+        vis.assign(n, 0);//第二次需要重新遍历，vis需要置0
+        for (;;) 
+        {
+            // 找到当前最短路，去更新它的邻居的最短路
+            // 根据数学归纳法，dis[x][k] 一定是从source到x的最短路长度
+            int x = -1;
+            for (int i = 0; i < n; ++i)
+                if (!vis[i] && (x < 0 || dis[i][k] < dis[x][k]))//找到当前的最短路径
+                    x = i;
+            if (x == destination) // 起点 source 到终点 destination 的最短路已确定
+                return;
+            vis[x] = true; // 标记，在后续的循环中无需反复更新 x 到其余点的最短路长度
+            //现在从source到 x的路径是最短的，再用这个最短路径去更新 x 邻居节点的距离
+            for (auto [y, eid] : g[x]) 
+            {
+                int wt = edges[eid][2];//原有的边权，第一次遍历的时候需要全部改成1，第二次就不需要
+                if (wt == -1)
+                    wt = 1; // -1 改成 1，注意原来的-1还是没有变的，因为下面我们要判断哪条边是可以改变的
+                if (k == 1 && edges[eid][2] == -1) 
+                {//只有第二次Dijkstra的时候才会执行改变边权的操作
+                    // 第二次 Dijkstra，改成 w
+                    //dis[x][1]是第二次Dijkstra算出来的到达x的最短路径，后续边权改变不会影响这一部分
+                    
+                    int w = delta + dis[y][0] - dis[x][1];
+                    if (w > wt)//可以改变从x到y这条边权，从 wt 改为 w
+                        edges[eid][2] = wt = w; // 直接在 edges 上修改
+                }
+                // 更新最短路
+                dis[y][k] = min(dis[y][k], dis[x][k] + wt);//注意这里的wt是改变后的
+            }
+        }
+    };
+
+    dijkstra(0);//第一次遍历
+    delta = target - dis[destination][0];//target是目标距离，当前最短距离是dis[destination][0]，要想变成target，就需要增加delta
+    
+    if (delta < 0) //如果delta小于0，说明即使把 -1 全改为 1 时，最短路比 target 还大，那么肯定找不到一条更短的路径了，返回空集合
+        return {};
+
+    dijkstra(1);
+    if (dis[destination][1] < target) // 最短路无法再变大，无法达到 target
+        return {};
+
+    for (auto& e : edges)
+        if (e[2] == -1) // 剩余没修改的边全部改成 1
+            e[2] = 1;
+    return edges;
+}
