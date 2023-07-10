@@ -12997,7 +12997,7 @@ T m_lcm(T a, T b)
 //    func(std::move(a));//实参为const右值，推导 T 为 const int&&，折叠后 a 为  const int&&
 //}
 
-//////////////////////////////////////////有序矩阵中的第 k 个最小数组和(二分）///////////////////////////////////////
+//////////////////////////////////////////1439.有序矩阵中的第 k 个最小数组和(二分）///////////////////////////////////////
 
 //https://leetcode-cn.com/problems/find-the-kth-smallest-sum-of-a-matrix-with-sorted-rows/solution/er-fen-by-newbie-19-3/
 //void dfs(vector<vector<int>>& mat, int mid, int index, int sum, int& num, int k, int m, int n) 
@@ -13005,20 +13005,27 @@ T m_lcm(T a, T b)
 //    // 注意·num是引用传递，每一层指针改变都会增大num的值
 //    if (index == m || num > k) 
 //        return;//我们不断挪动每一层的指针，从最底层开始挪动，并且计算小于等于mid的数组和数量，如果数量已经够了(num>k)，那么就不用再挪任何层的指针了，直接返回
-//    //我们想从最后一行开始往右查找，所以先到达最下一层，让它往右递增，此时上面的所有层都还在0的位置；然后挪动倒数第二层的指针，向右递增
-//    //比如 0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  2  2  2  2  2  2  2  2  2 按照这个顺序去计算sum的，注意第一列已经算过了（init一定小于mid，所以num从1开始）
+//    //我们想从最后一行开始往右查找，所以先到达最下一层，让它往右递增，此时上面的所有层都还在0的位置；然后返回上一层，挪动倒数第二层的指针，向右递增
+//    //比如 0  0  0  0  0  0  0  0  0  1  1  1  1  1  1  1  1  1  2  2  2  2  2  2  2  2  2 按照这个顺序去计算sum的，注意第0列已经算过了（init一定小于mid，所以num从1开始）
 //    //     0  0  0  1  1  1  2  2  2  0  0  0  1  1  1  2  2  2  0  0  0  1  1  1  2  2  2
 //    //     0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2  0  1  2
 //    dfs(mat, mid, index + 1, sum, num, k, m, n);
 //    for (int i = 1;i < n;i++) 
 //    {//这里i从1开始，如果从0开始的话，第一列的init就被重复计算了,导致的结果是：mid尽管小于sum(ans)，但是由于init的重复计算，小于等于mid的数组和个数仍然大于等于 k，向左缩小范围，导致错误
-//        if (sum + mat[index][i] - mat[index][0] <= mid) 
+//        if (sum + mat[index][i] - mat[index][0] <= mid) //这里每一行中移动指针都可以去判断一次，是因为sum的初始值已经包含了最后一行
+//                                                        //这里判断的意思就是说，上层的每次变动，都会引起下层的完全遍历（将下层的数组和全都
+//                                                        //初始化为第0列的和，然后递归遍历），只有这样才能包含所有的数组和，就比如上面的
+//                                                        //1
+//                                                        //0
+//                                                        //0
+//                                                        //这个指针组合，上层的指针指向1，下层的指针初始化为0，也就是“递”的过程中变动下层
+//                                                        //“归”的过程中变动上层
 //        {//这里算的是增量，起始是init
 //            num++;
 //            dfs(mat, mid, index + 1, sum + mat[index][i] - mat[index][0], num, k, m, n);
 //        }
 //        else 
-//        {//当前层的指针已经不能再往右移了，退出循环
+//        {//当前层的指针已经不能再往右移了，并且下层的指针也不能在右移了，因为这里判断的时候下层指针默认是0，是最小的，再右移sum就更大了，不可能比mid小了
 //            break;
 //        }
 //    }
@@ -13038,9 +13045,10 @@ T m_lcm(T a, T b)
 //        //mid是有可能不存在与数组中的，但是我们通过right=mid-1不断收缩空间，最后的答案一定在数组中，因为题目保证了答案一定存在，所以一定有一个sum是第k小的数组和
 //        //因此，sum一定满足：小于等于sum的数组和有 k-1 个，如果我们最后假设的 mid 不存在并且 mid> sum(ans)，那么二分循环一定没有结束，一定可以 right=mid -1再次缩小范围
 //        int mid = (left + right) >> 1;
-//        int num = 1;//表示mid是第num小的数组和，也就是说比mid小或等的数组和有 num-1 个，从1开始，因为init是最小的，一定小于mid
+//        int num = 1;//表示mid是第 num+1 小的数组和，也就是说比mid小或等的数组和有 num 个，从1开始，因为init是最小的，一定小于mid
 //        dfs(mat, mid, 0, init, num, k, m, n);
-//        if (num >= k) 
+//        if (num >= k) //比mid小或等的数组和有 num 个，如果这个num大于等于 k，说明比mid小或等的数组和个数大于等于 k，如果等于 k
+//                      //那么 mid 有可能是答案（因为还有可能 mid 不存在），所以还需要进一步进行确认，如果大于 k ，那么就需要缩小右边界查找
 //        {
 //            ans=mid;
 //            right = mid - 1;
@@ -14304,68 +14312,68 @@ T m_lcm(T a, T b)
 //}
 
 
-class Solution 
-{
-    static constexpr int MX = 4e5 + 1;//数组形式的线段树最大占用空间为 4n，所以开到4e5 + 1就行了
-
-    int cnt1[MX];//记录序列1区间内 1 的个数，由于序列1的元素只有 0 和 1，所以 1 的个数就是区间和
-    bool flip[MX];//数组形式的线段树无法像动态开点那样自带懒标记，需要借助一个额外的数组来帮助，flip[idx]记录cnt1[idx]这个区间是否需要整体更新
-
-    void pushdown(int idx, int left, int right)
-    {//下推懒标记，执行这一步说明[left,right]这个区间需要整体更新，也就是cnt1[idx]区间和需要更新
-        //序列1的更新就是把1变成0，把0变成1，所以新的区间和就等于区间长度减去旧的区间和
-        cnt1[idx] = right - left + 1 - cnt1[idx];//更新区间和
-        flip[idx] = !flip[idx];//当前区间的懒标记更新，不然的话下一次再次反转之后就出错了，
-    }
-
-    // 初始化线段树
-    void build(vector<int>& nums, int idx, int left, int right) 
-    {
-        if (left == right)//到达叶子节点
-        {
-            cnt1[idx] = nums[left - 1];//以idx=1来代表全部元素的区间和，left和right代表序号而不是下标，也就是[1:n]是所有元素
-            return;
-        }
-        int mid = (left + right) / 2;
-        build(nums, idx * 2, left, mid);//分成左右子树记录
-        build(nums, idx * 2 + 1, mid + 1, right);
-        cnt1[idx] = cnt1[idx * 2] + cnt1[idx * 2 + 1];//递归回来以后更新一下总的区间和，等于左右子树之和
-    }
-
-    // 反转区间 [L,R]
-    void update(int idx, int left, int right, int L, int R) {
-        if (L <= left && right <= R) 
-        {//当前区间完全包含在要反转的区间内，那么直接对整体的区间和做出修改就行了，不需要到叶子节点去
-            pushdown(idx, left, right);
-            return;
-        }
-        int mid = (left + right) / 2;
-        if (flip[idx]) {
-            pushdown(idx * 2, left, mid);
-            pushdown(idx * 2 + 1, mid + 1, right);
-            flip[idx] = false;
-        }
-        if (mid >= L) 
-            update(idx * 2, left, mid, L, R);
-        if (mid < R) 
-            update(idx * 2 + 1, mid + 1, right, L, R);
-        cnt1[idx] = cnt1[idx * 2] + cnt1[idx * 2 + 1];
-    }
-
-public:
-    vector<long long> handleQuery(vector<int>& nums1, vector<int>& nums2, vector<vector<int>>& queries) {
-        int n = nums1.size();
-        build(nums1, 1, 1, n);
-        vector<long long> ans;
-        long long sum = accumulate(nums2.begin(), nums2.end(), 0LL);
-        for (auto& q : queries) {
-            if (q[0] == 1) update(1, 1, n, q[1] + 1, q[2] + 1);
-            else if (q[0] == 2) sum += 1LL * q[1] * cnt1[1];
-            else ans.push_back(sum);
-        }
-        return ans;
-    }
-};
+//class Solution 
+//{
+//    static constexpr int MX = 4e5 + 1;//数组形式的线段树最大占用空间为 4n，所以开到4e5 + 1就行了
+//
+//    int cnt1[MX];//记录序列1区间内 1 的个数，由于序列1的元素只有 0 和 1，所以 1 的个数就是区间和
+//    bool flip[MX];//数组形式的线段树无法像动态开点那样自带懒标记，需要借助一个额外的数组来帮助，flip[idx]记录cnt1[idx]这个区间是否需要整体更新
+//
+//    void pushdown(int idx, int left, int right)
+//    {//下推懒标记，执行这一步说明[left,right]这个区间需要整体更新，也就是cnt1[idx]区间和需要更新
+//        //序列1的更新就是把1变成0，把0变成1，所以新的区间和就等于区间长度减去旧的区间和
+//        cnt1[idx] = right - left + 1 - cnt1[idx];//更新区间和
+//        flip[idx] = !flip[idx];//当前区间的懒标记更新，不然的话下一次再次反转之后就出错了，
+//    }
+//
+//    // 初始化线段树
+//    void build(vector<int>& nums, int idx, int left, int right) 
+//    {
+//        if (left == right)//到达叶子节点
+//        {
+//            cnt1[idx] = nums[left - 1];//以idx=1来代表全部元素的区间和，left和right代表序号而不是下标，也就是[1:n]是所有元素
+//            return;
+//        }
+//        int mid = (left + right) / 2;
+//        build(nums, idx * 2, left, mid);//分成左右子树记录
+//        build(nums, idx * 2 + 1, mid + 1, right);
+//        cnt1[idx] = cnt1[idx * 2] + cnt1[idx * 2 + 1];//递归回来以后更新一下总的区间和，等于左右子树之和
+//    }
+//
+//    // 反转区间 [L,R]
+//    void update(int idx, int left, int right, int L, int R) {
+//        if (L <= left && right <= R) 
+//        {//当前区间完全包含在要反转的区间内，那么直接对整体的区间和做出修改就行了，不需要到叶子节点去
+//            pushdown(idx, left, right);
+//            return;
+//        }
+//        int mid = (left + right) / 2;
+//        if (flip[idx]) {
+//            pushdown(idx * 2, left, mid);
+//            pushdown(idx * 2 + 1, mid + 1, right);
+//            flip[idx] = false;
+//        }
+//        if (mid >= L) 
+//            update(idx * 2, left, mid, L, R);
+//        if (mid < R) 
+//            update(idx * 2 + 1, mid + 1, right, L, R);
+//        cnt1[idx] = cnt1[idx * 2] + cnt1[idx * 2 + 1];
+//    }
+//
+//public:
+//    vector<long long> handleQuery(vector<int>& nums1, vector<int>& nums2, vector<vector<int>>& queries) {
+//        int n = nums1.size();
+//        build(nums1, 1, 1, n);
+//        vector<long long> ans;
+//        long long sum = accumulate(nums2.begin(), nums2.end(), 0LL);
+//        for (auto& q : queries) {
+//            if (q[0] == 1) update(1, 1, n, q[1] + 1, q[2] + 1);
+//            else if (q[0] == 2) sum += 1LL * q[1] * cnt1[1];
+//            else ans.push_back(sum);
+//        }
+//        return ans;
+//    }
+//};
 
 ////////////////////////////////////////////区间更新、单点查询（·差分数组+前缀和（最合适），树状数组）///////////////////////////////////////
 
@@ -28967,66 +28975,103 @@ public:
 //输出： [[4, 1, 1], [2, 0, 1], [0, 3, 3], [4, 3, 1]]
 //解释：上图展示了一个满足题意的修改方案，从 0 到 1 的最短距离为 5 。
 //
+//int main()
+//{
+//    int n = 5, source = 0, destination = 1, target = 5;
+//    vector<vector<int>> edges = { {4,1,-1},{2,0,-1},{0,3,-1},{4,3,-1} };
+//    vector<vector<pair<int, int>>> g(n);
+//    for (int i = 0; i < edges.size(); i++) {
+//        int x = edges[i][0], y = edges[i][1];//两个端点
+//        g[x].emplace_back(y, i);
+//        g[y].emplace_back(x, i); // 建图，额外记录边的编号
+//    }
+//    vector<vector<int>> dis(n, vector<int>(2,0x3f3f3f3f));//两次Dijkstra算法的距离数组
+//    int delta;//用来控制是第一次Dijkstra还是第二次
+//    vector<int> vis(n);
+//    dis[source][0] = dis[source][1] = 0;//不管是第几次，原点的距离一定是0
+//    auto dijkstra = [&](int k) { // 这里 k 表示第一次/第二次
+//        vis.assign(n, 0);//第二次需要重新遍历，vis需要置0
+//        for (;;) 
+//        {
+//            // 找到当前最短路，去更新它的邻居的最短路
+//            // 根据数学归纳法，dis[x][k] 一定是从source到x的最短路长度
+//            int x = -1;
+//            for (int i = 0; i < n; ++i)
+//                if (!vis[i] && (x < 0 || dis[i][k] < dis[x][k]))//找到当前的最短路径
+//                    x = i;
+//            if (x == destination) // 起点 source 到终点 destination 的最短路已确定
+//                return;
+//            vis[x] = true; // 标记，在后续的循环中无需反复更新 x 到其余点的最短路长度
+//            //现在从source到 x的路径是最短的，再用这个最短路径去更新 x 邻居节点的距离
+//            for (auto [y, eid] : g[x]) 
+//            {
+//                int wt = edges[eid][2];//原有的边权，第一次遍历的时候需要全部改成1，第二次就不需要
+//                if (wt == -1)
+//                    wt = 1; // -1 改成 1，注意原来的-1还是没有变的，因为下面我们要判断哪条边是可以改变的
+//                if (k == 1 && edges[eid][2] == -1) 
+//                {//只有第二次Dijkstra的时候才会执行改变边权的操作
+//                    // 第二次 Dijkstra，改成 w
+//                    //dis[x][1]是第二次Dijkstra算出来的到达x的最短路径，后续边权改变不会影响这一部分
+//                    //算出来的这个w就是当 x-y这条边权改为 w 时，原本的最短路到达终点的距离就是 target，但是此时由于我们更改了最短路的权值
+//                    //可能导致其他路径变成了最短路，那么最终的最短路的长度可能就不是target了，所以要继续Dijkstra找下一个能改的边权
+//                    int w = delta + dis[y][0] - dis[x][1];
+//                    if (w > wt)//可以改变从x到y这条边权，从 wt 改为 w
+//                        edges[eid][2] = wt = w; // 直接在 edges 上修改，即使改变这条边权后，到达y的最短路径不再是包含 x-y的这条路径也没有关系
+//                                                // 因为在最后面我们会更新最短路，最终找到的仍然是到达 y 的最短路，只是说我们刚才改的这条路径
+//                                                // 其实是没有用的（也可以说是因为我们改变了原本到达y最短路的边权，导致其不再是最短路，反而
+//                                                //另外的路径变成了最短路），但是没有关系，这次没有成功的话我们可以继续Dijkstra，继续改变边权
+//                                                //直到最后找到终点
+//                }
+//                // 更新最短路
+//                dis[y][k] = min(dis[y][k], dis[x][k] + wt);//注意这里的wt是改变后的，继续Dijkstra最短路
+//            }
+//        }
+//    };
+//
+//    dijkstra(0);//第一次遍历
+//    delta = target - dis[destination][0];//target是目标距离，当前最短距离是dis[destination][0]，要想变成target，就需要增加delta
+//    
+//    if (delta < 0) //如果delta小于0，说明即使把 -1 全改为 1 时，最短路比 target 还大，那么肯定找不到一条更短的路径了，返回空集合
+//        return {};
+//
+//    dijkstra(1);
+//    if (dis[destination][1] < target) // 最短路无法再变大，无法达到 target
+//        return {};
+//
+//    for (auto& e : edges)
+//        if (e[2] == -1) // 剩余没修改的边全部改成 1，改成其他的也可以，他们不影响
+//            e[2] = 1;
+//    //return edges;
+//}
+
 int main()
 {
-    int n = 5, source = 0, destination = 1, target = 5;
-    vector<vector<int>> edges = { {4,1,-1},{2,0,-1},{0,3,-1},{4,3,-1} };
-    vector<vector<pair<int, int>>> g(n);
-    for (int i = 0; i < edges.size(); i++) {
-        int x = edges[i][0], y = edges[i][1];//两个端点
-        g[x].emplace_back(y, i);
-        g[y].emplace_back(x, i); // 建图，额外记录边的编号
-    }
-    vector<vector<int>> dis(n, vector<int>(2,0x3f3f3f3f));//两次Dijkstra算法的距离数组
-    int delta;//用来控制是第一次Dijkstra还是第二次
-    vector<int> vis(n);
-    dis[source][0] = dis[source][1] = 0;//不管是第几次，原点的距离一定是0
-    auto dijkstra = [&](int k) { // 这里 k 表示第一次/第二次
-        vis.assign(n, 0);//第二次需要重新遍历，vis需要置0
-        for (;;) 
+    vector<string> d{ "leet","code","leetcode" };
+    string s = "leetscode";
+    int n = s.size();
+    unordered_set<string> uset;
+    vector<int> dp(n, -1);
+    for (auto s1 : d)
+        uset.insert(s1);
+    function<int(int)> dfs = [&](int idx)->int
+    {
+        if (idx < 0)
+            return 0;
+        if (dp[idx] != -1)
+            return dp[idx];
+        int ans = 0;
+        for (int i = idx; i >= 0; i--)
         {
-            // 找到当前最短路，去更新它的邻居的最短路
-            // 根据数学归纳法，dis[x][k] 一定是从source到x的最短路长度
-            int x = -1;
-            for (int i = 0; i < n; ++i)
-                if (!vis[i] && (x < 0 || dis[i][k] < dis[x][k]))//找到当前的最短路径
-                    x = i;
-            if (x == destination) // 起点 source 到终点 destination 的最短路已确定
-                return;
-            vis[x] = true; // 标记，在后续的循环中无需反复更新 x 到其余点的最短路长度
-            //现在从source到 x的路径是最短的，再用这个最短路径去更新 x 邻居节点的距离
-            for (auto [y, eid] : g[x]) 
+            string str = s.substr(i, idx - i + 1);
+            int nx = dfs(i - 1);
+            if (uset.count(str))
             {
-                int wt = edges[eid][2];//原有的边权，第一次遍历的时候需要全部改成1，第二次就不需要
-                if (wt == -1)
-                    wt = 1; // -1 改成 1，注意原来的-1还是没有变的，因为下面我们要判断哪条边是可以改变的
-                if (k == 1 && edges[eid][2] == -1) 
-                {//只有第二次Dijkstra的时候才会执行改变边权的操作
-                    // 第二次 Dijkstra，改成 w
-                    //dis[x][1]是第二次Dijkstra算出来的到达x的最短路径，后续边权改变不会影响这一部分
-                    
-                    int w = delta + dis[y][0] - dis[x][1];
-                    if (w > wt)//可以改变从x到y这条边权，从 wt 改为 w
-                        edges[eid][2] = wt = w; // 直接在 edges 上修改
-                }
-                // 更新最短路
-                dis[y][k] = min(dis[y][k], dis[x][k] + wt);//注意这里的wt是改变后的
+                ans = min(nx, ans);
             }
+            else
+                ans = min(nx + idx - i + 1, ans);
         }
+        return dp[idx] = ans;
     };
-
-    dijkstra(0);//第一次遍历
-    delta = target - dis[destination][0];//target是目标距离，当前最短距离是dis[destination][0]，要想变成target，就需要增加delta
-    
-    if (delta < 0) //如果delta小于0，说明即使把 -1 全改为 1 时，最短路比 target 还大，那么肯定找不到一条更短的路径了，返回空集合
-        return {};
-
-    dijkstra(1);
-    if (dis[destination][1] < target) // 最短路无法再变大，无法达到 target
-        return {};
-
-    for (auto& e : edges)
-        if (e[2] == -1) // 剩余没修改的边全部改成 1
-            e[2] = 1;
-    return edges;
+    return dfs(n - 1);
 }
