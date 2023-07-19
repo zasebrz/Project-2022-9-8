@@ -28971,6 +28971,8 @@ T m_lcm(T a, T b)
 //    return ans;
 //}
 
+//2699. 修改图中的边权
+
 //输入：n = 5, edges = [[4, 1, -1], [2, 0, -1], [0, 3, -1], [4, 3, -1]],
 //输出： [[4, 1, 1], [2, 0, 1], [0, 3, 3], [4, 3, 1]]
 //解释：上图展示了一个满足题意的修改方案，从 0 到 1 的最短距离为 5 。
@@ -29044,34 +29046,52 @@ T m_lcm(T a, T b)
 //    //return edges;
 //}
 
-int main()
-{
-    vector<string> d{ "leet","code","leetcode" };
-    string s = "leetscode";
-    int n = s.size();
-    unordered_set<string> uset;
-    vector<int> dp(n, -1);
-    for (auto s1 : d)
-        uset.insert(s1);
-    function<int(int)> dfs = [&](int idx)->int
-    {
-        if (idx < 0)
-            return 0;
-        if (dp[idx] != -1)
-            return dp[idx];
-        int ans = 0;
-        for (int i = idx; i >= 0; i--)
-        {
-            string str = s.substr(i, idx - i + 1);
-            int nx = dfs(i - 1);
-            if (uset.count(str))
-            {
-                ans = min(nx, ans);
-            }
-            else
-                ans = min(nx + idx - i + 1, ans);
-        }
-        return dp[idx] = ans;
-    };
-    return dfs(n - 1);
-}
+//int main()
+//{
+//    vector<string> d{ "leet","code","leetcode" };
+//    string s = "leetscode";
+//    int n = s.size();
+//    unordered_set<string> uset;
+//    vector<int> dp(n, -1);
+//    for (auto s1 : d)
+//        uset.insert(s1);
+//    function<int(int)> dfs = [&](int idx)->int
+//    {
+//        if (idx < 0)
+//            return 0;
+//        if (dp[idx] != -1)
+//            return dp[idx];
+//        int ans = 0;
+//        for (int i = idx; i >= 0; i--)
+//        {
+//            string str = s.substr(i, idx - i + 1);
+//            int nx = dfs(i - 1);
+//            if (uset.count(str))
+//            {
+//                ans = min(nx, ans);
+//            }
+//            else
+//                ans = min(nx + idx - i + 1, ans);
+//        }
+//        return dp[idx] = ans;
+//    };
+//    return dfs(n - 1);
+//}
+
+//2178. 拆分成最多数目的正偶数之和
+
+//int main()
+//{
+//    long long finalSum = 28;
+//    vector<long long> res;
+//    if (finalSum % 2 > 0) {
+//        return 0;
+//    }
+//    for (int i = 2; i <= finalSum; i += 2) {
+//        res.push_back(i);
+//        finalSum -= i;
+//    }
+//    res.back() += finalSum;
+//    for (auto i : res)
+//        cout << i << ' ';
+//}
